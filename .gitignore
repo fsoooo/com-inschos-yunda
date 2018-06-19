@@ -1,0 +1,8 @@
+.DS_Store
+.idea/
+*.iml
+target/
+src/main/test/*
+resources/environment/development/config.properties
+
+
