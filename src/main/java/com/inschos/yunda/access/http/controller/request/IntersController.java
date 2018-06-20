@@ -1,12 +1,13 @@
 package com.inschos.yunda.access.http.controller.request;
 
 import com.inschos.yunda.access.http.controller.action.IntersAction;
-import com.inschos.yunda.access.http.controller.bean.ActionBean;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * User: wangsl
@@ -45,14 +46,13 @@ public class IntersController {
      */
     @RequestMapping("/joint_login/**")
     @ResponseBody
-    public String JointLogin(ActionBean actionBean) {
-        return intersAction.jointLogin(actionBean);
+    public String JointLogin(HttpServletRequest request) {
+        return intersAction.jointLogin(request);
     }
 
     /**
      * 授权查询
      *
-     * @param actionBean
      * @return json
      * @params channel_code|渠道代号
      * @params insured_name|姓名
@@ -61,18 +61,21 @@ public class IntersController {
      */
     @RequestMapping("/authorization_query/**")
     @ResponseBody
-    public String AuthorizationQuery(ActionBean actionBean) {
-        return intersAction.authorizationQuery(actionBean);
+    public String AuthorizationQuery(HttpServletRequest request) {
+        return intersAction.authorizationQuery(request);
     }
 
     /**
      * 预投保
-     * @param actionBean
+     * @params account_id
+     * @params biz_content
+     * @params sign
+     * @params timestamp
      * @return
      */
-    @RequestMapping("/authorization_query/**")
+    @RequestMapping("/get_prepare/**")
     @ResponseBody
-    public String PrepareInusre(ActionBean actionBean){
-        return intersAction.prepareInusre(actionBean);
+    public String PrepareInusre(HttpServletRequest request){
+        return intersAction.prepareInusre(request);
     }
 }

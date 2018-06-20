@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 命名空间，对sql进行分类化管理（sql隔离） -->
+<mapper namespace="com.inschos.yunda.data.mapper.JointLoginMapper">
+
+    <insert id="addLoginRecord" parameterType="JointLogin"  useGeneratedKeys="true" keyProperty="id">
+        insert into joint_login(`phone`,`login_start`) values(#{phone},#{login_start})
+    </insert>
+
+</mapper>
