@@ -36,6 +36,7 @@ public class InsuredHttpRequest<Request extends InsuredHttpRequest, Response ext
         try {
             L.log.debug("=============================================================================================================================");
             L.log.debug(JsonKit.bean2Json(request));
+            //TODO http 请求
             String result = HttpClientKit.post(url, JsonKit.bean2Json(request));
             L.log.debug("=============================================================================================================================");
             L.log.debug(result);
