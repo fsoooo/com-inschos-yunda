@@ -3,7 +3,9 @@ package com.inschos.yunda.access.http.controller.action;
 import com.inschos.yunda.access.http.controller.bean.*;
 import com.inschos.yunda.assist.kit.*;
 import com.inschos.yunda.data.dao.*;
+import com.inschos.yunda.extend.*;
 import com.inschos.yunda.extend.insured.InsuredHttpRequest;
+import com.inschos.yunda.extend.insured.InsuredResponse;
 import com.inschos.yunda.model.*;
 import org.apache.log4j.Logger;
 
@@ -21,9 +23,7 @@ public class IntersAction extends BaseAction {
     @Autowired
     private JointLoginDao jointLoginDao;
 
-    private InsuredHttpRequest insuredHttpRequest;
-
-    private String login_url = " http://122.14.202.146:9200/account";//账号服务接口地址
+    private String login_url = "http://122.14.202.146:9200/account";//账号服务接口地址
 
     private String prepare_url = "http://122.14.202.146:9200/trading/insure";//预投保接口地址
 
@@ -53,8 +53,12 @@ public class IntersAction extends BaseAction {
             return json(BaseResponse.CODE_FAILURE, "姓名,证件号,手机号不能为空", response);
         }
         //TODO 触发联合登录,同步操作 http 请求
-        //String result = HttpClientKit.post(login_url,JsonKit.bean2Json(request));
-
+        InsuredResponse insuredResponse = new InsuredHttpRequest<>(insure_url,request, response).post();
+        if(insuredResponse==null){
+            return json(BaseResponse.CODE_FAILURE, "接口请求失败", response);
+        }else{
+            return json(BaseResponse.CODE_SUCCESS, "接口请求成功", response);
+        }
         long date = new Date().getTime();
         JointLogin jointLogin = new JointLogin();
         jointLogin.login_start = date;
