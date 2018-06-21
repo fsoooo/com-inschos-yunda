@@ -3,11 +3,12 @@ package com.inschos.yunda.access.http.controller.action;
 import com.inschos.yunda.access.http.controller.bean.*;
 import com.inschos.yunda.assist.kit.*;
 import com.inschos.yunda.data.dao.*;
+import com.inschos.yunda.extend.insured.InsuredHttpRequest;
 import com.inschos.yunda.model.*;
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Component;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import com.inschos.yunda.assist.kit.JsonKit;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -20,11 +21,17 @@ public class IntersAction extends BaseAction {
     @Autowired
     private JointLoginDao jointLoginDao;
 
-    private String login_url = "";//账号服务接口地址
+    private InsuredHttpRequest insuredHttpRequest;
 
-    private String prepare_url = "";//预投保接口地址
+    private String login_url = " http://122.14.202.146:9200/account";//账号服务接口地址
 
-    private String insure_url = "";//投保接口地址
+    private String prepare_url = "http://122.14.202.146:9200/trading/insure";//预投保接口地址
+
+    private String insure_url = "http://122.14.202.146:9200/trading/insure";//投保接口地址
+
+    private String p_code_yd = "90";//英大产品id
+
+    private String p_code_tk = "91";//泰康产品id
 
     /**
      * 联合登录
@@ -45,7 +52,8 @@ public class IntersAction extends BaseAction {
         if (request.insured_name.isEmpty() || request.insured_code.isEmpty() || request.insured_phone == 0) {
             return json(BaseResponse.CODE_FAILURE, "姓名,证件号,手机号不能为空", response);
         }
-        //TODO 触发联合登录
+        //TODO 触发联合登录,同步操作 http 请求
+        //String result = HttpClientKit.post(login_url,JsonKit.bean2Json(request));
 
         long date = new Date().getTime();
         JointLogin jointLogin = new JointLogin();
