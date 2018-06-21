@@ -1,9 +1,8 @@
-package com.inschos.yunda.extend.insured;
+package com.inschos.yunda.model;
 
 import java.util.List;
 
-public class InsuredResponse {
-
+public class IntersResponse {
 
     public String code;
     public List<Message> message;
@@ -19,6 +18,5 @@ public class InsuredResponse {
         public String statusTxt;//保单状态文案
         public String warrantyUuid;//保单UUID
     }
-
 
 }

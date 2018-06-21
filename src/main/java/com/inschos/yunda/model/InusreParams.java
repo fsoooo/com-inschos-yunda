@@ -1,7 +1,5 @@
 package com.inschos.yunda.model;
 
-import org.omg.CORBA.PolicyHolder;
-
 import java.util.List;
 
 public class InusreParams {

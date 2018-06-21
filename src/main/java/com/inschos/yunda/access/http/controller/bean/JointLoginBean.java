@@ -8,7 +8,7 @@ public class JointLoginBean {
 
     public String insured_code;
 
-    public long insured_phone;
+    public String insured_phone;
 
     public String insured_email;
 
@@ -24,7 +24,7 @@ public class JointLoginBean {
 
     public String bank_code;
 
-    public long bank_phone;
+    public String bank_phone;
 
     public String bank_address;
 

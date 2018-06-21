@@ -2,7 +2,7 @@ package com.inschos.yunda.model;
 
 public class JointLogin {
 
-    public long phone;
+    public String phone;
 
     public long login_start;
 }
