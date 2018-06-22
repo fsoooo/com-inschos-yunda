@@ -22,4 +22,16 @@ public class InsureClaimController {
 
     private static final Logger logger = Logger.getLogger(InsureClaimController.class);
 
+
+    //我的理赔
+    //13.获取理赔列表
+    //14.获取理赔详情
+    //15.获取理赔状态
+    //我要理赔
+    //16.理赔提交（多步操作）
+    //理赔审核
+    //17.获取理赔详情
+    //18.理赔审核
+
+
 }

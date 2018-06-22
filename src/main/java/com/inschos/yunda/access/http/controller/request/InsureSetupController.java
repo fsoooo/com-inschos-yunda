@@ -55,5 +55,35 @@ public class InsureSetupController {
         return insureSetupAction.updateInsureAutoStatus(actionBean);
     }
 
+    /**
+     * 获取签约信息(url)
+     *
+     * @return json
+     * @params actionBean
+     * @access public
+     */
+    @GetActionBeanAnnotation
+    @RequestMapping("/findWhetContractUrl/**")
+    @ResponseBody
+    public String findWhetContractUrl(ActionBean actionBean) {
+        return insureSetupAction.findWhetContractUrl(actionBean);
+    }
+
+    /**
+     * 获取微信免密授权书详情
+     *
+     * @return json
+     * @params actionBean
+     * @access public
+     */
+    @GetActionBeanAnnotation
+    @RequestMapping("/findWhetContractInfo/**")
+    @ResponseBody
+    public String findWhetContractInfo(ActionBean actionBean) {
+        return insureSetupAction.findWhetContractInfo(actionBean);
+    }
+
+
+
 
 }

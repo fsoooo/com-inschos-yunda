@@ -14,7 +14,6 @@ public class BankAction extends BaseAction {
 
     private static final Logger logger = Logger.getLogger(BankAction.class);
 
-
     /**
      * 添加银行卡
      *
