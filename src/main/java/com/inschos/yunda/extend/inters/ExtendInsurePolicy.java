@@ -18,8 +18,8 @@ public class ExtendInsurePolicy {
         public String businessNo;//业务识别号
         public String payCategoryId;//缴别ID
         public PolicyHolder policyholder;//投保人 必填
-        public List<Recognizee> recognizees;//被保人 必填
-        public Beneficiary beneficiary;//投保人
+        public List<PolicyHolder> recognizees;//被保人 必填
+        public PolicyHolder beneficiary;//受益人
     }
 
     public static class GetInsuredesponse extends InsureResponse {
@@ -111,6 +111,23 @@ public class ExtendInsurePolicy {
         public String weight;//体重
         public String area;//地区
         public String address;//详细地址
+    }
+
+    public static class GetAccountLogin extends InsureRequest{
+        public String channel_code;
+        public String insured_name;
+        public String insured_code;
+        public String insured_phone;
+        public String insured_email;
+        public String insured_province;
+        public String insured_city;
+        public String insured_county;
+        public String insured_address;
+        public String bank_name;
+        public String bank_code;
+        public String bank_phone;
+        public String bank_address;
+        public String channel_order_code;
     }
 
 }

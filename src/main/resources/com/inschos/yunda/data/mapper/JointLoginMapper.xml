@@ -7,4 +7,13 @@
         insert into joint_login(`phone`,`login_start`) values(#{phone},#{login_start})
     </insert>
 
+    <select id="findLoginRecord" parameterType="JointLogin" resultType="long">
+        select
+        count(1)
+        from joint_login
+        <where>
+          phone =#{phone} AND login_start >=#{day_start} AND login_start &lt;#{phone}
+        </where>
+    </select>
+
 </mapper>

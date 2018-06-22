@@ -10,7 +10,11 @@ public class JointLoginDao {
     @Autowired
     private JointLoginMapper jointLoginMapper;
 
-    public int addLoginRecord(JointLogin jointLogin){
+    public long addLoginRecord(JointLogin jointLogin){
         return jointLoginMapper.addLoginRecord(jointLogin);
+    }
+
+    public long findLoginRecord(JointLogin jointLogin){
+        return jointLoginMapper.findLoginRecord(jointLogin);
     }
 }
