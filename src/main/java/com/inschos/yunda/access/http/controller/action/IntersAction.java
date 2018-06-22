@@ -4,21 +4,20 @@ import com.inschos.yunda.access.http.controller.bean.*;
 import com.inschos.yunda.assist.kit.*;
 import com.inschos.yunda.data.dao.*;
 import com.inschos.yunda.model.*;
-import com.inschos.yunda.extend.inters.ExtendInsurePolicy;
-import com.inschos.yunda.extend.inters.InsureHttpRequest;
+import com.inschos.yunda.extend.inters.IntersCommonParams;
+import com.inschos.yunda.extend.inters.IntersHttpRequest;
 import org.apache.log4j.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import static com.inschos.yunda.extend.inters.InsureCommon.*;
+import static com.inschos.yunda.extend.inters.IntersCommonUrls.*;
 
 @Component
 public class IntersAction extends BaseAction {
@@ -27,10 +26,6 @@ public class IntersAction extends BaseAction {
 
     @Autowired
     private JointLoginDao jointLoginDao;
-
-    private String p_code_yd = "90";//英大产品id
-
-    private String p_code_tk = "91";//泰康产品id
 
     /**
      * 联合登录
@@ -48,7 +43,7 @@ public class IntersAction extends BaseAction {
         if (request == null) {
             return json(BaseResponse.CODE_FAILURE, "请检查报文格式是否正确", response);
         }
-        if (request.insured_name== null || request.insured_code== null || request.insured_phone== null) {
+        if (request.insured_name == null || request.insured_code == null || request.insured_phone == null) {
             return json(BaseResponse.CODE_FAILURE, "姓名,证件号,手机号不能为空", response);
         }
         //TODO 联合登录表插入数据,先判断今天有没有插入,再插入登录记录.每天只有一个记录
@@ -59,32 +54,32 @@ public class IntersAction extends BaseAction {
         jointLogin.login_start = date;
         jointLogin.phone = request.insured_phone;
         jointLogin.day_start = date_start;
-        jointLogin.day_end = date_start+24*60*60*1000;
+        jointLogin.day_end = date_start + 24 * 60 * 60 * 1000;
         long repeatRes = jointLoginDao.findLoginRecord(jointLogin);
-        if(repeatRes==0){
+        if (repeatRes == 0) {
             long login_id = jointLoginDao.addLoginRecord(jointLogin);
         }
         //TODO 触发联合登录,同步操作 http 请求 账号服务
         String loginRes = doAccount(request);
-        if(loginRes==null){
+        if (loginRes == null) {
             return json(BaseResponse.CODE_FAILURE, "账号服务调用失败", response);
         }
         IntersResponse loginResponse = JsonKit.json2Bean(loginRes, IntersResponse.class);
-        if(loginResponse==null){
+        if (loginResponse == null) {
             return json(BaseResponse.CODE_FAILURE, "账号服务调用失败", response);
         }
-        if(loginResponse.code!="200"){
+        if (loginResponse.code != "200") {
             return json(BaseResponse.CODE_FAILURE, "账号服务调用失败", response);
         }
         String insureRes = doInsured(request);
-        if(insureRes==null){
+        if (insureRes == null) {
             return json(BaseResponse.CODE_FAILURE, "投保接口调用失败", response);
         }
         IntersResponse insureResponse = JsonKit.json2Bean(insureRes, IntersResponse.class);
-        if(insureResponse==null){
+        if (insureResponse == null) {
             return json(BaseResponse.CODE_FAILURE, "投保接口调用失败", response);
         }
-        if(insureResponse.code!="200"){
+        if (insureResponse.code != "200") {
             return json(BaseResponse.CODE_FAILURE, "投保接口调用失败", response);
         }
         return json(BaseResponse.CODE_SUCCESS, "操作成功", response);
@@ -101,66 +96,162 @@ public class IntersAction extends BaseAction {
     public String authorizationQuery(HttpServletRequest httpServletRequest) {
         JointLoginBean request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), JointLoginBean.class);
         BaseResponse response = new BaseResponse();
+        AuthorizeQueryResponseBean authorizeQueryResponse = new AuthorizeQueryResponseBean();
         //判空
         if (request == null) {
             return json(BaseResponse.CODE_FAILURE, "请检查报文格式是否正确", response);
         }
-        if (request.insured_name== null || request.insured_code== null || request.insured_phone== null) {
+        if (request.insured_name == null || request.insured_code == null || request.insured_phone == null) {
             return json(BaseResponse.CODE_FAILURE, "姓名,证件号,手机号不能为空", response);
         }
         //TODO 触发联合登录,同步操作 http 请求 账号服务
         String loginRes = doAccount(request);
-        if(loginRes==null){
+        if (loginRes == null) {
             return json(BaseResponse.CODE_FAILURE, "账号服务调用失败", response);
         }
         IntersResponse loginResponse = JsonKit.json2Bean(loginRes, IntersResponse.class);
-        if(loginResponse==null){
+        if (loginResponse == null) {
             return json(BaseResponse.CODE_FAILURE, "账号服务调用失败", response);
         }
-        if(loginResponse.code!="200"){
+        if (loginResponse.code != "200") {
             return json(BaseResponse.CODE_FAILURE, "账号服务调用失败", response);
         }
-        return json(BaseResponse.CODE_FAILURE, "操作失败", response);
+        //TODO 查询授权详情
+        String authorizeRes = doAuthorizeRes(request);
+        if (authorizeRes == null) {
+            return json(BaseResponse.CODE_FAILURE, "授权查询接口调用失败", response);
+        }
+        IntersResponse authorizeResponse = JsonKit.json2Bean(authorizeRes, IntersResponse.class);
+        if (authorizeResponse == null) {
+            return json(BaseResponse.CODE_FAILURE, "授权查询接口调用失败", response);
+        }
+        if (authorizeResponse.code != "200") {
+            return json(BaseResponse.CODE_FAILURE, "授权查询接口调用失败", response);
+        }
+
+        authorizeQueryResponse.status = authorizeResponse.data.status;
+        authorizeQueryResponse.url = authorizeResponse.data.warrantyUuid;
+        response.data = authorizeQueryResponse;
+        return json(BaseResponse.CODE_FAILURE, authorizeResponse.data.statusTxt, response);
+    }
+
+    /**
+     * 预投保
+     * @params account_id
+     * @params biz_content
+     * @params sign
+     * @params timestamp
+     * @return
+     */
+    public String prepareInusre(HttpServletRequest httpServletRequest){
+        JointLoginBean request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), JointLoginBean.class);
+        BaseResponse response = new BaseResponse();
+        //判空
+        if (request == null) {
+            return json(BaseResponse.CODE_FAILURE, "请检查报文格式是否正确", response);
+        }
+        return json(BaseResponse.CODE_FAILURE, "请检查报文格式是否正确", response);
+    }
+
+
+    /**
+     * 保险推送接口,做异步处理
+     *
+     * @param httpServletRequest
+     * @return
+     */
+    public String CallBackYunda(HttpServletRequest httpServletRequest) {
+        CallbackYunda.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), CallbackYunda.Requset.class);
+        BaseResponse response = new BaseResponse();
+        if(request==null){
+            return json(BaseResponse.CODE_FAILURE, "参数解析错误", response);
+        }
+        if(request.ordersId==null||request.payTime==null||request.effectiveTime==null||request.type==null||request.status==null||request.ordersName==null||request.companyName==null){
+            return json(BaseResponse.CODE_FAILURE, "参数解析错", response);
+        }
+        IntersCommonParams.CallbackYundaRequest callbackYundaRequest = new IntersCommonParams.CallbackYundaRequest();
+        callbackYundaRequest.ordersId = request.ordersId;
+        callbackYundaRequest.payTime = request.payTime;
+        callbackYundaRequest.effectiveTime = request.effectiveTime;
+        callbackYundaRequest.type = request.type;
+        callbackYundaRequest.status = request.status;
+        callbackYundaRequest.ordersName = request.ordersName;
+        callbackYundaRequest.companyName = request.companyName;
+        IntersCommonParams.InsuredResponse result = new IntersHttpRequest<>(toJointLogin, callbackYundaRequest, IntersCommonParams.InsuredResponse.class).post();
+        if (result == null) {
+            return json(BaseResponse.CODE_FAILURE, "授权查询请求失败", response);
+        }
+        if (result.code != "200") {
+            return json(BaseResponse.CODE_FAILURE, "授权查询请求失败", response);
+        }
+        response.data = result.data;
+        return json(BaseResponse.CODE_SUCCESS, "授权查询请求成功", response);
+    }
+
+    /**
+     * 获取授权详情(微信+银行卡)
+     *
+     * @return
+     */private String doAuthorizeRes(JointLoginBean request) {
+        BaseResponse response = new BaseResponse();
+        IntersCommonParams.JointLoginRequest jointLoginRequest = new IntersCommonParams.JointLoginRequest();
+        jointLoginRequest.insured_name = request.insured_name;
+        jointLoginRequest.insured_code = request.insured_code;
+        jointLoginRequest.insured_phone = request.insured_phone;
+        IntersCommonParams.InsuredResponse result = new IntersHttpRequest<>(toJointLogin, jointLoginRequest, IntersCommonParams.InsuredResponse.class).post();
+        if (result == null) {
+            return json(BaseResponse.CODE_FAILURE, "授权查询请求失败", response);
+        }
+        if (result.code != "200") {
+            return json(BaseResponse.CODE_FAILURE, "授权查询请求失败", response);
+        }
+        response.data = result.data;
+        return json(BaseResponse.CODE_SUCCESS, "授权查询请求成功", response);
     }
 
     /**
      * 调用账号服务
+     *
      * @param request
      * @return
      */
-    private String doAccount(JointLoginBean request){
+    private String doAccount(JointLoginBean request) {
         BaseResponse response = new BaseResponse();
-        ExtendInsurePolicy.GetAccountLogin accountLoginRequest = new ExtendInsurePolicy.GetAccountLogin();
-        accountLoginRequest.channel_code = request.channel_code;
-        accountLoginRequest.insured_name = request.insured_name;
-        accountLoginRequest.insured_code = request.insured_code;
-        accountLoginRequest.insured_phone = request.insured_phone;
-        accountLoginRequest.insured_email = request.insured_email;
-        accountLoginRequest.insured_province = request.insured_province;
-        accountLoginRequest.insured_city = request.insured_city;
-        accountLoginRequest.insured_county = request.insured_county;
-        accountLoginRequest.insured_address = request.insured_address;
-        accountLoginRequest.bank_name = request.bank_name;
-        accountLoginRequest.bank_code = request.bank_code;
-        accountLoginRequest.bank_phone = request.bank_phone;
-        accountLoginRequest.bank_address = request.bank_address;
-        accountLoginRequest.channel_order_code = request.channel_order_code;
-        ExtendInsurePolicy.GetInsuredesponse result = new InsureHttpRequest<>(toJointLogin, accountLoginRequest, ExtendInsurePolicy.GetInsuredesponse.class).post();
+        IntersCommonParams.JointLoginRequest jointLoginRequest = new IntersCommonParams.JointLoginRequest();
+        jointLoginRequest.channel_code = request.channel_code;
+        jointLoginRequest.insured_name = request.insured_name;
+        jointLoginRequest.insured_code = request.insured_code;
+        jointLoginRequest.insured_phone = request.insured_phone;
+        jointLoginRequest.insured_email = request.insured_email;
+        jointLoginRequest.insured_province = request.insured_province;
+        jointLoginRequest.insured_city = request.insured_city;
+        jointLoginRequest.insured_county = request.insured_county;
+        jointLoginRequest.insured_address = request.insured_address;
+        jointLoginRequest.bank_name = request.bank_name;
+        jointLoginRequest.bank_code = request.bank_code;
+        jointLoginRequest.bank_phone = request.bank_phone;
+        jointLoginRequest.bank_address = request.bank_address;
+        jointLoginRequest.channel_order_code = request.channel_order_code;
+        IntersCommonParams.InsuredResponse result = new IntersHttpRequest<>(toJointLogin, jointLoginRequest, IntersCommonParams.InsuredResponse.class).post();
         if (result == null) {
-            return json(BaseResponse.CODE_FAILURE, "接口请求失败", response);
-        } else {
-            return json(BaseResponse.CODE_FAILURE, "接口请求失败", response);
+            return json(BaseResponse.CODE_FAILURE, "账号服务接口请求失败", response);
         }
+        if (result.code != "200") {
+            return json(BaseResponse.CODE_FAILURE, "账号服务接口请求失败", response);
+        }
+        response.data = result.data;
+        return json(BaseResponse.CODE_SUCCESS, "账号服务接口请求成功", response);
     }
 
     /**
      * 投保操作，先走英大投保，再进行泰康投保
+     *
      * @return
      */
-    private String doInsured(JointLoginBean request){
+    private String doInsured(JointLoginBean request) {
         BaseResponse response = new BaseResponse();
         //投保人基础信息
-        ExtendInsurePolicy.PolicyHolder policyHolder = new ExtendInsurePolicy.PolicyHolder();
+        IntersCommonParams.PolicyHolder policyHolder = new IntersCommonParams.PolicyHolder();
         policyHolder.name = request.insured_name;
         policyHolder.cardType = "1";
         policyHolder.cardCode = request.insured_code;
@@ -189,10 +280,10 @@ public class IntersAction extends BaseAction {
         policyHolder.insure_days = "";//购保天数
         policyHolder.price = "";//价格
         //TODO 投保人被保人和受益人是本人
-        List<ExtendInsurePolicy.PolicyHolder> recognizees = new ArrayList<>();
+        List<IntersCommonParams.PolicyHolder> recognizees = new ArrayList<>();
         recognizees.add(policyHolder);
-        ExtendInsurePolicy.GetInusredRequest insuredRequest = new ExtendInsurePolicy.GetInusredRequest();
-        insuredRequest.productId = 90;
+        IntersCommonParams.InusredRequest insuredRequest = new IntersCommonParams.InusredRequest();
+        insuredRequest.productId = 90;//产品id:英大90,泰康91
         insuredRequest.startTime = "";
         insuredRequest.endTime = "";
         insuredRequest.count = "";
@@ -202,37 +293,59 @@ public class IntersAction extends BaseAction {
         insuredRequest.policyholder = policyHolder;
         insuredRequest.recognizees = recognizees;
         insuredRequest.beneficiary = policyHolder;
-        ExtendInsurePolicy.GetInsuredesponse result = new InsureHttpRequest<>(toInsured, insuredRequest, ExtendInsurePolicy.GetInsuredesponse.class).post();
+        IntersCommonParams.InsuredResponse result = new IntersHttpRequest<>(toInsured, insuredRequest, IntersCommonParams.InsuredResponse.class).post();
         if (result == null) {
-            return json(BaseResponse.CODE_FAILURE, "接口请求失败", response);
-        } else {
-            return json(BaseResponse.CODE_FAILURE, "接口请求失败", response);
+            return json(BaseResponse.CODE_FAILURE, "投保接口请求失败", response);
         }
+        if (result.code != "200") {
+            return json(BaseResponse.CODE_FAILURE, "投保接口请求失败", response);
+        }
+        //TODO 投保成功,调用支付
+        String payRes = doInsurePay(request, result);
+        if (payRes == null) {
+            return json(BaseResponse.CODE_FAILURE, "支付接口调用失败", response);
+        }
+        IntersResponse payResponse = JsonKit.json2Bean(payRes, IntersResponse.class);
+        if (payResponse == null) {
+            return json(BaseResponse.CODE_FAILURE, "支付接口调用失败", response);
+        }
+        if (payResponse.code != "200") {
+            return json(BaseResponse.CODE_FAILURE, "支付接口调用失败", response);
+        }
+        return json(BaseResponse.CODE_SUCCESS, "接口请求成功", response);
+    }
+
+    /**
+     * 投保支付操作
+     *
+     * @param jointLoginRequest
+     * @param insuredeRsponse
+     * @return
+     */
+    private String doInsurePay(JointLoginBean jointLoginRequest, IntersCommonParams.InsuredResponse insuredeRsponse) {
+        BaseResponse response = new BaseResponse();
+        return json(BaseResponse.CODE_FAILURE, "接口请求失败", response);
     }
 
     /**
      * 调用微信签约
+     *
      * @param request
      * @return
      */
-    private String doWechatContract(JointLoginBean request){
+    private String doWechatContract(JointLoginBean request) {
         return "";
     }
 
     /**
      * 调用微信代扣
+     *
      * @param request
      * @return
      */
-    private String doWechatPay(JointLoginBean request){
+    private String doWechatPay(JointLoginBean request) {
         return "";
     }
 
-    /**
-     * 获取授权详情(微信+银行卡)
-     * @return
-     */
-    private String doAuthorizeRes(){
-        return "";
-    }
+
 }

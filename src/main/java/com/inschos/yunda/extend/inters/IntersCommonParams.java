@@ -1,17 +1,11 @@
 package com.inschos.yunda.extend.inters;
 
-import com.inschos.yunda.annotation.CheckParams;
-import com.inschos.yunda.assist.kit.*;
-import com.inschos.yunda.model.IntersResponse;
-
-import java.util.Date;
 import java.util.List;
 
-public class ExtendInsurePolicy {
+public class IntersCommonParams {
 
-
-    public static class GetInusredRequest extends InsureRequest {
-        public long productId;//产品id：英大90/泰康91
+    public static class InusredRequest extends IntersCommonRequest {
+        public int productId;//产品id：英大90/泰康91
         public String startTime;//开始时间,必填
         public String endTime;//结束时间,必填
         public String count;//购买份数,必填
@@ -22,10 +16,10 @@ public class ExtendInsurePolicy {
         public PolicyHolder beneficiary;//受益人
     }
 
-    public static class GetInsuredesponse extends InsureResponse {
+    public static class InsuredResponse extends IntersCommonResponse {
         public String code;
-        public List<IntersResponse.Message> message;
-        public IntersResponse.Data data;
+        public List<com.inschos.yunda.model.IntersResponse.Message> message;
+        public com.inschos.yunda.model.IntersResponse.Data data;
 
         public static class Message {
             public String digest;//default
@@ -113,7 +107,7 @@ public class ExtendInsurePolicy {
         public String address;//详细地址
     }
 
-    public static class GetAccountLogin extends InsureRequest{
+    public static class JointLoginRequest extends IntersCommonRequest {
         public String channel_code;
         public String insured_name;
         public String insured_code;
@@ -129,5 +123,23 @@ public class ExtendInsurePolicy {
         public String bank_address;
         public String channel_order_code;
     }
+
+    public static class CallbackYundaRequest extends IntersCommonRequest {
+        public String ordersId;//保单号 256
+        public String payTime;//支付时间 64
+        public String effectiveTime;//生效时段 64
+        public String type;//套餐类型,当日订单，长效订单 64
+        public String status;//保单状态 10
+        public String ordersName;//保单名称 32
+        public String companyName;//保险公司名称 32
+    }
+
+    public static class CallbackYundaResponse extends IntersCommonResponse {
+        public String code;//错误编码
+        public String remark;//结果描述
+        public String data;//返回数据 可为空
+        public Boolean result;//接口调用结果
+    }
+
 
 }

@@ -78,4 +78,24 @@ public class IntersController {
     public String PrepareInusre(HttpServletRequest request){
         return intersAction.prepareInusre(request);
     }
+
+    /**
+     * 保险推送韵达
+     * @params ordersId
+     * @params payTime
+     * @params effectiveTime
+     * @params type
+     * @params status
+     * @params ordersName
+     * @params companyName
+     * @return
+     */
+    @RequestMapping("/call_bank_yunda/**")
+    @ResponseBody
+    public String CallBackYunda(HttpServletRequest request){
+        return intersAction.CallBackYunda(request);
+    }
+
+
+
 }

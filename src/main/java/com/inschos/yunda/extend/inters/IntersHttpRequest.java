@@ -8,23 +8,22 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class InsureHttpRequest<Request extends InsureRequest, Response extends InsureResponse> {
+public class IntersHttpRequest<Request extends IntersCommonRequest, Response extends IntersCommonResponse> {
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    private InsureRequestEntity request;
+    private IntersRequests request;
     private Class<Response> cls;
     private String url;
 
-    public InsureHttpRequest(String url, Request request, Class<Response> cls) {
+    public IntersHttpRequest(String url, Request request, Class<Response> cls) {
         this.url = url;
-        this.request = new InsureRequestEntity<Request>();
+        this.request = new IntersRequests<Request>();
         this.cls = cls;
         if (request != null) {
             this.request.data = request;
-            this.request.sign = SignatureTools.sign(JsonKit.bean2Json(request), SignatureTools.CAR_RSA_PRIVATE_KEY);
+            this.request.sign = IntersSignatureTools.sign(JsonKit.bean2Json(request), IntersSignatureTools.CAR_RSA_PRIVATE_KEY);
         }
-
         this.request.sendTime = sdf.format(new Date(System.currentTimeMillis()));
     }
 
@@ -36,33 +35,28 @@ public class InsureHttpRequest<Request extends InsureRequest, Response extends I
             String result = HttpClientKit.post(url, JsonKit.bean2Json(request));
             L.log.debug("=============================================================================================================================");
             L.log.debug(result);
-
             response = JsonKit.json2Bean(result, cls);
-
             if (response != null) {
                 response.verify = verifySignature(result);
             } else {
                 try {
                     response = cls.newInstance();
-                    response.state = InsureResponse.RESULT_FAIL;
+                    response.state = IntersCommonResponse.RESULT_FAIL;
                     response.msg = "请求失败";
                     response.verify = false;
                 } catch (InstantiationException | IllegalAccessException e) {
-                    // e.printStackTrace();
                     return null;
                 }
             }
             return response;
         } catch (IOException e) {
-            // e.printStackTrace();
             try {
                 response = cls.newInstance();
-                response.state = InsureResponse.RESULT_FAIL;
+                response.state = IntersCommonResponse.RESULT_FAIL;
                 response.msg = "请求失败";
                 response.verify = false;
                 return response;
             } catch (InstantiationException | IllegalAccessException ex) {
-                // ex.printStackTrace();
                 return null;
             }
         }
@@ -83,7 +77,7 @@ public class InsureHttpRequest<Request extends InsureRequest, Response extends I
                 flag = true;
             } else {
                 String content = jsonNode.get("data").toString();
-                flag = SignatureTools.verify(content, sign, SignatureTools.CAR_RSA_PUBLIC_KEY);
+                flag = IntersSignatureTools.verify(content, sign, IntersSignatureTools.CAR_RSA_PUBLIC_KEY);
             }
         }
         return flag;
