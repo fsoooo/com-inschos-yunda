@@ -38,13 +38,13 @@ public class IntersAction extends BaseAction {
      */
     public String jointLogin(HttpServletRequest httpServletRequest) {
         JointLoginBean request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), JointLoginBean.class);
-        BaseResponse response = new BaseResponse();
+        BaseResponseBean response = new BaseResponseBean();
         //判空
         if (request == null) {
-            return json(BaseResponse.CODE_FAILURE, "请检查报文格式是否正确", response);
+            return json(BaseResponseBean.CODE_FAILURE, "请检查报文格式是否正确", response);
         }
         if (request.insured_name == null || request.insured_code == null || request.insured_phone == null) {
-            return json(BaseResponse.CODE_FAILURE, "姓名,证件号,手机号不能为空", response);
+            return json(BaseResponseBean.CODE_FAILURE, "姓名,证件号,手机号不能为空", response);
         }
         //TODO 联合登录表插入数据,先判断今天有没有插入,再插入登录记录.每天只有一个记录
         long date = new Date().getTime();
@@ -62,27 +62,28 @@ public class IntersAction extends BaseAction {
         //TODO 触发联合登录,同步操作 http 请求 账号服务
         String loginRes = doAccount(request);
         if (loginRes == null) {
-            return json(BaseResponse.CODE_FAILURE, "账号服务调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
         }
         IntersResponse loginResponse = JsonKit.json2Bean(loginRes, IntersResponse.class);
         if (loginResponse == null) {
-            return json(BaseResponse.CODE_FAILURE, "账号服务调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
         }
         if (loginResponse.code != "200") {
-            return json(BaseResponse.CODE_FAILURE, "账号服务调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
         }
+        //TODO 触发联合登录,异步操作 http 请求 投保服务
         String insureRes = doInsured(request);
         if (insureRes == null) {
-            return json(BaseResponse.CODE_FAILURE, "投保接口调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
         }
         IntersResponse insureResponse = JsonKit.json2Bean(insureRes, IntersResponse.class);
         if (insureResponse == null) {
-            return json(BaseResponse.CODE_FAILURE, "投保接口调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
         }
         if (insureResponse.code != "200") {
-            return json(BaseResponse.CODE_FAILURE, "投保接口调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
         }
-        return json(BaseResponse.CODE_SUCCESS, "操作成功", response);
+        return json(BaseResponseBean.CODE_SUCCESS, "操作成功", response);
     }
 
     /**
@@ -95,44 +96,52 @@ public class IntersAction extends BaseAction {
      */
     public String authorizationQuery(HttpServletRequest httpServletRequest) {
         JointLoginBean request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), JointLoginBean.class);
-        BaseResponse response = new BaseResponse();
+        BaseResponseBean response = new BaseResponseBean();
         AuthorizeQueryResponseBean authorizeQueryResponse = new AuthorizeQueryResponseBean();
         //判空
         if (request == null) {
-            return json(BaseResponse.CODE_FAILURE, "请检查报文格式是否正确", response);
+            return json(BaseResponseBean.CODE_FAILURE, "请检查报文格式是否正确", response);
         }
         if (request.insured_name == null || request.insured_code == null || request.insured_phone == null) {
-            return json(BaseResponse.CODE_FAILURE, "姓名,证件号,手机号不能为空", response);
+            return json(BaseResponseBean.CODE_FAILURE, "姓名,证件号,手机号不能为空", response);
         }
         //TODO 触发联合登录,同步操作 http 请求 账号服务
         String loginRes = doAccount(request);
         if (loginRes == null) {
-            return json(BaseResponse.CODE_FAILURE, "账号服务调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
         }
         IntersResponse loginResponse = JsonKit.json2Bean(loginRes, IntersResponse.class);
         if (loginResponse == null) {
-            return json(BaseResponse.CODE_FAILURE, "账号服务调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
         }
         if (loginResponse.code != "200") {
-            return json(BaseResponse.CODE_FAILURE, "账号服务调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
         }
         //TODO 查询授权详情
         String authorizeRes = doAuthorizeRes(request);
         if (authorizeRes == null) {
-            return json(BaseResponse.CODE_FAILURE, "授权查询接口调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "授权查询接口调用失败", response);
         }
         IntersResponse authorizeResponse = JsonKit.json2Bean(authorizeRes, IntersResponse.class);
         if (authorizeResponse == null) {
-            return json(BaseResponse.CODE_FAILURE, "授权查询接口调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "授权查询接口调用失败", response);
         }
         if (authorizeResponse.code != "200") {
-            return json(BaseResponse.CODE_FAILURE, "授权查询接口调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "授权查询接口调用失败", response);
         }
 
         authorizeQueryResponse.status = authorizeResponse.data.status;
         authorizeQueryResponse.url = authorizeResponse.data.warrantyUuid;
         response.data = authorizeQueryResponse;
-        return json(BaseResponse.CODE_FAILURE, authorizeResponse.data.statusTxt, response);
+        if(authorizeQueryResponse.status=="01"){
+            String responseText = "未授权";
+            return json(BaseResponseBean.CODE_FAILURE,responseText, response);
+        }else if(authorizeQueryResponse.status=="02"){
+            String responseText = "已授权";
+            return json(BaseResponseBean.CODE_FAILURE,responseText, response);
+        }else{
+            return json(BaseResponseBean.CODE_FAILURE,"", response);
+        }
     }
 
     /**
@@ -145,12 +154,12 @@ public class IntersAction extends BaseAction {
      */
     public String prepareInusre(HttpServletRequest httpServletRequest){
         JointLoginBean request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), JointLoginBean.class);
-        BaseResponse response = new BaseResponse();
+        BaseResponseBean response = new BaseResponseBean();
         //判空
         if (request == null) {
-            return json(BaseResponse.CODE_FAILURE, "请检查报文格式是否正确", response);
+            return json(BaseResponseBean.CODE_FAILURE, "请检查报文格式是否正确", response);
         }
-        return json(BaseResponse.CODE_FAILURE, "请检查报文格式是否正确", response);
+        return json(BaseResponseBean.CODE_FAILURE, "请检查报文格式是否正确", response);
     }
 
 
@@ -161,13 +170,13 @@ public class IntersAction extends BaseAction {
      * @return
      */
     public String CallBackYunda(HttpServletRequest httpServletRequest) {
-        CallbackYunda.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), CallbackYunda.Requset.class);
-        BaseResponse response = new BaseResponse();
+        CallbackYundaBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), CallbackYundaBean.Requset.class);
+        BaseResponseBean response = new BaseResponseBean();
         if(request==null){
-            return json(BaseResponse.CODE_FAILURE, "参数解析错误", response);
+            return json(BaseResponseBean.CODE_FAILURE, "参数解析错误", response);
         }
         if(request.ordersId==null||request.payTime==null||request.effectiveTime==null||request.type==null||request.status==null||request.ordersName==null||request.companyName==null){
-            return json(BaseResponse.CODE_FAILURE, "参数解析错", response);
+            return json(BaseResponseBean.CODE_FAILURE, "参数解析错", response);
         }
         IntersCommonParams.CallbackYundaRequest callbackYundaRequest = new IntersCommonParams.CallbackYundaRequest();
         callbackYundaRequest.ordersId = request.ordersId;
@@ -177,15 +186,15 @@ public class IntersAction extends BaseAction {
         callbackYundaRequest.status = request.status;
         callbackYundaRequest.ordersName = request.ordersName;
         callbackYundaRequest.companyName = request.companyName;
-        IntersCommonParams.InsuredResponse result = new IntersHttpRequest<>(toJointLogin, callbackYundaRequest, IntersCommonParams.InsuredResponse.class).post();
+        IntersCommonParams.InsuredResponse result = new IntersHttpRequest<>(toCallBackYunda, callbackYundaRequest, IntersCommonParams.InsuredResponse.class).post();
         if (result == null) {
-            return json(BaseResponse.CODE_FAILURE, "授权查询请求失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "投保推送韵达请求失败", response);
         }
         if (result.code != "200") {
-            return json(BaseResponse.CODE_FAILURE, "授权查询请求失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "投保推送韵达请求失败", response);
         }
         response.data = result.data;
-        return json(BaseResponse.CODE_SUCCESS, "授权查询请求成功", response);
+        return json(BaseResponseBean.CODE_SUCCESS, "投保推送韵达请求成功", response);
     }
 
     /**
@@ -193,20 +202,20 @@ public class IntersAction extends BaseAction {
      *
      * @return
      */private String doAuthorizeRes(JointLoginBean request) {
-        BaseResponse response = new BaseResponse();
+        BaseResponseBean response = new BaseResponseBean();
         IntersCommonParams.JointLoginRequest jointLoginRequest = new IntersCommonParams.JointLoginRequest();
         jointLoginRequest.insured_name = request.insured_name;
         jointLoginRequest.insured_code = request.insured_code;
         jointLoginRequest.insured_phone = request.insured_phone;
         IntersCommonParams.InsuredResponse result = new IntersHttpRequest<>(toJointLogin, jointLoginRequest, IntersCommonParams.InsuredResponse.class).post();
         if (result == null) {
-            return json(BaseResponse.CODE_FAILURE, "授权查询请求失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "授权查询请求失败", response);
         }
         if (result.code != "200") {
-            return json(BaseResponse.CODE_FAILURE, "授权查询请求失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "授权查询请求失败", response);
         }
         response.data = result.data;
-        return json(BaseResponse.CODE_SUCCESS, "授权查询请求成功", response);
+        return json(BaseResponseBean.CODE_SUCCESS, "授权查询请求成功", response);
     }
 
     /**
@@ -216,7 +225,7 @@ public class IntersAction extends BaseAction {
      * @return
      */
     private String doAccount(JointLoginBean request) {
-        BaseResponse response = new BaseResponse();
+        BaseResponseBean response = new BaseResponseBean();
         IntersCommonParams.JointLoginRequest jointLoginRequest = new IntersCommonParams.JointLoginRequest();
         jointLoginRequest.channel_code = request.channel_code;
         jointLoginRequest.insured_name = request.insured_name;
@@ -234,13 +243,13 @@ public class IntersAction extends BaseAction {
         jointLoginRequest.channel_order_code = request.channel_order_code;
         IntersCommonParams.InsuredResponse result = new IntersHttpRequest<>(toJointLogin, jointLoginRequest, IntersCommonParams.InsuredResponse.class).post();
         if (result == null) {
-            return json(BaseResponse.CODE_FAILURE, "账号服务接口请求失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败", response);
         }
         if (result.code != "200") {
-            return json(BaseResponse.CODE_FAILURE, "账号服务接口请求失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败", response);
         }
         response.data = result.data;
-        return json(BaseResponse.CODE_SUCCESS, "账号服务接口请求成功", response);
+        return json(BaseResponseBean.CODE_SUCCESS, "账号服务接口请求成功", response);
     }
 
     /**
@@ -249,7 +258,7 @@ public class IntersAction extends BaseAction {
      * @return
      */
     private String doInsured(JointLoginBean request) {
-        BaseResponse response = new BaseResponse();
+        BaseResponseBean response = new BaseResponseBean();
         //投保人基础信息
         IntersCommonParams.PolicyHolder policyHolder = new IntersCommonParams.PolicyHolder();
         policyHolder.name = request.insured_name;
@@ -295,24 +304,24 @@ public class IntersAction extends BaseAction {
         insuredRequest.beneficiary = policyHolder;
         IntersCommonParams.InsuredResponse result = new IntersHttpRequest<>(toInsured, insuredRequest, IntersCommonParams.InsuredResponse.class).post();
         if (result == null) {
-            return json(BaseResponse.CODE_FAILURE, "投保接口请求失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "投保接口请求失败", response);
         }
         if (result.code != "200") {
-            return json(BaseResponse.CODE_FAILURE, "投保接口请求失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "投保接口请求失败", response);
         }
         //TODO 投保成功,调用支付
         String payRes = doInsurePay(request, result);
         if (payRes == null) {
-            return json(BaseResponse.CODE_FAILURE, "支付接口调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "支付接口调用失败", response);
         }
         IntersResponse payResponse = JsonKit.json2Bean(payRes, IntersResponse.class);
         if (payResponse == null) {
-            return json(BaseResponse.CODE_FAILURE, "支付接口调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "支付接口调用失败", response);
         }
         if (payResponse.code != "200") {
-            return json(BaseResponse.CODE_FAILURE, "支付接口调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "支付接口调用失败", response);
         }
-        return json(BaseResponse.CODE_SUCCESS, "接口请求成功", response);
+        return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
     }
 
     /**
@@ -323,8 +332,8 @@ public class IntersAction extends BaseAction {
      * @return
      */
     private String doInsurePay(JointLoginBean jointLoginRequest, IntersCommonParams.InsuredResponse insuredeRsponse) {
-        BaseResponse response = new BaseResponse();
-        return json(BaseResponse.CODE_FAILURE, "接口请求失败", response);
+        BaseResponseBean response = new BaseResponseBean();
+        return json(BaseResponseBean.CODE_FAILURE, "接口请求失败", response);
     }
 
     /**
@@ -334,7 +343,8 @@ public class IntersAction extends BaseAction {
      * @return
      */
     private String doWechatContract(JointLoginBean request) {
-        return "";
+        BaseResponseBean response = new BaseResponseBean();
+        return json(BaseResponseBean.CODE_FAILURE, "接口服务完善中。。。", response);
     }
 
     /**
@@ -344,7 +354,8 @@ public class IntersAction extends BaseAction {
      * @return
      */
     private String doWechatPay(JointLoginBean request) {
-        return "";
+        BaseResponseBean response = new BaseResponseBean();
+        return json(BaseResponseBean.CODE_FAILURE, "接口服务完善中。。。", response);
     }
 
 

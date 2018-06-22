@@ -4,7 +4,7 @@ import com.inschos.yunda.annotation.CheckParamsKit;
 
 import java.util.List;
 
-public class BaseResponse {
+public class BaseResponseBean {
     public static final int CODE_SUCCESS = 200;
     public static final int CODE_FAILURE = 500;
     public static final int CODE_PARAM_ERROR = 500;

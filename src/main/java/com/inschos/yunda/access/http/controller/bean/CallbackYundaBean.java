@@ -1,6 +1,6 @@
 package com.inschos.yunda.access.http.controller.bean;
 
-public class CallbackYunda {
+public class CallbackYundaBean {
 
     public static class Requset {
         public String ordersId;//保单号 256

@@ -1,6 +1,6 @@
 package com.inschos.yunda.access.http.controller.action;
 
-import com.inschos.yunda.access.http.controller.bean.BaseResponse;
+import com.inschos.yunda.access.http.controller.bean.BaseResponseBean;
 import com.inschos.yunda.access.http.controller.bean.PageBean;
 import com.inschos.yunda.annotation.CheckParamsKit;
 import com.inschos.yunda.assist.kit.JsonKit;
@@ -25,9 +25,9 @@ public class BaseAction {
         return bean;
     }
 
-    public String json(int code, String message, BaseResponse response) {
+    public String json(int code, String message, BaseResponseBean response) {
         if (response == null) {
-            response = new BaseResponse();
+            response = new BaseResponseBean();
         }
         response.code = code;
         CheckParamsKit.Entry<String, String> defaultEntry = CheckParamsKit.getDefaultEntry();
@@ -39,9 +39,9 @@ public class BaseAction {
         return JsonKit.bean2Json(response);
     }
 
-    public String json(int code, List<CheckParamsKit.Entry<String, String>> message, BaseResponse response) {
+    public String json(int code, List<CheckParamsKit.Entry<String, String>> message, BaseResponseBean response) {
         if (response == null) {
-            response = new BaseResponse();
+            response = new BaseResponseBean();
         }
 
         response.code = code;
@@ -50,7 +50,7 @@ public class BaseAction {
         return JsonKit.bean2Json(response);
     }
 
-    public String json(BaseResponse response) {
+    public String json(BaseResponseBean response) {
         return JsonKit.bean2Json(response);
     }
 
