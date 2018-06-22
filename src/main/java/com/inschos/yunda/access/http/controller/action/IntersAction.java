@@ -123,14 +123,12 @@ public class IntersAction extends BaseAction {
         return json(BaseResponse.CODE_FAILURE, "操作失败", response);
     }
 
-
-
     /**
      * 调用账号服务
      * @param request
      * @return
      */
-    private String GetAccount(JointLoginBean request){
+    private String doAccount(JointLoginBean request){
         BaseResponse response = new BaseResponse();
         ExtendInsurePolicy.GetAccountLogin accountLoginRequest = new ExtendInsurePolicy.GetAccountLogin();
         accountLoginRequest.channel_code = request.channel_code;
@@ -159,7 +157,7 @@ public class IntersAction extends BaseAction {
      * 投保操作，先走英大投保，再进行泰康投保
      * @return
      */
-    private String GetInsured(JointLoginBean request){
+    private String doInsured(JointLoginBean request){
         BaseResponse response = new BaseResponse();
         //投保人基础信息
         ExtendInsurePolicy.PolicyHolder policyHolder = new ExtendInsurePolicy.PolicyHolder();
@@ -217,7 +215,7 @@ public class IntersAction extends BaseAction {
      * @param request
      * @return
      */
-    private String GetWechatContract(JointLoginBean request){
+    private String doWechatContract(JointLoginBean request){
         return "";
     }
 
@@ -226,7 +224,7 @@ public class IntersAction extends BaseAction {
      * @param request
      * @return
      */
-    private String GetWechatPay(JointLoginBean request){
+    private String doWechatPay(JointLoginBean request){
         return "";
     }
 
@@ -234,7 +232,7 @@ public class IntersAction extends BaseAction {
      * 获取授权详情(微信+银行卡)
      * @return
      */
-    private String GetAuthorizeRes(){
+    private String doAuthorizeRes(){
         return "";
     }
 }
