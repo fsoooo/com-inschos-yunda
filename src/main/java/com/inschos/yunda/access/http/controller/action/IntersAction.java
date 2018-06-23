@@ -257,7 +257,7 @@ public class IntersAction extends BaseAction {
         jointLoginRequest.channel_order_code = request.channel_order_code;
         try {
             //TODO 请求http
-//            String insureRes = HttpClientKit.post(toJointLogin,JsonKit.bean2Json(jointLoginRequest));
+//            String accountRes = HttpClientKit.post(toJointLogin,JsonKit.bean2Json(jointLoginRequest));
             String accountRes = HttpClientKit.post(toHttpTest, JsonKit.bean2Json(jointLoginRequest));
             if (accountRes == null) {
                 return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败", response);
