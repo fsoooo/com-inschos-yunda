@@ -30,15 +30,13 @@ public class IntersHttpRequest<Request extends IntersCommonRequest, Response ext
     public Response post() {
         Response response;
         try {
-            L.log.debug("=============================================================================================================================");
+            L.log.debug("==================================Request======================================");
             L.log.debug(JsonKit.bean2Json(request));
             String result = HttpClientKit.post(url, JsonKit.bean2Json(request));
-            L.log.debug("=============================================================================================================================");
+            L.log.debug("==================================Response======================================");
             L.log.debug(result);
             response = JsonKit.json2Bean(result, cls);
-            if (response != null) {
-                response.verify = verifySignature(result);
-            } else {
+            if (response == null) {
                 try {
                     response = cls.newInstance();
                     response.state = IntersCommonResponse.RESULT_FAIL;
@@ -60,26 +58,5 @@ public class IntersHttpRequest<Request extends IntersCommonRequest, Response ext
                 return null;
             }
         }
-    }
-
-    private boolean verifySignature(String responseJson) {
-        JsonNode jsonNode = null;
-        try {
-            jsonNode = new ObjectMapper().readTree(responseJson);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        boolean flag = false;
-        if (jsonNode != null) {
-            JsonNode signNode = jsonNode.get("sign");
-            String sign = signNode.textValue();
-            if (StringKit.isEmpty(sign)) {
-                flag = true;
-            } else {
-                String content = jsonNode.get("data").toString();
-                flag = IntersSignatureTools.verify(content, sign, IntersSignatureTools.CAR_RSA_PUBLIC_KEY);
-            }
-        }
-        return flag;
     }
 }

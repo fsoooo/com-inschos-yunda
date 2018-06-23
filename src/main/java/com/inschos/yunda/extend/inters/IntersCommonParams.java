@@ -18,8 +18,8 @@ public class IntersCommonParams {
 
     public static class InsuredResponse extends IntersCommonResponse {
         public String code;
-        public List<com.inschos.yunda.model.IntersResponse.Message> message;
-        public com.inschos.yunda.model.IntersResponse.Data data;
+        public List<Message> message;
+        public Data data;
 
         public static class Message {
             public String digest;//default

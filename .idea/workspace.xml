@@ -8,11 +8,11 @@
   <component name="ChangeListManager">
     <list default="true" id="1070bd92-fc34-476e-92bf-336e2e585cc2" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/action/BankAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/action/BankAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/action/InsureSetupAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/action/InsureSetupAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/BankController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/BankController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/InsureSetupController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/InsureSetupController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/InsureWarrantyController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/InsureWarrantyController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/action/IntersAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/action/IntersAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/assist/kit/HttpClientKit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/assist/kit/HttpClientKit.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommonParams.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommonParams.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommonUrls.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommonUrls.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersHttpRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersHttpRequest.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -24,11 +24,44 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file leaf-file-name="InsureWarrantyController.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/InsureWarrantyController.java">
+      <file leaf-file-name="IntersAction.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/action/IntersAction.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="648">
-              <caret line="27" column="53" selection-start-line="27" selection-start-column="33" selection-end-line="27" selection-end-column="53" />
+            <state relative-caret-position="504">
+              <caret line="24" column="78" lean-forward="true" selection-start-line="24" selection-start-column="4" selection-end-line="24" selection-end-column="78" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="method#jointLogin#0;class#IntersAction#0" />
+                <element signature="method#authorizationQuery#0;class#IntersAction#0" />
+                <element signature="method#prepareInusre#0;class#IntersAction#0" />
+                <element signature="method#CallBackYunda#0;class#IntersAction#0" />
+                <element signature="method#doAuthorizeRes#0;class#IntersAction#0" />
+                <element signature="method#doInsured#0;class#IntersAction#0" />
+                <element signature="method#doInsurePay#0;class#IntersAction#0" />
+                <element signature="method#doWechatContract#0;class#IntersAction#0" />
+                <element signature="method#doWechatPay#0;class#IntersAction#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Logger.class" pinned="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/log4j/log4j/1.2.17/log4j-1.2.17.jar!/org/apache/log4j/Logger.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="216">
+              <caret line="9" column="19" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="19" />
+              <folding>
+                <element signature="e#0#1517#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="IntersHttpRequest.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersHttpRequest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="396">
+              <caret line="38" column="35" lean-forward="true" selection-start-line="38" selection-start-column="35" selection-end-line="38" selection-end-column="35" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -36,20 +69,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="IntersController.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/IntersController.java">
+      <file leaf-file-name="IntersCommonUrls.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommonUrls.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="224">
-              <caret line="92" column="37" selection-start-line="92" selection-start-column="22" selection-end-line="92" selection-end-column="37" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="docComment;method#JointLogin#0;class#IntersController#0" />
-                <element signature="docComment;method#AuthorizationQuery#0;class#IntersController#0" />
-                <element signature="docComment;method#PrepareInusre#0;class#IntersController#0" />
-                <element signature="e#2096#2097#0" expanded="true" />
-                <element signature="e#2154#2155#0" expanded="true" />
-                <element signature="docComment;method#CallBackYunda#0;class#IntersController#0" />
-              </folding>
+            <state relative-caret-position="78">
+              <caret line="74" column="95" lean-forward="true" selection-start-line="74" selection-start-column="95" selection-end-line="74" selection-end-column="95" />
             </state>
           </provider>
         </entry>
@@ -69,6 +93,7 @@
       <find>trading</find>
       <find>cloud.trading</find>
       <find>List</find>
+      <find>connectTimeout</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -86,8 +111,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/data/dao/JointLoginDao.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/data/mapper/JointLoginMapper.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/model/JointLogin.java" />
         <option value="$PROJECT_DIR$/src/main/resources/com/inschos/yunda/data/mapper/JointLoginMapper.xml" />
         <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/bean/JointLoginBean.java" />
@@ -108,16 +131,12 @@
         <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/SignatureTools.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommon.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersParams.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersHttpRequest.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommonUrl.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommonRequests.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommonRequest.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersRequests.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersSignatureTools.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/IntersController.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/bean/BaseRequestBean.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommonUrls.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/action/IntersAction.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/AuthorizeController.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/InsureCenterController.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/InsureInfoController.java" />
@@ -137,6 +156,12 @@
         <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/BankController.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/InsureSetupController.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/action/InsureSetupAction.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/IntersController.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommonParams.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/action/IntersAction.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/assist/kit/HttpClientKit.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersHttpRequest.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommonUrls.java" />
       </list>
     </option>
   </component>
@@ -309,6 +334,29 @@
               <item name="http" type="462c0819:PsiDirectoryNode" />
               <item name="controller" type="462c0819:PsiDirectoryNode" />
               <item name="request" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="com-inschos-yunda" type="b2602c69:ProjectViewProjectNode" />
+              <item name="com-inschos-yunda" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="inschos" type="462c0819:PsiDirectoryNode" />
+              <item name="yunda" type="462c0819:PsiDirectoryNode" />
+              <item name="extend" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="com-inschos-yunda" type="b2602c69:ProjectViewProjectNode" />
+              <item name="com-inschos-yunda" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="inschos" type="462c0819:PsiDirectoryNode" />
+              <item name="yunda" type="462c0819:PsiDirectoryNode" />
+              <item name="extend" type="462c0819:PsiDirectoryNode" />
+              <item name="inters" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -488,15 +536,16 @@
       <workItem from="1529568850468" duration="2957000" />
       <workItem from="1529633548266" duration="224000" />
       <workItem from="1529633810293" duration="21995000" />
-      <workItem from="1529721074271" duration="2311000" />
+      <workItem from="1529721074271" duration="7431000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="50214000" />
+    <option name="totallyTimeSpent" value="55334000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="Event Log" order="6" side_tool="true" />
@@ -511,22 +560,22 @@
       <window_info id="UI Designer" order="4" />
       <window_info anchor="bottom" id="Debug" order="2" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="5" />
+      <window_info anchor="bottom" id="Messages" order="13" weight="0.32995495" />
       <window_info anchor="right" id="Palette&#9;" order="6" />
       <window_info id="Image Layers" order="3" />
       <window_info anchor="bottom" id="Java Enterprise" order="8" />
       <window_info anchor="right" id="Capture Analysis" order="4" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="bottom" id="Run" order="14" weight="0.6689189" />
+      <window_info anchor="bottom" id="Run" order="14" visible="true" weight="0.6689189" />
       <window_info anchor="bottom" id="Spring" order="10" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.32882884" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.28701717" />
+      <window_info anchor="bottom" id="Terminal" order="11" weight="0.32882884" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.222103" />
       <window_info id="Web" order="6" side_tool="true" />
       <window_info anchor="right" id="Theme Preview" order="7" />
       <window_info id="Favorites" order="5" side_tool="true" />
       <window_info anchor="bottom" id="Inspection" order="4" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="3" weight="0.25" />
-      <window_info anchor="bottom" id="Messages" order="13" weight="0.32995495" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32995495" />
@@ -544,41 +593,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/resources/com/inschos/yunda/data/mapper/JointLoginMapper.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="9" column="77" selection-start-line="9" selection-start-column="77" selection-end-line="9" selection-end-column="77" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/data/mapper/JointLoginMapper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="6" column="9" selection-start-line="6" selection-start-column="9" selection-end-line="6" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/data/dao/JointLoginDao.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="17" column="39" selection-start-line="17" selection-start-column="39" selection-end-line="17" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/model/PolicyHolder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="48">
-          <caret line="2" selection-start-line="2" selection-end-line="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/model/WarrantyRecord.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="48">
-          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/model/Recognizee.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
@@ -618,20 +632,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/CallBackInsureResponse.java" />
     <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/CallBackInsureRequest.java" />
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommonRequest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="48">
-          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommonResponse.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="20" column="1" selection-start-line="20" selection-start-column="1" selection-end-line="20" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersSignatureTools.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="624">
@@ -653,23 +653,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommonParams.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="809">
-          <caret line="136" column="75" selection-start-line="136" selection-start-column="75" selection-end-line="136" selection-end-column="75" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersHttpRequest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="456">
-          <caret line="19" column="23" lean-forward="true" selection-start-line="19" selection-start-column="23" selection-end-line="19" selection-end-column="23" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Desktop/桌面文件/alert.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="528">
@@ -681,13 +664,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="48">
           <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommonUrls.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-696">
-          <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
         </state>
       </provider>
     </entry>
@@ -704,27 +680,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="360">
           <caret line="15" column="4" selection-start-line="15" selection-start-column="4" selection-end-line="15" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/InsureResultController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="593">
-          <caret line="33" column="28" lean-forward="true" selection-start-line="33" selection-start-column="28" selection-end-line="33" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/InsureClaimController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="24" selection-start-line="24" selection-end-line="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/CommonController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="617">
-          <caret line="38" column="5" lean-forward="true" selection-start-line="27" selection-start-column="4" selection-end-line="38" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -774,25 +732,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="216">
           <caret line="9" selection-start-line="9" selection-end-line="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/action/IntersAction.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="504">
-          <caret line="38" column="68" selection-start-line="38" selection-start-column="68" selection-end-line="38" selection-end-column="68" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#authorizationQuery#0;class#IntersAction#0" />
-            <element signature="method#prepareInusre#0;class#IntersAction#0" />
-            <element signature="method#CallBackYunda#0;class#IntersAction#0" />
-            <element signature="method#doAuthorizeRes#0;class#IntersAction#0" />
-            <element signature="method#doAccount#0;class#IntersAction#0" />
-            <element signature="method#doInsured#0;class#IntersAction#0" />
-            <element signature="method#doInsurePay#0;class#IntersAction#0" />
-            <element signature="method#doWechatContract#0;class#IntersAction#0" />
-            <element signature="method#doWechatPay#0;class#IntersAction#0" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -858,26 +797,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/BankController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret line="18" column="43" selection-start-line="18" selection-start-column="43" selection-end-line="18" selection-end-column="43" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1160#1161#0" expanded="true" />
-            <element signature="e#1213#1214#0" expanded="true" />
-            <element signature="e#1436#1437#0" expanded="true" />
-            <element signature="e#1494#1495#0" expanded="true" />
-            <element signature="e#1717#1718#0" expanded="true" />
-            <element signature="e#1775#1776#0" expanded="true" />
-            <element signature="e#2002#2003#0" expanded="true" />
-            <element signature="e#2062#2063#0" expanded="true" />
-            <element signature="e#2293#2294#0" expanded="true" />
-            <element signature="e#2355#2356#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/action/InsureSetupAction.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="372">
@@ -888,9 +807,44 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/CommonController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="528">
+          <caret line="30" column="14" lean-forward="true" selection-start-line="30" selection-start-column="14" selection-end-line="30" selection-end-column="14" />
+          <folding>
+            <element signature="e#1139#1140#0" expanded="true" />
+            <element signature="e#1199#1200#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/BankController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="432">
+          <caret line="18" column="43" selection-start-line="18" selection-start-column="43" selection-end-line="18" selection-end-column="43" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/InsureClaimController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="408">
+          <caret line="24" selection-start-line="24" selection-end-line="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/InsureResultController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="624">
+          <caret line="33" column="28" lean-forward="true" selection-start-line="33" selection-start-column="28" selection-end-line="33" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/InsureSetupController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
+        <state relative-caret-position="2304">
           <caret line="96" column="39" selection-start-line="96" selection-start-column="39" selection-end-line="96" selection-end-column="39" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -900,7 +854,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/InsureWarrantyController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="648">
+        <state relative-caret-position="-372">
           <caret line="27" column="53" selection-start-line="27" selection-start-column="33" selection-end-line="27" selection-end-column="53" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -910,8 +864,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/request/IntersController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="92" column="37" selection-start-line="92" selection-start-column="22" selection-end-line="92" selection-end-column="37" />
+        <state relative-caret-position="1176">
+          <caret line="99" lean-forward="true" selection-start-line="99" selection-end-line="99" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="docComment;method#JointLogin#0;class#IntersController#0" />
@@ -921,6 +875,122 @@
             <element signature="e#2154#2155#0" expanded="true" />
             <element signature="docComment;method#CallBackYunda#0;class#IntersController#0" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommonResponse.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="480">
+          <caret line="20" column="1" selection-start-line="20" selection-start-column="1" selection-end-line="20" selection-end-column="1" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommonRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="48">
+          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommonParams.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="25" column="38" lean-forward="true" selection-start-line="25" selection-start-column="38" selection-end-line="25" selection-end-column="38" />
+          <folding>
+            <element signature="class#InusredRequest#0;class#IntersCommonParams#0" />
+            <element signature="class#PolicyHolder#0;class#IntersCommonParams#0" />
+            <element signature="class#Recognizee#0;class#IntersCommonParams#0" />
+            <element signature="class#Beneficiary#0;class#IntersCommonParams#0" />
+            <element signature="class#JointLoginRequest#0;class#IntersCommonParams#0" />
+            <element signature="class#CallbackYundaRequest#0;class#IntersCommonParams#0" />
+            <element signature="class#CallbackYundaResponse#0;class#IntersCommonParams#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/com/squareup/okhttp3/okhttp/3.10.0/okhttp-3.10.0.jar!/okhttp3/OkHttpClient.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="96">
+          <caret line="7" column="7" lean-forward="true" selection-start-line="7" selection-start-column="7" selection-end-line="7" selection-end-column="7" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/log4j/log4j/1.2.17/log4j-1.2.17.jar!/org/apache/log4j/Logger.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="9" column="19" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="19" />
+          <folding>
+            <element signature="e#0#1517#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/access/http/controller/action/IntersAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="504">
+          <caret line="24" column="78" lean-forward="true" selection-start-line="24" selection-start-column="4" selection-end-line="24" selection-end-column="78" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#jointLogin#0;class#IntersAction#0" />
+            <element signature="method#authorizationQuery#0;class#IntersAction#0" />
+            <element signature="method#prepareInusre#0;class#IntersAction#0" />
+            <element signature="method#CallBackYunda#0;class#IntersAction#0" />
+            <element signature="method#doAuthorizeRes#0;class#IntersAction#0" />
+            <element signature="method#doInsured#0;class#IntersAction#0" />
+            <element signature="method#doInsurePay#0;class#IntersAction#0" />
+            <element signature="method#doWechatContract#0;class#IntersAction#0" />
+            <element signature="method#doWechatPay#0;class#IntersAction#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/assist/kit/HttpClientKit.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="10" column="79" lean-forward="true" selection-start-line="10" selection-start-column="79" selection-end-line="10" selection-end-column="79" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.8.0-alpha2/slf4j-api-1.8.0-alpha2.jar!/org/slf4j/ILoggerFactory.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="16" selection-start-line="8" selection-start-column="16" selection-end-line="8" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/assist/kit/L.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="264">
+          <caret line="11" column="69" lean-forward="true" selection-start-line="11" selection-start-column="69" selection-end-line="11" selection-end-column="69" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersHttpRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="396">
+          <caret line="38" column="35" lean-forward="true" selection-start-line="38" selection-start-column="35" selection-end-line="38" selection-end-column="35" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/inschos/yunda/extend/inters/IntersCommonUrls.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="78">
+          <caret line="74" column="95" lean-forward="true" selection-start-line="74" selection-start-column="95" selection-end-line="74" selection-end-column="95" />
         </state>
       </provider>
     </entry>

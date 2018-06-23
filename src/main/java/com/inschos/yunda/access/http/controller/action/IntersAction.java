@@ -71,19 +71,21 @@ public class IntersAction extends BaseAction {
         if (loginResponse.code != "200") {
             return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
         }
-        //TODO 触发联合登录,异步操作 http 请求 投保服务
-        String insureRes = doInsured(request);
-        if (insureRes == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
-        }
-        IntersResponse insureResponse = JsonKit.json2Bean(insureRes, IntersResponse.class);
-        if (insureResponse == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
-        }
-        if (insureResponse.code != "200") {
-            return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
-        }
+        response.data = loginResponse;
         return json(BaseResponseBean.CODE_SUCCESS, "操作成功", response);
+//        //TODO 触发联合登录,异步操作 http 请求 投保服务
+//        String insureRes = doInsured(request);
+//        if (insureRes == null) {
+//            return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
+//        }
+//        IntersResponse insureResponse = JsonKit.json2Bean(insureRes, IntersResponse.class);
+//        if (insureResponse == null) {
+//            return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
+//        }
+//        if (insureResponse.code != "200") {
+//            return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
+//        }
+//        return json(BaseResponseBean.CODE_SUCCESS, "操作成功", response);
     }
 
     /**
@@ -241,7 +243,8 @@ public class IntersAction extends BaseAction {
         jointLoginRequest.bank_phone = request.bank_phone;
         jointLoginRequest.bank_address = request.bank_address;
         jointLoginRequest.channel_order_code = request.channel_order_code;
-        IntersCommonParams.InsuredResponse result = new IntersHttpRequest<>(toJointLogin, jointLoginRequest, IntersCommonParams.InsuredResponse.class).post();
+        //IntersCommonParams.InsuredResponse result = new IntersHttpRequest<>(toJointLogin, jointLoginRequest, IntersCommonParams.InsuredResponse.class).post();
+        IntersCommonParams.InsuredResponse result = new IntersHttpRequest<>(toHttpTest, jointLoginRequest, IntersCommonParams.InsuredResponse.class).post();
         if (result == null) {
             return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败", response);
         }
