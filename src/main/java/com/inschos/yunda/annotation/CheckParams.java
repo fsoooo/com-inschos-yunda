@@ -7,11 +7,6 @@ import java.lang.annotation.Target;
 
 import static com.inschos.yunda.annotation.CheckParams.StringType.STRING;
 
-/**
- * 创建日期：2018/4/3 on 11:20
- * 描述：
- * 作者：zhangyunhe
- */
 @Target(ElementType.FIELD)  //这个标识注解应该标在那里   ElementType的几个枚举值就代表了  注解应该写在的位置
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CheckParams {

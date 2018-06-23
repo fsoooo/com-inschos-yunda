@@ -4,11 +4,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * 创建日期：2018/3/22 on 15:00
- * 描述：
- * 作者：zhangyunhe
- */
 public class CardCodeKit {
 
     private static int[] coefficient = new int[]{7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2};

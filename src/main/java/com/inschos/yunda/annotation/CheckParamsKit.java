@@ -9,11 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * 创建日期：2018/4/3 on 11:24
- * 描述：
- * 作者：zhangyunhe
- */
 public class CheckParamsKit {
 
     public static final String DEFAULT = "default";
