@@ -1,6 +1,6 @@
 package com.inschos.yunda.access.http.controller.bean;
 
-public class WechatPrepareBean {
+public class InsurePrepareBean {
 
     public String account_id;
 

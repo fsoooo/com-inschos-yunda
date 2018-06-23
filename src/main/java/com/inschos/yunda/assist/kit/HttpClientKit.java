@@ -19,6 +19,8 @@ public class HttpClientKit {
                     .connectTimeout(30, TimeUnit.SECONDS)
                     .build();
         }
+        L.log.debug("==================================Request======================================");
+        L.log.debug(json);
         RequestBody body = RequestBody.create(JSON, json);
         Request request = new Request.Builder()
                 .url(url)
@@ -31,6 +33,8 @@ public class HttpClientKit {
         if (response.body() != null) {
             result = response.body().string();
         }
+        L.log.debug("==================================Response======================================");
+        L.log.debug(result);
         return result;
     }
 }
