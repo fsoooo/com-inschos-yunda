@@ -92,39 +92,6 @@ public class BankAction extends BaseAction {
         }
         return json(BaseResponseBean.CODE_SUCCESS, "业务完善中...", response);
     }
-
-    /**
-     * 获取银行卡转账授权书详情
-     *
-     * @return
-     * @params actionBean
-     */
-
-    public String findBankAuthorizeInfo(ActionBean actionBean) {
-        InsureSetupBean request = JsonKit.json2Bean(actionBean.body, InsureSetupBean.class);
-        BaseResponseBean response = new BaseResponseBean();
-        //判空
-        if (request == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
-        }
-        return json(BaseResponseBean.CODE_SUCCESS, "业务完善中...", response);
-    }
-
-    /**
-     * 银行卡授权操作
-     *
-     * @return
-     * @params actionBean
-     */
-    public String doBankAuthorize(ActionBean actionBean) {
-        InsureSetupBean request = JsonKit.json2Bean(actionBean.body, InsureSetupBean.class);
-        BaseResponseBean response = new BaseResponseBean();
-        //判空
-        if (request == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
-        }
-        return json(BaseResponseBean.CODE_SUCCESS, "业务完善中...", response);
-    }
 }
 
 

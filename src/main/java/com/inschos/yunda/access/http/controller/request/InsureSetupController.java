@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
  * User: wangsl
  * Date: 2018/06/22
  * Time: 17:12
- * 韵达项目-投保设置
+ * 韵达项目-投保设置:获取自动投保设置,更改自动投保设置,获取微信签约链接,获取微信授权书详情
  */
 @Controller
 @RequestMapping("/webapi")
@@ -56,6 +56,20 @@ public class InsureSetupController {
     }
 
     /**
+     * 获取签约状态
+     *
+     * @return json
+     * @params actionBean
+     * @access public
+     */
+    @GetActionBeanAnnotation
+    @RequestMapping("/findWhetContractStatus/**")
+    @ResponseBody
+    public String findWhetContractStatus(ActionBean actionBean) {
+        return insureSetupAction.findWhetContractStatus(actionBean);
+    }
+
+    /**
      * 获取签约信息(url)
      *
      * @return json
@@ -83,7 +97,42 @@ public class InsureSetupController {
         return insureSetupAction.findWhetContractInfo(actionBean);
     }
 
+    /**
+     * 获取银行卡授权状态
+     *
+     * @return
+     * @params actionBean
+     */
+    @GetActionBeanAnnotation
+    @RequestMapping("/findBankAuthorizeStatus/**")
+    @ResponseBody
+    public String findBankAuthorizeStatus(ActionBean actionBean) {
+        return insureSetupAction.findBankAuthorizeStatus(actionBean);
+    }
 
+    /**
+     * 获取银行卡转账授权书详情
+     *
+     * @return
+     * @params actionBean
+     */
+    @GetActionBeanAnnotation
+    @RequestMapping("/findBankAuthorizeInfo/**")
+    @ResponseBody
+    public String findBankAuthorizeInfo(ActionBean actionBean) {
+        return insureSetupAction.findBankAuthorizeInfo(actionBean);
+    }
 
-
+    /**
+     * 银行卡授权操作
+     *
+     * @return
+     * @params actionBean
+     */
+    @GetActionBeanAnnotation
+    @RequestMapping("/doBankAuthorize/**")
+    @ResponseBody
+    public String doBankAuthorize(ActionBean actionBean) {
+        return insureSetupAction.doBankAuthorize(actionBean);
+    }
 }

@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
  * User: wangsl
  * Date: 2018/06/22
  * Time: 17:12
- * 韵达项目对外接口:联合登录接口,授权查询接口,预投保接口
+ * 韵达项目-银行卡管理:添加银行卡,获取银行卡列表,获取银行卡详情,获取银行卡状态
  */
 @Controller
 @RequestMapping("/webapi")
@@ -91,32 +91,4 @@ public class BankController {
     public String updateBankStatus(ActionBean actionBean) {
         return bankAction.updateBankStatus(actionBean);
     }
-
-    /**
-     * 获取银行卡转账授权书详情
-     *
-     * @return
-     * @params actionBean
-     */
-    @GetActionBeanAnnotation
-    @RequestMapping("/findBankAuthorizeInfo/**")
-    @ResponseBody
-    public String findBankAuthorizeInfo(ActionBean actionBean) {
-        return bankAction.findBankAuthorizeInfo(actionBean);
-    }
-
-    /**
-     * 银行卡授权操作
-     *
-     * @return
-     * @params actionBean
-     */
-    @GetActionBeanAnnotation
-    @RequestMapping("/doBankAuthorize/**")
-    @ResponseBody
-    public String doBankAuthorize(ActionBean actionBean) {
-        return bankAction.doBankAuthorize(actionBean);
-    }
-
-
 }
