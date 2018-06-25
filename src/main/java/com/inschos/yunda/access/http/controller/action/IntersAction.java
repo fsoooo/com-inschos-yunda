@@ -75,10 +75,10 @@ public class IntersAction extends BaseAction {
         if (loginResponse == null) {
             return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
         }
-        if (loginResponse.code != 200) {
+        if (loginResponse.code == 500) {
             return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
         }
-        response.data = loginResponse;
+        response.data = loginResponse.data;
         //return json(BaseResponseBean.CODE_SUCCESS, "操作成功", response);
         //TODO 触发联合登录,异步操作 http 请求 投保服务
         String insureRes = doInsured(request);
@@ -311,10 +311,10 @@ public class IntersAction extends BaseAction {
                 return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败", response);
             }
             JointLoginBean.AccountResponse accountResponse = JsonKit.json2Bean(accountRes, JointLoginBean.AccountResponse.class);
-            if (accountResponse.code != 200) {
+            if (accountResponse.code == 500) {
                 return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败", response);
             }
-            response.data = accountResponse;
+            response.data = accountResponse.data;
             return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
         } catch (IOException e) {
             return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败", response);

@@ -1,7 +1,6 @@
 package com.inschos.yunda.access.http.controller.request;
 
-import com.inschos.yunda.access.http.controller.action.BankAction;
-import com.inschos.yunda.access.http.controller.action.IntersAction;
+import com.inschos.yunda.access.http.controller.action.InsureBankAction;
 import com.inschos.yunda.access.http.controller.bean.ActionBean;
 import com.inschos.yunda.annotation.GetActionBeanAnnotation;
 import org.apache.log4j.Logger;
@@ -9,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * User: wangsl
@@ -25,7 +22,7 @@ public class BankController {
 
     private static final Logger logger = Logger.getLogger(BankController.class);
     @Autowired
-    private BankAction bankAction;
+    private InsureBankAction bankAction;
 
     /**
      * 添加银行卡
