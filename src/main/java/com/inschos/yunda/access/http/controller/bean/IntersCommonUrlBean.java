@@ -50,11 +50,6 @@ public class IntersCommonUrlBean {
     public static final String toWechatContract = IntersCommonUrlBean.getServerHostInsure() + "/wechatContract";
 
     /**
-     * 微信代扣
-     */
-    public static final String toWechatPay = IntersCommonUrlBean.getServerHostInsure() + "/wechatPay";
-
-    /**
      * 出单
      */
     public static final String toIssue = IntersCommonUrlBean.getServerHostInsure() + "/issue";

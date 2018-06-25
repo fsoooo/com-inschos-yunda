@@ -9,7 +9,11 @@ public class AuthorizeQueryBean {
         public String insured_phone;
     }
 
-    public static class Response {
+    public static class Response extends BaseResponseBean {
+        public InsureParamsBean.ResponseData data;
+    }
+
+    public static class ResponseData {
         public String status;//授权状态:01未授权/02已授权
         public String url;//授权页面地址
     }

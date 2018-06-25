@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class IntersAction extends BaseAction {
         if (loginRes == null) {
             return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
         }
-        BaseResponseBean loginResponse = JsonKit.json2Bean(loginRes, BaseResponseBean.class);
+        JointLoginBean.Response loginResponse = JsonKit.json2Bean(loginRes, JointLoginBean.Response.class);
         if (loginResponse == null) {
             return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
         }
@@ -78,7 +79,7 @@ public class IntersAction extends BaseAction {
         if (insureRes == null) {
             return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
         }
-        BaseResponseBean insureResponse = JsonKit.json2Bean(insureRes, BaseResponseBean.class);
+        InsureParamsBean.Response insureResponse = JsonKit.json2Bean(insureRes, InsureParamsBean.Response.class);
         if (insureResponse == null) {
             return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
         }
@@ -99,7 +100,7 @@ public class IntersAction extends BaseAction {
     public String authorizationQuery(HttpServletRequest httpServletRequest) {
         JointLoginBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), JointLoginBean.Requset.class);
         BaseResponseBean response = new BaseResponseBean();
-        AuthorizeQueryBean.Response authorizeQueryResponse = new AuthorizeQueryBean.Response();
+        AuthorizeQueryBean.ResponseData authorizeQueryResponseData = new AuthorizeQueryBean.ResponseData();
         //判空
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "请检查报文格式是否正确", response);
@@ -112,7 +113,7 @@ public class IntersAction extends BaseAction {
         if (loginRes == null) {
             return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
         }
-        BaseResponseBean loginResponse = JsonKit.json2Bean(loginRes, BaseResponseBean.class);
+        JointLoginBean.Response loginResponse = JsonKit.json2Bean(loginRes, JointLoginBean.Response.class);
         if (loginResponse == null) {
             return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
         }
@@ -124,7 +125,7 @@ public class IntersAction extends BaseAction {
         if (authorizeRes == null) {
             return json(BaseResponseBean.CODE_FAILURE, "授权查询接口调用失败", response);
         }
-        BaseResponseBean authorizeResponse = JsonKit.json2Bean(authorizeRes, BaseResponseBean.class);
+        AuthorizeQueryBean.Response authorizeResponse = JsonKit.json2Bean(authorizeRes, AuthorizeQueryBean.Response.class);
         if (authorizeResponse == null) {
             return json(BaseResponseBean.CODE_FAILURE, "授权查询接口调用失败", response);
         }
@@ -132,13 +133,13 @@ public class IntersAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, "授权查询接口调用失败", response);
         }
         //TODO 返回参数
-        authorizeQueryResponse.status = "";
-        authorizeQueryResponse.url = "";
-        response.data = authorizeQueryResponse;
-        if (authorizeQueryResponse.status == "01") {
+        authorizeQueryResponseData.status = "";
+        authorizeQueryResponseData.url = "";
+        response.data = authorizeQueryResponseData;
+        if (authorizeQueryResponseData.status == "01") {
             String responseText = "未授权";
             return json(BaseResponseBean.CODE_FAILURE, responseText, response);
-        } else if (authorizeQueryResponse.status == "02") {
+        } else if (authorizeQueryResponseData.status == "02") {
             String responseText = "已授权";
             return json(BaseResponseBean.CODE_FAILURE, responseText, response);
         } else {
@@ -156,20 +157,21 @@ public class IntersAction extends BaseAction {
      * @params timestamp
      */
     public String prepareInusre(HttpServletRequest httpServletRequest) {
-        InsurePrepareBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest),  InsurePrepareBean.Requset.class);
+        InsurePrepareBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), InsurePrepareBean.Requset.class);
         BaseResponseBean response = new BaseResponseBean();
-        if(request==null){
+        if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
-        if(request.biz_content==null){
+        if (request.biz_content == null) {
             return json(BaseResponseBean.CODE_FAILURE, "必要参数为空", response);
         }
         Base64Kit base64Kit = new Base64Kit();
         String biz_content = base64Kit.getFromBase64(request.biz_content);
-        if(biz_content==null){
+        if (biz_content == null) {
             return json(BaseResponseBean.CODE_FAILURE, "与投保参数解析失败", response);
         }
-        List<InsurePrepareBean.InsureRequest> insureRequests =  JsonKit.json2Bean(biz_content, new TypeReference<List<InsurePrepareBean.InsureRequest>>(){});
+        List<InsurePrepareBean.InsureRequest> insureRequests = JsonKit.json2Bean(biz_content, new TypeReference<List<InsurePrepareBean.InsureRequest>>() {
+        });
         for (InsurePrepareBean.InsureRequest insureRequest : insureRequests) {
             JointLoginBean.Requset jointLoginRequest = new JointLoginBean.Requset();
             jointLoginRequest.channel_code = insureRequest.channel_code;
@@ -186,12 +188,12 @@ public class IntersAction extends BaseAction {
             jointLoginRequest.bank_phone = insureRequest.channel_bank_phone;
             jointLoginRequest.bank_address = insureRequest.channel_bank_address;
             jointLoginRequest.channel_order_code = "";
-            //TODO 触发联合登录,异步操作 http 请求 投保服务
+            //TODO  http 请求 投保服务
             String insureRes = doInsured(jointLoginRequest);
             if (insureRes == null) {
                 return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
             }
-            BaseResponseBean insureResponse = JsonKit.json2Bean(insureRes, BaseResponseBean.class);
+            InsureParamsBean.Response insureResponse = JsonKit.json2Bean(insureRes, InsureParamsBean.Response.class);
             if (insureResponse == null) {
                 return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
             }
@@ -199,6 +201,7 @@ public class IntersAction extends BaseAction {
                 return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
             }
         }
+        //TODO 预投保接口跟其他接口的返回格式不同
         return json(BaseResponseBean.CODE_SUCCESS, "操作成功", response);
     }
 
@@ -231,7 +234,7 @@ public class IntersAction extends BaseAction {
             if (result == null) {
                 return json(BaseResponseBean.CODE_FAILURE, "投保推送韵达请求失败", response);
             }
-            BaseResponseBean responseData = JsonKit.json2Bean(result, BaseResponseBean.class);
+            CallbackYundaBean.Response responseData = JsonKit.json2Bean(result, CallbackYundaBean.Response.class);
             if (response.code != 200) {
                 return json(BaseResponseBean.CODE_FAILURE, "投保推送韵达请求失败", response);
             }
@@ -255,11 +258,12 @@ public class IntersAction extends BaseAction {
         jointLoginRequest.insured_phone = request.insured_phone;
         try {
             //TODO 请求http
+            //String authorizeRes = HttpClientKit.post(toAuthorizeQuery, JsonKit.bean2Json(jointLoginRequest));
             String authorizeRes = HttpClientKit.post(toHttpTest, JsonKit.bean2Json(jointLoginRequest));
             if (authorizeRes == null) {
                 return json(BaseResponseBean.CODE_FAILURE, "授权查询请求失败", response);
             }
-            BaseResponseBean authorizeResponse = JsonKit.json2Bean(authorizeRes, BaseResponseBean.class);
+            AuthorizeQueryBean.Response authorizeResponse = JsonKit.json2Bean(authorizeRes, AuthorizeQueryBean.Response.class);
             if (authorizeResponse.code != 200) {
                 return json(BaseResponseBean.CODE_FAILURE, "授权查询请求失败", response);
             }
@@ -300,7 +304,7 @@ public class IntersAction extends BaseAction {
             if (accountRes == null) {
                 return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败", response);
             }
-            BaseResponseBean accountResponse = JsonKit.json2Bean(accountRes, BaseResponseBean.class);
+            JointLoginBean.Response accountResponse = JsonKit.json2Bean(accountRes, JointLoginBean.Response.class);
             if (accountResponse.code != 200) {
                 return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败", response);
             }
@@ -319,7 +323,7 @@ public class IntersAction extends BaseAction {
     private String doInsured(JointLoginBean.Requset request) {
         BaseResponseBean response = new BaseResponseBean();
         //投保人基础信息
-        InusreParamsBean.PolicyHolder policyHolder = new InusreParamsBean.PolicyHolder();
+        InsureParamsBean.PolicyHolder policyHolder = new InsureParamsBean.PolicyHolder();
         policyHolder.name = request.insured_name;
         policyHolder.cardType = "1";
         policyHolder.cardCode = request.insured_code;
@@ -348,44 +352,48 @@ public class IntersAction extends BaseAction {
         policyHolder.insure_days = "";//购保天数
         policyHolder.price = "";//价格
         //TODO 投保人被保人和受益人是本人
-        List<InusreParamsBean.PolicyHolder> recognizees = new ArrayList<>();
+        List<InsureParamsBean.PolicyHolder> recognizees = new ArrayList<>();
         recognizees.add(policyHolder);
-        InusreParamsBean insuredParams = new InusreParamsBean();
-        insuredParams.productId = 90;//产品id:英大90,泰康91
-        insuredParams.startTime = "";
-        insuredParams.endTime = "";
-        insuredParams.count = "";
-        insuredParams.businessNo = "";
-        insuredParams.payCategoryId = "";
-        insuredParams.businessNo = "";
-        insuredParams.policyholder = policyHolder;
-        insuredParams.recognizees = recognizees;
-        insuredParams.beneficiary = policyHolder;
+        InsureParamsBean.Requset insuredRequest = new InsureParamsBean.Requset();
+        insuredRequest.productId = 90;//产品id:英大90,泰康91
+        insuredRequest.startTime = "";
+        insuredRequest.endTime = "";
+        insuredRequest.count = "";
+        insuredRequest.businessNo = "";
+        insuredRequest.payCategoryId = "";
+        insuredRequest.businessNo = "";
+        insuredRequest.policyholder = policyHolder;
+        insuredRequest.recognizees = recognizees;
+        insuredRequest.beneficiary = policyHolder;
         try {
             //TODO 请求http
-            String insureRes = HttpClientKit.post(toInsured, JsonKit.bean2Json(insuredParams));
+            String insureRes = HttpClientKit.post(toInsured, JsonKit.bean2Json(insuredRequest));
             if (insureRes == null) {
                 return json(BaseResponseBean.CODE_FAILURE, "投保接口请求失败", response);
             }
-            BaseResponseBean insureResponse = JsonKit.json2Bean(insureRes, BaseResponseBean.class);
+            InsureParamsBean.Response insureResponse = JsonKit.json2Bean(insureRes, InsureParamsBean.Response.class);
             if (insureResponse.code != 200) {
                 return json(BaseResponseBean.CODE_FAILURE, "投保接口请求失败", response);
             }
+            InsureParamsBean.ResponseData responseData = new InsureParamsBean.ResponseData();
             InusrePayBean.Requset inusrePayRequest = new InusrePayBean.Requset();
             //TODO 支付参数
+            inusrePayRequest.payNo = insureResponse.data.payNo;
+            inusrePayRequest.payWay = insureResponse.data.payType;
             //TODO 投保成功,调用支付
             String payRes = doInsurePay(request, inusrePayRequest);
             if (payRes == null) {
                 return json(BaseResponseBean.CODE_FAILURE, "支付接口调用失败", response);
             }
-            BaseResponseBean payResponse = JsonKit.json2Bean(payRes, BaseResponseBean.class);
+            InusrePayBean.Response payResponse = JsonKit.json2Bean(payRes, InusrePayBean.Response.class);
             if (payResponse == null) {
                 return json(BaseResponseBean.CODE_FAILURE, "支付接口调用失败", response);
             }
             if (payResponse.code != 200) {
                 return json(BaseResponseBean.CODE_FAILURE, "支付接口调用失败", response);
             }
-            return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
+            String statusText = payResponse.data.statusTxt;//支付返回文案
+            return json(BaseResponseBean.CODE_SUCCESS, statusText, response);
         } catch (IOException e) {
             return json(BaseResponseBean.CODE_FAILURE, "投保接口请求失败", response);
         }
@@ -394,12 +402,56 @@ public class IntersAction extends BaseAction {
     /**
      * 投保支付操作
      *
-     * @param jointLoginRequest
+     * @param inusrePayRequest
      * @return
      */
     private String doInsurePay(JointLoginBean.Requset jointLoginRequest, InusrePayBean.Requset inusrePayRequest) {
         BaseResponseBean response = new BaseResponseBean();
-        return json(BaseResponseBean.CODE_FAILURE, "接口请求失败", response);
+        InusrePayBean.Requset insurePayRequest = new InusrePayBean.Requset();
+        insurePayRequest.payNo = inusrePayRequest.payNo;
+        insurePayRequest.payWay = insurePayRequest.payWay;
+        if (insurePayRequest.payWay == "1") {//支付方式 1 银联 2 支付宝 3 微信 4现金  必填
+            //TODO http 请求 支付银行卡服务
+            String bankRes = doPayBank(jointLoginRequest);
+            if (bankRes == null) {
+                return json(BaseResponseBean.CODE_FAILURE, "银行卡服务调用失败", response);
+            }
+            JointLoginBean.BankResponse bankResponse = JsonKit.json2Bean(bankRes, JointLoginBean.BankResponse.class);
+            if (bankResponse == null) {
+                return json(BaseResponseBean.CODE_FAILURE, "银行卡服务调用失败", response);
+            }
+            if (bankResponse.code != 200) {
+                return json(BaseResponseBean.CODE_FAILURE, "银行卡服务调用失败", response);
+            }
+            //TODO 获取支付银行卡
+            //insurePayRequest.bankData = bankResponse.data;
+        }
+        try {
+            //TODO 请求http
+            String payRes = HttpClientKit.post(toPay, JsonKit.bean2Json(insurePayRequest));
+            if (payRes == null) {
+                return json(BaseResponseBean.CODE_FAILURE, "支付接口请求失败", response);
+            }
+            BaseResponseBean payResponse = JsonKit.json2Bean(payRes, BaseResponseBean.class);
+            if (payResponse.code != 200) {
+                return json(BaseResponseBean.CODE_FAILURE, "支付接口请求失败", response);
+            }
+            response.data = payResponse;
+            return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
+        } catch (IOException e) {
+            return json(BaseResponseBean.CODE_FAILURE, "支付接口请求失败", response);
+        }
+    }
+
+    /**
+     * 获取支付银行卡信息
+     *
+     * @param request
+     * @return
+     */
+    private String doPayBank(JointLoginBean.Requset request) {
+        BaseResponseBean response = new BaseResponseBean();
+        return json(BaseResponseBean.CODE_FAILURE, "接口服务完善中。。。", response);
     }
 
     /**
@@ -408,20 +460,10 @@ public class IntersAction extends BaseAction {
      * @param request
      * @return
      */
-    private String doWechatContract(JointLoginBean.Requset request) {
+    private String doWechatContract(WechatContractBean.Requset request) {
         BaseResponseBean response = new BaseResponseBean();
+        //先判断前一天是否进行预投保
+        //获取预投保，然后调用微信签约接口
         return json(BaseResponseBean.CODE_FAILURE, "接口服务完善中。。。", response);
     }
-
-    /**
-     * 调用微信代扣
-     *
-     * @param request
-     * @return
-     */
-    private String doWechatPay(JointLoginBean.Requset request) {
-        BaseResponseBean response = new BaseResponseBean();
-        return json(BaseResponseBean.CODE_FAILURE, "接口服务完善中。。。", response);
-    }
-
 }

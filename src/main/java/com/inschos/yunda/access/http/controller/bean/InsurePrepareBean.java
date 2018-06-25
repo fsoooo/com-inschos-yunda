@@ -8,7 +8,11 @@ public class InsurePrepareBean {
         public String timestamp;
     }
 
-    public static class Response {
+    public static class Response extends BaseResponseBean {
+        public ResponseData data;
+    }
+
+    public static class ResponseData {
         public String status;
         public String content;
     }

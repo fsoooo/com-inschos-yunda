@@ -12,7 +12,11 @@ public class CallbackYundaBean {
         public String companyName;//保险公司名称 32
     }
 
-    public static class Response {
+    public static class Response extends BaseResponseBean {
+        public InsureParamsBean.ResponseData data;
+    }
+
+    public static class ResponseData {
         public String code;//错误编码
         public String remark;//结果描述
         public String data;//返回数据 可为空
