@@ -5,6 +5,8 @@ import com.inschos.yunda.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class WarrantyRecordDao {
     @Autowired
@@ -24,5 +26,9 @@ public class WarrantyRecordDao {
 
     public WarrantyRecord findInsureResult(WarrantyRecord warrantyRecord) {
         return warrantyRecordMapper.findInsureResult(warrantyRecord);
+    }
+
+    public List<WarrantyRecord> findInsureWarrantyList(WarrantyRecord warrantyRecord){
+        return warrantyRecordMapper.findInsureWarrantyList(warrantyRecord);
     }
 }

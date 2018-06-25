@@ -2,6 +2,8 @@ package com.inschos.yunda.data.mapper;
 
 import com.inschos.yunda.model.*;
 
+import java.util.List;
+
 public interface WarrantyRecordMapper {
     long addWarrantyRecord(WarrantyRecord warrantyRecord);
 
@@ -10,4 +12,6 @@ public interface WarrantyRecordMapper {
     long updateWarrantyRecord(WarrantyRecord warrantyRecord);
 
     WarrantyRecord findInsureResult(WarrantyRecord warrantyRecord);
+
+    List<WarrantyRecord> findInsureWarrantyList(WarrantyRecord warrantyRecord);
 }
