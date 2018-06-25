@@ -60,6 +60,11 @@ public class IntersCommonUrlBean {
     public static final String toAuthorizeQuery = IntersCommonUrlBean.getServerHostInsure() + "/authorizeQuery";
 
     /**
+     * 获取支付银行卡信息
+     */
+    public static final String toPayBank = IntersCommonUrlBean.getServerHostInsure() + "/payBank";
+
+    /**
      * 投保推送韵达
      */
     public static final String toCallBackYunda = IntersCommonUrlBean.getServerHostCallBackYunda() + "/call_back_yunda";

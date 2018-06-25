@@ -32,8 +32,18 @@ public class JointLoginBean {
         public String local_url;//我的保险地址
     }
 
+    public static class AccountResponse extends BaseResponseBean {
+        public AccountResponseData data;
+    }
+
+    public static class AccountResponseData {
+        public long custId;
+        public long accountUuid;
+        public String loginToken;
+    }
+
     public static class BankResponse extends BaseResponseBean {
-        public List<ResponseData> data;
+        public List<BankResponseData> data;
     }
 
     public static class BankResponseData {

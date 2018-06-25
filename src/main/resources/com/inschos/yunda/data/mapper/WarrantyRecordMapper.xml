@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 命名空间，对sql进行分类化管理（sql隔离） -->
+<mapper namespace="com.inschos.yunda.data.mapper.WarrantyRecordMapper">
+
+    <insert id="addWarrantyRecord" parameterType="WarrantyRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into warranty_record(`cust_id`,`warranty_uuid`,`warranty_status`,`warranty_status_text`,`created_at`,`updated_at`) values(#{cust_id},#{warranty_uuid},#{warranty_status},#{warranty_status_text},#{created_at},#{updated_at})
+    </insert>
+
+    <select id="findLastDayWarrantyRecord" parameterType="WarrantyRecord" resultType="WarrantyRecord">
+        select `cust_id`,`warranty_uuid`,`warranty_status`,`warranty_status_text`,`created_at`,`updated_at`
+        from joint_login
+        <where>
+            cust_id =#{cust_id} AND created_at >=#{day_start} AND created_at &lt;#{day_end}
+        </where>
+    </select>
+
+</mapper>

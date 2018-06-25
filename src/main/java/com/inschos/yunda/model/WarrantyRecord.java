@@ -7,4 +7,7 @@ public class WarrantyRecord {
     public String warranty_status_text;//保单状态文案 1待处理, 2待支付,3待生效, 4保障中,5可续保，6已失效，7已退保  8已过保',
     public long created_at;
     public long updated_at;
+    //查询使用
+    public long day_start;//凌晨0点时间戳
+    public long day_end;//晚上23:59:59时间戳
 }
