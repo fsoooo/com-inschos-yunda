@@ -7,5 +7,7 @@ public interface WarrantyRecordMapper {
 
     WarrantyRecord findLastDayWarrantyRecord(WarrantyRecord warrantyRecord);
 
+    long updateWarrantyRecord(WarrantyRecord warrantyRecord);
+
     WarrantyRecord findInsureResult(WarrantyRecord warrantyRecord);
 }

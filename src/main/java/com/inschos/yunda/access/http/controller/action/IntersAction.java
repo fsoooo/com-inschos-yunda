@@ -384,6 +384,25 @@ public class IntersAction extends BaseAction {
             InsureParamsBean.ResponseData responseData = new InsureParamsBean.ResponseData();
             InusrePayBean.Requset inusrePayRequest = new InusrePayBean.Requset();
             //TODO 保单记录表添加/更新
+            WarrantyRecord warrantyRecord = new WarrantyRecord();
+            long date = new Date().getTime();
+            long custId = doCustId(request);
+            if(custId==0){
+                return json(BaseResponseBean.CODE_FAILURE, "获取用户信息失败", response);
+            }
+            warrantyRecord.cust_id = custId;
+            warrantyRecord.warranty_uuid = responseData.warrantyUuid;
+            warrantyRecord.warranty_status = responseData.status;
+            warrantyRecord.warranty_status_text = responseData.statusTxt;
+            warrantyRecord.pay_no = responseData.payNo;
+            warrantyRecord.pay_type = responseData.payType;
+            warrantyRecord.pay_url = responseData.payUrl;
+            warrantyRecord.created_at = date;
+            warrantyRecord.updated_at = date;
+            String addWarrantyRecordRes = doAddWarrantyRecord(warrantyRecord);
+            if(addWarrantyRecordRes==null) {
+                return json(BaseResponseBean.CODE_FAILURE, "添加投保记录失败", response);
+            }
             //TODO 支付参数
             inusrePayRequest.payNo = insureResponse.data.payNo;
             inusrePayRequest.payWay = insureResponse.data.payType;
@@ -398,6 +417,13 @@ public class IntersAction extends BaseAction {
             }
             if (payResponse.code != 200) {
                 return json(BaseResponseBean.CODE_FAILURE, "支付接口调用失败", response);
+            }
+            warrantyRecord.warranty_status = payResponse.data.status;
+            warrantyRecord.warranty_status_text = payResponse.data.statusTxt;
+            warrantyRecord.updated_at = new Date().getTime();
+            String updateWarrantyRecordRes = doUpdateWarrantyRecord(warrantyRecord);
+            if(updateWarrantyRecordRes==null) {
+                return json(BaseResponseBean.CODE_FAILURE, "更新投保记录失败", response);
             }
             String statusText = payResponse.data.statusTxt;//支付返回文案
             return json(BaseResponseBean.CODE_SUCCESS, statusText, response);
@@ -484,39 +510,12 @@ public class IntersAction extends BaseAction {
     private String doWechatContract(JointLoginBean.Requset jointLoginRequest, WechatContractBean.Requset wechatContractRequest) {
         BaseResponseBean response = new BaseResponseBean();
         //先判断前一天是否进行预投保
-        StaffPerson staffPerson = new StaffPerson();
-        staffPerson.name = jointLoginRequest.insured_name;
-        staffPerson.papers_code = jointLoginRequest.insured_name;
-        staffPerson.phone = jointLoginRequest.insured_phone;
-        long cust_id = staffPersonDao.findStaffPersonId(staffPerson);
-        long date = new Date().getTime();
-        if (cust_id == 0) {
-            //TODO 触发联合登录,同步操作 http 请求 账号服务
-            String loginRes = doAccount(jointLoginRequest);
-            if (loginRes == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
-            }
-            JointLoginBean.AccountResponse loginResponse = JsonKit.json2Bean(loginRes, JointLoginBean.AccountResponse.class);
-            if (loginResponse == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
-            }
-            if (loginResponse.code != 200) {
-                return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
-            }
-            staffPerson.cust_id = loginResponse.data.custId;
-            staffPerson.account_uuid = loginResponse.data.accountUuid;
-            staffPerson.login_token = loginResponse.data.loginToken;
-            staffPerson.created_at = date;
-            staffPerson.updated_at = date;
-            long addRes = staffPersonDao.addStaffPerson(staffPerson);
-            if (addRes != 0) {
-                cust_id = loginResponse.data.custId;
-            } else {
-                return json(BaseResponseBean.CODE_FAILURE, "没有此用户，请重新联合登录", response);
-            }
+        long custId = doCustId(jointLoginRequest);
+        if(custId==0){
+            return json(BaseResponseBean.CODE_FAILURE, "获取用户信息失败", response);
         }
         WarrantyRecord warrantyRecord = new WarrantyRecord();
-        warrantyRecord.cust_id = cust_id;
+        warrantyRecord.cust_id = custId;
         Calendar calendar = Calendar.getInstance();
         long day_start = calendar.getTimeInMillis();
         warrantyRecord.day_start = day_start;
@@ -557,20 +556,70 @@ public class IntersAction extends BaseAction {
      */
     private String doAddWarrantyRecord(WarrantyRecord warrantyRecord) {
         BaseResponseBean response = new BaseResponseBean();
-
-        return json(BaseResponseBean.CODE_FAILURE, "接口请求失败", response);
-
+        long warrantyId = warrantyRecordDao.addWarrantyRecord(warrantyRecord);
+        if(warrantyId==0){
+            return json(BaseResponseBean.CODE_FAILURE, "添加投保记录失败", response);
+        }
+        response.data = warrantyId;
+        return json(BaseResponseBean.CODE_SUCCESS, "添加投保记录成功", response);
     }
 
     /**
      * 更新投保记录(保单状态等)
      * @param warrantyRecord
+     * @params id
+     * @params warranty_status
+     * @params warranty_status_text
+     * @params updated_at
      * @return
      */
     private String doUpdateWarrantyRecord(WarrantyRecord warrantyRecord) {
         BaseResponseBean response = new BaseResponseBean();
+        long updateRes = warrantyRecordDao.updateWarrantyRecord(warrantyRecord);
+        if(updateRes==0){
+            return json(BaseResponseBean.CODE_FAILURE, "更新投保记录失败", response);
+        }
+        return json(BaseResponseBean.CODE_SUCCESS, "更新投保记录成功", response);
+    }
 
-        return json(BaseResponseBean.CODE_FAILURE, "接口请求失败", response);
 
+    /**
+     * 获取cust_id
+     * @param jointLoginRequest
+     * @return
+     */
+    private long doCustId(JointLoginBean.Requset jointLoginRequest){
+        StaffPerson staffPerson = new StaffPerson();
+        staffPerson.name = jointLoginRequest.insured_name;
+        staffPerson.papers_code = jointLoginRequest.insured_name;
+        staffPerson.phone = jointLoginRequest.insured_phone;
+        long cust_id = staffPersonDao.findStaffPersonId(staffPerson);
+        long date = new Date().getTime();
+        if (cust_id == 0) {
+            //TODO 触发联合登录,同步操作 http 请求 账号服务
+            String loginRes = doAccount(jointLoginRequest);
+            if (loginRes == null) {
+                return 0;
+            }
+            JointLoginBean.AccountResponse loginResponse = JsonKit.json2Bean(loginRes, JointLoginBean.AccountResponse.class);
+            if (loginResponse == null) {
+                return 0;
+            }
+            if (loginResponse.code != 200) {
+                return 0;
+            }
+            staffPerson.cust_id = loginResponse.data.custId;
+            staffPerson.account_uuid = loginResponse.data.accountUuid;
+            staffPerson.login_token = loginResponse.data.loginToken;
+            staffPerson.created_at = date;
+            staffPerson.updated_at = date;
+            long addRes = staffPersonDao.addStaffPerson(staffPerson);
+            if (addRes != 0) {
+                cust_id = loginResponse.data.custId;
+            } else {
+                return 0;
+            }
+        }
+        return cust_id;
     }
 }
