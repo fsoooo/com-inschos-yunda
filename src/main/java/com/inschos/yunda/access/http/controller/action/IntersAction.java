@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -155,13 +156,50 @@ public class IntersAction extends BaseAction {
      * @params timestamp
      */
     public String prepareInusre(HttpServletRequest httpServletRequest) {
-        JointLoginBean request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), JointLoginBean.class);
+        InsurePrepareBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest),  InsurePrepareBean.Requset.class);
         BaseResponseBean response = new BaseResponseBean();
-        //判空
-        if (request == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "请检查报文格式是否正确", response);
+        if(request==null){
+            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
-        return json(BaseResponseBean.CODE_FAILURE, "请检查报文格式是否正确", response);
+        if(request.biz_content==null){
+            return json(BaseResponseBean.CODE_FAILURE, "必要参数为空", response);
+        }
+        Base64Kit base64Kit = new Base64Kit();
+        String biz_content = base64Kit.getFromBase64(request.biz_content);
+        if(biz_content==null){
+            return json(BaseResponseBean.CODE_FAILURE, "与投保参数解析失败", response);
+        }
+        List<InsurePrepareBean.InsureRequest> insureRequests =  JsonKit.json2Bean(biz_content, new TypeReference<List<InsurePrepareBean.InsureRequest>>(){});
+        for (InsurePrepareBean.InsureRequest insureRequest : insureRequests) {
+            JointLoginBean.Requset jointLoginRequest = new JointLoginBean.Requset();
+            jointLoginRequest.channel_code = insureRequest.channel_code;
+            jointLoginRequest.insured_name = insureRequest.channel_user_name;
+            jointLoginRequest.insured_code = insureRequest.channel_user_code;
+            jointLoginRequest.insured_phone = insureRequest.channel_user_phone;
+            jointLoginRequest.insured_email = insureRequest.channel_user_email;
+            jointLoginRequest.insured_province = insureRequest.channel_provinces;
+            jointLoginRequest.insured_city = insureRequest.channel_city;
+            jointLoginRequest.insured_county = insureRequest.channel_county;
+            jointLoginRequest.insured_address = insureRequest.channel_user_address;
+            jointLoginRequest.bank_name = insureRequest.channel_bank_name;
+            jointLoginRequest.bank_code = insureRequest.channel_bank_code;
+            jointLoginRequest.bank_phone = insureRequest.channel_bank_phone;
+            jointLoginRequest.bank_address = insureRequest.channel_bank_address;
+            jointLoginRequest.channel_order_code = "";
+            //TODO 触发联合登录,异步操作 http 请求 投保服务
+            String insureRes = doInsured(jointLoginRequest);
+            if (insureRes == null) {
+                return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
+            }
+            BaseResponseBean insureResponse = JsonKit.json2Bean(insureRes, BaseResponseBean.class);
+            if (insureResponse == null) {
+                return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
+            }
+            if (insureResponse.code != 200) {
+                return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
+            }
+        }
+        return json(BaseResponseBean.CODE_SUCCESS, "操作成功", response);
     }
 
     /**
