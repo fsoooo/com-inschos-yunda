@@ -14,7 +14,11 @@ public class StaffPersonDao {
         return staffPersonMapper.addStaffPerson(staffPerson);
     }
 
-    public long findStaffPerson(StaffPerson staffPerson) {
-        return staffPersonMapper.findStaffPerson(staffPerson);
+    public long findStaffPersonId(StaffPerson staffPerson) {
+        return staffPersonMapper.findStaffPersonId(staffPerson);
+    }
+
+    public StaffPerson findStaffPersonInfo(StaffPerson staffPerson) {
+        return staffPersonMapper.findStaffPersonInfo(staffPerson);
     }
 }

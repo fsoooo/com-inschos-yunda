@@ -17,4 +17,8 @@ public class WarrantyRecordDao {
     public WarrantyRecord findLastDayWarrantyRecord(WarrantyRecord warrantyRecord) {
         return warrantyRecordMapper.findLastDayWarrantyRecord(warrantyRecord);
     }
+
+    public WarrantyRecord findInsureResult(WarrantyRecord warrantyRecord) {
+        return warrantyRecordMapper.findInsureResult(warrantyRecord);
+    }
 }

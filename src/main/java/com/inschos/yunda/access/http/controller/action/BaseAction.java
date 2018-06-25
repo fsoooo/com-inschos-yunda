@@ -59,7 +59,7 @@ public class BaseAction {
 
         if (obj == null) {
             CheckParamsKit.Entry<String, String> anEntry = CheckParamsKit.getDefaultEntry();
-            anEntry.details = "解析错误";
+            anEntry.details = "解析失败";
             list.add(anEntry);
             return list;
         }

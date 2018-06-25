@@ -174,7 +174,7 @@ public class IntersAction extends BaseAction {
         Base64Kit base64Kit = new Base64Kit();
         String biz_content = base64Kit.getFromBase64(request.biz_content);
         if (biz_content == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "与投保参数解析失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "预投保参数解析失败", response);
         }
         List<InsurePrepareBean.InsureRequest> insureRequests = JsonKit.json2Bean(biz_content, new TypeReference<List<InsurePrepareBean.InsureRequest>>() {
         });
@@ -221,10 +221,10 @@ public class IntersAction extends BaseAction {
         CallbackYundaBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), CallbackYundaBean.Requset.class);
         BaseResponseBean response = new BaseResponseBean();
         if (request == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "参数解析错误", response);
+            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
         if (request.ordersId == null || request.payTime == null || request.effectiveTime == null || request.type == null || request.status == null || request.ordersName == null || request.companyName == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "参数解析错", response);
+            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
         CallbackYundaBean.Requset callbackYundaRequest = new CallbackYundaBean.Requset();
         callbackYundaRequest.ordersId = request.ordersId;
@@ -383,6 +383,7 @@ public class IntersAction extends BaseAction {
             }
             InsureParamsBean.ResponseData responseData = new InsureParamsBean.ResponseData();
             InusrePayBean.Requset inusrePayRequest = new InusrePayBean.Requset();
+            //TODO 保单记录表添加/更新
             //TODO 支付参数
             inusrePayRequest.payNo = insureResponse.data.payNo;
             inusrePayRequest.payWay = insureResponse.data.payType;
@@ -487,7 +488,7 @@ public class IntersAction extends BaseAction {
         staffPerson.name = jointLoginRequest.insured_name;
         staffPerson.papers_code = jointLoginRequest.insured_name;
         staffPerson.phone = jointLoginRequest.insured_phone;
-        long cust_id = staffPersonDao.findStaffPerson(staffPerson);
+        long cust_id = staffPersonDao.findStaffPersonId(staffPerson);
         long date = new Date().getTime();
         if (cust_id == 0) {
             //TODO 触发联合登录,同步操作 http 请求 账号服务
@@ -547,5 +548,29 @@ public class IntersAction extends BaseAction {
         } catch (IOException e) {
             return json(BaseResponseBean.CODE_FAILURE, "微信签约接口请求失败", response);
         }
+    }
+
+    /**
+     * 添加投保记录
+     * @param warrantyRecord
+     * @return
+     */
+    private String doAddWarrantyRecord(WarrantyRecord warrantyRecord) {
+        BaseResponseBean response = new BaseResponseBean();
+
+        return json(BaseResponseBean.CODE_FAILURE, "接口请求失败", response);
+
+    }
+
+    /**
+     * 更新投保记录(保单状态等)
+     * @param warrantyRecord
+     * @return
+     */
+    private String doUpdateWarrantyRecord(WarrantyRecord warrantyRecord) {
+        BaseResponseBean response = new BaseResponseBean();
+
+        return json(BaseResponseBean.CODE_FAILURE, "接口请求失败", response);
+
     }
 }

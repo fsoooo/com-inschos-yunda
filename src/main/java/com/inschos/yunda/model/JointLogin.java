@@ -1,6 +1,7 @@
 package com.inschos.yunda.model;
 
 public class JointLogin {
+    public long id;
     public String phone;
     public long login_start;
     public long day_start;//凌晨0点时间戳

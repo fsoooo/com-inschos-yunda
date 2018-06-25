@@ -1,6 +1,7 @@
 package com.inschos.yunda.model;
 
 public class WarrantyRecord {
+    public long id;
     public long cust_id;//用户id
     //保单信息
     public String warranty_uuid;//'warranty_uuid内部保单唯一标识'

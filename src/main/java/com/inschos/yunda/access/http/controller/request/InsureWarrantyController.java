@@ -68,4 +68,17 @@ public class InsureWarrantyController {
     public String findInsureWarrantyStatus(ActionBean actionBean) {
         return insureWarrantyAction.findInsureWarrantyStatus(actionBean);
     }
+
+    /**
+     * 获取购保详情
+     *
+     * @return
+     * @params actionBean
+     */
+    @GetActionBeanAnnotation
+    @RequestMapping("/findInsureResult/**")
+    @ResponseBody
+    public String findInsureResult(ActionBean actionBean) {
+        return insureWarrantyAction.findInsureResult(actionBean);
+    }
 }

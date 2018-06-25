@@ -3,12 +3,20 @@
 <!-- 命名空间，对sql进行分类化管理（sql隔离） -->
 <mapper namespace="com.inschos.yunda.data.mapper.StaffPersonMapper">
 
-    <insert id="addStaffPerson" parameterType="WarrantyRecord" useGeneratedKeys="true" keyProperty="id">
+    <insert id="addStaffPerson" parameterType="StaffPerson" useGeneratedKeys="true" keyProperty="id">
         insert into staff_person(`cust_id`,`account_uuid`,`name`,`papers_type`,`papers_code`,`phone`,`created_at`,`updated_at`) values(#{cust_id},#{account_uuid},#{name},#{papers_type},#{papers_code},#{phone},#{created_at},#{updated_at})
     </insert>
 
-    <select id="findStaffPerson" parameterType="WarrantyRecord" resultType="long">
+    <select id="findStaffPersonId" parameterType="StaffPerson" resultType="long">
         select `cust_id`
+        from staff_person
+        <where>
+            name =#{name} AND papers_type =#{papers_type} AND papers_code =#{papers_code} AND phone =#{phone}
+        </where>
+    </select>
+
+    <select id="findStaffPersonInfo" parameterType="StaffPerson" resultType="StaffPerson">
+        select `cust_id`,`account_uuid`,`name`,`papers_type`,`papers_code`,`phone`,`created_at`,`updated_at`
         from staff_person
         <where>
             name =#{name} AND papers_type =#{papers_type} AND papers_code =#{papers_code} AND phone =#{phone}
