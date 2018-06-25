@@ -1,7 +1,5 @@
 package com.inschos.yunda.data.mapper;
 
-
-
 import com.inschos.yunda.model.*;
 
 public interface StaffPersonMapper {

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!-- 命名空间，对sql进行分类化管理（sql隔离） -->
-<mapper namespace="com.inschos.yunda.data.mapper.WarrantyRecordMapper">
+<mapper namespace="com.inschos.yunda.data.mapper.StaffPersonMapper">
 
-    <insert id="addWarrantyRecord" parameterType="WarrantyRecord" useGeneratedKeys="true" keyProperty="id">
-        insert into warranty_record(`cust_id`,`warranty_uuid`,`warranty_status`,`warranty_status_text`,`created_at`,`updated_at`) values(#{cust_id},#{warranty_uuid},#{warranty_status},#{warranty_status_text},#{created_at},#{updated_at})
+    <insert id="addStaffPerson" parameterType="WarrantyRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into staff_person(`cust_id`,`account_uuid`,`name`,`papers_type`,`papers_code`,`phone`,`created_at`,`updated_at`) values(#{cust_id},#{account_uuid},#{name},#{papers_type},#{papers_code},#{phone},#{created_at},#{updated_at})
     </insert>
 
-    <select id="findLastDayWarrantyRecord" parameterType="WarrantyRecord" resultType="long">
-        select count (1)
-        from joint_login
+    <select id="findStaffPerson" parameterType="WarrantyRecord" resultType="long">
+        select `cust_id`
+        from staff_person
         <where>
-            cust_id =#{cust_id} AND created_at >=#{day_start} AND created_at &lt;#{day_end}
+            name =#{name} AND papers_type =#{papers_type} AND papers_code =#{papers_code} AND phone =#{phone}
         </where>
     </select>
 

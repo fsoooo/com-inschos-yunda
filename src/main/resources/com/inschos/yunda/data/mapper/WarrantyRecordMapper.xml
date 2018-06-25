@@ -9,7 +9,7 @@
 
     <select id="findLastDayWarrantyRecord" parameterType="WarrantyRecord" resultType="WarrantyRecord">
         select `cust_id`,`warranty_uuid`,`warranty_status`,`warranty_status_text`,`created_at`,`updated_at`
-        from joint_login
+        from warranty_record
         <where>
             cust_id =#{cust_id} AND created_at >=#{day_start} AND created_at &lt;#{day_end}
         </where>
