@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
  * User: wangsl
  * Date: 2018/06/23
  * Time: 17:12
- * 韵达项目-保单管理:获取保单列表,获取保单详情,获取保单状态
+ * 韵达项目-保单管理:获取保单列表,获取保单详情,获取购保结果
  */
 @Controller
 @RequestMapping("/webapi")
@@ -56,21 +56,7 @@ public class InsureWarrantyController {
     }
 
     /**
-     * 获取保单状态
-     *
-     * @return json
-     * @params actionBean
-     * @access public
-     */
-    @GetActionBeanAnnotation
-    @RequestMapping("/findInsureWarrantyStatus/**")
-    @ResponseBody
-    public String findInsureWarrantyStatus(ActionBean actionBean) {
-        return insureWarrantyAction.findInsureWarrantyStatus(actionBean);
-    }
-
-    /**
-     * 获取购保详情
+     * 获取购保结果
      *
      * @return
      * @params actionBean

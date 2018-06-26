@@ -26,7 +26,8 @@ public class InsureWarrantyAction extends BaseAction {
 
     /**
      * 获取保单列表(不同状态的)
-     * TODO 从本地库里取数据
+     * TODO 从本地库里取数据？？
+     *
      * @param actionBean
      * @return
      */
@@ -39,8 +40,8 @@ public class InsureWarrantyAction extends BaseAction {
         }
         WarrantyRecord warrantyRecord = new WarrantyRecord();
         warrantyRecord.cust_id = Long.valueOf(actionBean.userId);
-        if(request.warrantyStatus==null){
-            request.warrantyStatus="4";//保障中
+        if (request.warrantyStatus == null) {
+            request.warrantyStatus = "4";//保障中
         }
         warrantyRecord.warranty_status = request.warrantyStatus;
         List<WarrantyRecord> InsureWarrantyLists = warrantyRecordDao.findInsureWarrantyList(warrantyRecord);
@@ -55,6 +56,7 @@ public class InsureWarrantyAction extends BaseAction {
     /**
      * 获取保单详情
      * TODO 根据warranty_uuid,从远程接口取数据
+     *
      * @param actionBean
      * @return
      */
@@ -66,8 +68,8 @@ public class InsureWarrantyAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
         InsureWarrantyBean.warrantyInfoRequest warrantyInfoRequest = new InsureWarrantyBean.warrantyInfoRequest();
-        warrantyInfoRequest.custId =  Long.valueOf(actionBean.userId);
-        warrantyInfoRequest.accountUid =  Long.valueOf(actionBean.accountUuid);
+        warrantyInfoRequest.custId = Long.valueOf(actionBean.userId);
+        warrantyInfoRequest.accountUid = Long.valueOf(actionBean.accountUuid);
         warrantyInfoRequest.warrantyUuid = request.warrantyUuid;
         try {
             //TODO 请求http
@@ -87,23 +89,7 @@ public class InsureWarrantyAction extends BaseAction {
     }
 
     /**
-     * 获取保单状态
-     *
-     * @param actionBean
-     * @return
-     */
-    public String findInsureWarrantyStatus(ActionBean actionBean) {
-        InsureSetupBean request = JsonKit.json2Bean(actionBean.body, InsureSetupBean.class);
-        BaseResponseBean response = new BaseResponseBean();
-        //判空
-        if (request == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
-        }
-        return json(BaseResponseBean.CODE_SUCCESS, "业务完善中...", response);
-    }
-
-    /**
-     * 获取投保设置详情
+     * 获取购保结果
      *
      * @param actionBean
      * @return

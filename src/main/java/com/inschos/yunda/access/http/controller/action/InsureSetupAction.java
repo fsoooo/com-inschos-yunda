@@ -2,7 +2,9 @@ package com.inschos.yunda.access.http.controller.action;
 
 import com.inschos.yunda.access.http.controller.bean.*;
 import com.inschos.yunda.assist.kit.JsonKit;
+import com.inschos.yunda.data.dao.InsureSetupDao;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -10,6 +12,8 @@ public class InsureSetupAction extends BaseAction {
 
     private static final Logger logger = Logger.getLogger(InsureSetupAction.class);
 
+    @Autowired
+    private InsureSetupDao insureSetupDao;
 
     /**
      * 获取投保设置详情
