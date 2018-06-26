@@ -31,7 +31,7 @@ public class InsureSetupAction extends BaseAction {
         insureSetup.cust_id = custId;
         InsureSetup insureAutoRes = insureSetupDao.findInsureAutoInfo(insureSetup);
         InsureSetupBean.findInsureAutoResponseData insureAutoResponseData = new InsureSetupBean.findInsureAutoResponseData();
-        if(insureAutoRes==null){
+        if (insureAutoRes == null) {
             //TODO 添加投保设置记录
             long date = new Date().getTime();
             insureSetup.authorize_bank = "";
@@ -43,16 +43,16 @@ public class InsureSetupAction extends BaseAction {
             insureSetup.created_at = date;
             insureSetup.updated_at = date;
             long addRes = insureSetupDao.addInsureSetup(insureSetup);
-            if(addRes==0){
+            if (addRes == 0) {
                 return json(BaseResponseBean.CODE_SUCCESS, "获取投保设置失败", response);
-            }else{
+            } else {
                 insureAutoResponseData.custId = insureSetup.cust_id;
                 insureAutoResponseData.autoStatus = insureSetup.auto_insure_status;
                 insureAutoResponseData.price = insureSetup.auto_insure_price;
                 insureAutoResponseData.type = insureSetup.auto_insure_type;
                 insureAutoResponseData.closeTime = insureSetup.auto_insure_end;
             }
-        }else{
+        } else {
             insureAutoResponseData.custId = insureAutoRes.cust_id;
             insureAutoResponseData.autoStatus = insureAutoRes.auto_insure_status;
             insureAutoResponseData.price = insureAutoRes.auto_insure_price;
@@ -85,9 +85,9 @@ public class InsureSetupAction extends BaseAction {
         insureSetup.auto_insure_end = date;
         insureSetup.updated_at = date;
         long updateRes = insureSetupDao.updateInsureAuto(insureSetup);
-        if(updateRes==0){
+        if (updateRes == 0) {
             return json(BaseResponseBean.CODE_FAILURE, "更新投保设置失败", response);
-        }else{
+        } else {
             return json(BaseResponseBean.CODE_SUCCESS, "更新投保设置成功", response);
         }
     }

@@ -387,7 +387,7 @@ public class IntersAction extends BaseAction {
             WarrantyRecord warrantyRecord = new WarrantyRecord();
             long date = new Date().getTime();
             long custId = doCustId(request);
-            if(custId==0){
+            if (custId == 0) {
                 return json(BaseResponseBean.CODE_FAILURE, "获取用户信息失败", response);
             }
             warrantyRecord.cust_id = custId;
@@ -400,7 +400,7 @@ public class IntersAction extends BaseAction {
             warrantyRecord.created_at = date;
             warrantyRecord.updated_at = date;
             String addWarrantyRecordRes = doAddWarrantyRecord(warrantyRecord);
-            if(addWarrantyRecordRes==null) {
+            if (addWarrantyRecordRes == null) {
                 return json(BaseResponseBean.CODE_FAILURE, "添加投保记录失败", response);
             }
             //TODO 支付参数
@@ -422,7 +422,7 @@ public class IntersAction extends BaseAction {
             warrantyRecord.warranty_status_text = payResponse.data.statusTxt;
             warrantyRecord.updated_at = new Date().getTime();
             String updateWarrantyRecordRes = doUpdateWarrantyRecord(warrantyRecord);
-            if(updateWarrantyRecordRes==null) {
+            if (updateWarrantyRecordRes == null) {
                 return json(BaseResponseBean.CODE_FAILURE, "更新投保记录失败", response);
             }
             String statusText = payResponse.data.statusTxt;//支付返回文案
@@ -511,7 +511,7 @@ public class IntersAction extends BaseAction {
         BaseResponseBean response = new BaseResponseBean();
         //先判断前一天是否进行预投保
         long custId = doCustId(jointLoginRequest);
-        if(custId==0){
+        if (custId == 0) {
             return json(BaseResponseBean.CODE_FAILURE, "获取用户信息失败", response);
         }
         WarrantyRecord warrantyRecord = new WarrantyRecord();
@@ -551,13 +551,14 @@ public class IntersAction extends BaseAction {
 
     /**
      * 添加投保记录
+     *
      * @param warrantyRecord
      * @return
      */
     private String doAddWarrantyRecord(WarrantyRecord warrantyRecord) {
         BaseResponseBean response = new BaseResponseBean();
         long warrantyId = warrantyRecordDao.addWarrantyRecord(warrantyRecord);
-        if(warrantyId==0){
+        if (warrantyId == 0) {
             return json(BaseResponseBean.CODE_FAILURE, "添加投保记录失败", response);
         }
         response.data = warrantyId;
@@ -566,17 +567,18 @@ public class IntersAction extends BaseAction {
 
     /**
      * 更新投保记录(保单状态等)
+     *
      * @param warrantyRecord
+     * @return
      * @params id
      * @params warranty_status
      * @params warranty_status_text
      * @params updated_at
-     * @return
      */
     private String doUpdateWarrantyRecord(WarrantyRecord warrantyRecord) {
         BaseResponseBean response = new BaseResponseBean();
         long updateRes = warrantyRecordDao.updateWarrantyRecord(warrantyRecord);
-        if(updateRes==0){
+        if (updateRes == 0) {
             return json(BaseResponseBean.CODE_FAILURE, "更新投保记录失败", response);
         }
         return json(BaseResponseBean.CODE_SUCCESS, "更新投保记录成功", response);
@@ -585,10 +587,11 @@ public class IntersAction extends BaseAction {
 
     /**
      * 获取cust_id
+     *
      * @param jointLoginRequest
      * @return
      */
-    private long doCustId(JointLoginBean.Requset jointLoginRequest){
+    private long doCustId(JointLoginBean.Requset jointLoginRequest) {
         StaffPerson staffPerson = new StaffPerson();
         staffPerson.name = jointLoginRequest.insured_name;
         staffPerson.papers_code = jointLoginRequest.insured_name;

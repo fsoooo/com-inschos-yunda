@@ -45,5 +45,4 @@ public class InsureClaimYdAction extends BaseAction {
     }
 
 
-
 }
