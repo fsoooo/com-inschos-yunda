@@ -40,7 +40,7 @@ public class InsureWarrantyAction extends BaseAction {
         }
         InsureWarrantyBean.warrantyListRequest warrantyListRequest = new InsureWarrantyBean.warrantyListRequest();
         warrantyListRequest.custId = Long.valueOf(actionBean.userId);
-        warrantyListRequest.accountUid = Long.valueOf(actionBean.accountUuid);
+        warrantyListRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
         if (request.warrantyStatus == null) {
             request.warrantyStatus = "4";//保障中
         }
@@ -78,7 +78,7 @@ public class InsureWarrantyAction extends BaseAction {
         }
         InsureWarrantyBean.warrantyInfoRequest warrantyInfoRequest = new InsureWarrantyBean.warrantyInfoRequest();
         warrantyInfoRequest.custId = Long.valueOf(actionBean.userId);
-        warrantyInfoRequest.accountUid = Long.valueOf(actionBean.accountUuid);
+        warrantyInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
         warrantyInfoRequest.warrantyUuid = request.warrantyUuid;
         try {
             //TODO 请求http
@@ -121,7 +121,7 @@ public class InsureWarrantyAction extends BaseAction {
         if (insureResult == null) {
             InsureWarrantyBean.insureResultRequest insureResultRequest = new InsureWarrantyBean.insureResultRequest();
             insureResultRequest.custId = Long.valueOf(actionBean.userId);
-            insureResultRequest.accountUid = Long.valueOf(actionBean.accountUuid);
+            insureResultRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
             try {
                 //TODO 请求http
                 String insureResultRes = HttpClientKit.post(toInsureResult, JsonKit.bean2Json(insureResultRequest));

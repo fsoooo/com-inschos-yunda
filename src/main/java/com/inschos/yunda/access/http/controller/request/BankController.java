@@ -64,19 +64,6 @@ public class BankController {
     }
 
     /**
-     * 获取银行卡状态
-     *
-     * @return
-     * @params actionBean
-     */
-    @GetActionBeanAnnotation
-    @RequestMapping("/findBankStatus/**")
-    @ResponseBody
-    public String findBankStatus(ActionBean actionBean) {
-        return bankAction.findBankStatus(actionBean);
-    }
-
-    /**
      * 更改银行卡状态
      *
      * @return

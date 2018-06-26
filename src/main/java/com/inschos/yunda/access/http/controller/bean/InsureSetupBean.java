@@ -27,4 +27,17 @@ public class InsureSetupBean {
         public long authorizeStatus;
     }
 
+    public static class accountInfoRequest {
+        public long custId;//用户id
+        public long accountUuid;//用户account_uuid
+    }
+
+    public static class accountInfoResponse extends BaseResponseBean {
+        public accountInfoResponseData data;
+    }
+
+    public static class accountInfoResponseData {
+
+    }
+
 }

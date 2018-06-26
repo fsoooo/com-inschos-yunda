@@ -17,7 +17,7 @@ public class InsureWarrantyBean {
 
     public static class warrantyListRequest {
         public long custId;//用户id
-        public long accountUid;//用户account_uuid
+        public long accountUuid;//用户account_uuid
         public String warrantyStatus;//保单状态 待支付/保障中/已失效
     }
 
@@ -31,7 +31,7 @@ public class InsureWarrantyBean {
 
     public static class warrantyInfoRequest {
         public long custId;//用户id
-        public long accountUid;//用户account_uuid
+        public long accountUuid;//用户account_uuid
         public String warrantyUuid;//'warranty_uuid内部保单唯一标识'
     }
 
@@ -45,7 +45,7 @@ public class InsureWarrantyBean {
 
     public static class insureResultRequest {
         public long custId;//用户id
-        public long accountUid;//用户account_uuid
+        public long accountUuid;//用户account_uuid
     }
 
     public static class insureResultResponse extends BaseResponseBean {
@@ -55,6 +55,4 @@ public class InsureWarrantyBean {
     public static class insureResultResponseData {
 
     }
-
-
 }

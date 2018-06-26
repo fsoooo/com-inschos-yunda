@@ -29,8 +29,11 @@ public class IntersCommonUrlBean {
         return SERVER_HOST_TEST;
     }
 
-    //1.联合登录接口,获取user_id,account_id,manager_id,token
+    //1.账号服务-个人信息接口
+    //联合登录接口,获取user_id,account_id,manager_id,token
     public static final String toJointLogin = IntersCommonUrlBean.getServerHostAccount() + "/";
+    //根据userId,accountUuid获取个人详细信息
+    public static final String toAccountInfo = IntersCommonUrlBean.getServerHostAccount() + "/";
 
     //2.交易服务-投保流程接口
     //投保(包括预投保流程)
@@ -67,6 +70,8 @@ public class IntersCommonUrlBean {
     public static final String toBankInfo = IntersCommonUrlBean.getServerHostCallBackYunda() + "/";
     //更改银行卡状态
     public static final String toUpdateBank = IntersCommonUrlBean.getServerHostCallBackYunda() + "/";
+    //获取银行卡绑定短信
+    public static final String toBankSms = IntersCommonUrlBean.getServerHostCallBackYunda() + "/";
 
     //5.交易服务-理赔服务接口(英大/泰康)
 
