@@ -52,4 +52,19 @@ public class InsureBankBean {
     public static class bankInfoResponseData {
 
     }
+
+    public static class bankSmsRequest {
+        public long custId;//用户id
+        public long accountUuid;//用户account_uuid
+        public String bankPhone;//银行卡手机号
+        public String bankCode;//用户银行卡号
+    }
+
+    public static class bankSmsResponse extends BaseResponseBean {
+        public bankSmsResponseData data;
+    }
+
+    public static class bankSmsResponseData {
+
+    }
 }

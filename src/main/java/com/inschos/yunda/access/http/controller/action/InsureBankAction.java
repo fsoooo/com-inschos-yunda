@@ -16,7 +16,7 @@ public class InsureBankAction extends BaseAction {
     private static final Logger logger = Logger.getLogger(InsureBankAction.class);
 
     /**
-     * 添加银行卡
+     * 添加银行卡,TODO 要先做英大短信验证
      *
      * @params actionBean
      */
@@ -113,9 +113,11 @@ public class InsureBankAction extends BaseAction {
     }
 
     /**
-     * 更改银行卡状态,银行卡有两种状态:默认使用状态和授权状态(删除)
-     * 当所有银行卡都取消授权，本地库要更改银行卡授权状态
-     * 当改变默认使用银行卡时，要变更本地库
+     * 更改银行卡状态
+     * 银行卡有两种状态:默认使用状态和授权状态(删除)
+     * 当只剩下一张银行卡时,不能取消授权
+     * 当所有银行卡都取消授权,本地库要更改银行卡授权状态
+     * 当改变默认使用银行卡时,要做银行卡短信验证,然后变更本地库
      *
      * @return
      * @params actionBean

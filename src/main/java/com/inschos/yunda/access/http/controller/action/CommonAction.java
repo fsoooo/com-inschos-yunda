@@ -1,9 +1,6 @@
 package com.inschos.yunda.access.http.controller.action;
 
-import com.inschos.yunda.access.http.controller.bean.ActionBean;
-import com.inschos.yunda.access.http.controller.bean.BaseResponseBean;
-import com.inschos.yunda.access.http.controller.bean.InsureSetupBean;
-import com.inschos.yunda.access.http.controller.bean.StaffPersonBean;
+import com.inschos.yunda.access.http.controller.bean.*;
 import com.inschos.yunda.assist.kit.HttpClientKit;
 import com.inschos.yunda.assist.kit.JsonKit;
 import com.inschos.yunda.data.dao.*;
@@ -75,6 +72,39 @@ public class CommonAction extends BaseAction {
             staffPersonBean.updatedAt = staffPersonInfo.updated_at;
             response.data = staffPersonBean;
             return json(BaseResponseBean.CODE_SUCCESS, "获取用户信息成功", response);
+        }
+    }
+
+    /**
+     * 银行卡获取短信验证码
+     * @param actionBean
+     * @return
+     */
+    public String findBankSms(ActionBean actionBean){
+        InsureBankBean.bankRequest request = JsonKit.json2Bean(actionBean.body,  InsureBankBean.bankRequest.class);
+        BaseResponseBean response = new BaseResponseBean();
+        if(request==null){
+            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
+        }
+        InsureBankBean.bankSmsRequest bankSmsRequest = new InsureBankBean.bankSmsRequest();
+        bankSmsRequest.custId = Long.valueOf(actionBean.userId);
+        bankSmsRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
+        bankSmsRequest.bankPhone = request.phone;
+        bankSmsRequest.bankCode = request.bankCode;
+        try {
+            //TODO 请求http
+            String bankSmsRes = HttpClientKit.post(toAccountInfo, JsonKit.bean2Json(bankSmsRequest));
+            if (bankSmsRes == null) {
+                return json(BaseResponseBean.CODE_FAILURE, "获取银行卡绑定验证码接口请求失败", response);
+            }
+            InsureBankBean.bankSmsResponse bankSmsResponse = JsonKit.json2Bean(bankSmsRes,  InsureBankBean.bankSmsResponse.class);
+            if (bankSmsResponse.code == 500) {
+                return json(BaseResponseBean.CODE_FAILURE, "获取银行卡绑定验证码接口请求失败", response);
+            }
+            response.data = bankSmsResponse.data;
+            return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
+        } catch (IOException e) {
+            return json(BaseResponseBean.CODE_FAILURE, "获取银行卡绑定验证码接口请求失败", response);
         }
     }
 }

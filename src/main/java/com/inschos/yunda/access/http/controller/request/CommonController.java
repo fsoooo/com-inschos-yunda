@@ -37,5 +37,18 @@ public class CommonController {
         return commonAction.findUserInfo(actionBean);
     }
 
+    /**
+     * 获取银行卡绑定验证码
+     *
+     * @return
+     * @params actionBean
+     */
+    @GetActionBeanAnnotation
+    @RequestMapping("/findBankSms/**")
+    @ResponseBody
+    public String findBankSms(ActionBean actionBean) {
+        return commonAction.findBankSms(actionBean);
+    }
+
 
 }
