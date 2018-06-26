@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 
-import static com.inschos.yunda.access.http.controller.bean.IntersCommonUrlBean.toHttpTest;
+import static com.inschos.yunda.access.http.controller.bean.IntersCommonUrlBean.*;
 
 @Component
 public class InsureWarrantyAction extends BaseAction {
@@ -26,7 +26,7 @@ public class InsureWarrantyAction extends BaseAction {
 
     /**
      * 获取保单列表(不同状态的)
-     * TODO 从本地库里取数据？？
+     * TODO 从接口里取数据,本地库里取数据做备用
      *
      * @param actionBean
      * @return
@@ -50,7 +50,7 @@ public class InsureWarrantyAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, "获取保单列表失败", response);
         }
         response.data = InsureWarrantyLists;
-        return json(BaseResponseBean.CODE_SUCCESS, "业务完善中...", response);
+        return json(BaseResponseBean.CODE_SUCCESS, "获取保单列表成功", response);
     }
 
     /**

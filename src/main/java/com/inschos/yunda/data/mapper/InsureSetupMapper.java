@@ -7,9 +7,11 @@ public interface InsureSetupMapper {
 
     InsureSetup findInsureAutoInfo(InsureSetup insureSetup);
 
+    long updateInsureAuto(InsureSetup insureSetup);
+
     InsureSetup findInsureAuthorizeInfo(InsureSetup insureSetup);
 
     long updateInsureAuthorize(InsureSetup insureSetup);
 
-    long updateInsureAuto(InsureSetup insureSetup);
+
 }

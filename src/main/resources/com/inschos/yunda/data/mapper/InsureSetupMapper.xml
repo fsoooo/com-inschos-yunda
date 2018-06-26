@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 命名空间，对sql进行分类化管理（sql隔离） -->
+<mapper namespace="com.inschos.yunda.data.mapper.InsureSetupMapper">
+
+    <insert id="addInsureSetup" parameterType="InsureSetup" useGeneratedKeys="true" keyProperty="id">
+        insert into insure_setup(`cust_id`,`authorize_bank`,`authorize_status`,`auto_insure_status`,`auto_insure_price`,`auto_insure_type`,`auto_insure_end`,`created_at`,`updated_at`)
+        values(#{cust_id},#{authorize_bank},#{authorize_status},#{auto_insure_status},#{auto_insure_price},#{auto_insure_type},#{auto_insure_end},#{created_at},#{updated_at})
+    </insert>
+
+    <select id="findInsureAutoInfo" parameterType="InsureSetup" resultType="InsureSetup">
+        select
+        `cust_id`,`auto_insure_status`,`auto_insure_price`,`auto_insure_type`,`auto_insure_end`
+        from insure_setup
+        where cust_id =#{cust_id}
+    </select>
+
+    <update id="updateInsureAuto" parameterType="InsureSetup">
+        update insure_setup set
+        `auto_insure_status`=#{auto_insure_status} AND `auto_insure_price`=#{auto_insure_price} AND `auto_insure_type`=#{auto_insure_type} AND `auto_insure_end`=#{auto_insure_end} AND `updated_at`=#{updated_at}
+        where cust_id =#{cust_id}
+    </update>
+
+    <select id="findInsureAuthorizeInfo" parameterType="InsureSetup" resultType="InsureSetup">
+       select
+       `cust_id`,`authorize_bank`,`authorize_status`
+       from insure_setup
+       where cust_id =#{cust_id}
+    </select>
+
+    <update id="updateInsureAuthorize" parameterType="InsureSetup">
+        update insure_setup set
+        `authorize_bank`=#{authorize_bank} AND `authorize_status`=#{authorize_status} AND `updated_at`=#{updated_at}
+        where cust_id =#{cust_id}
+    </update>
+
+</mapper>
