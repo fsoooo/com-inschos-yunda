@@ -66,7 +66,7 @@ public class InsureSetupController {
     @RequestMapping("/findWhetContractStatus/**")
     @ResponseBody
     public String findWhetContractStatus(ActionBean actionBean) {
-        return insureSetupAction.findWhetContractStatus(actionBean);
+        return insureSetupAction.findWehatContractStatus(actionBean);
     }
 
     /**
