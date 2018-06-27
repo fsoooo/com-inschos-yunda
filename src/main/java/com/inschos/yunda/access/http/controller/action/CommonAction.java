@@ -3,14 +3,14 @@ package com.inschos.yunda.access.http.controller.action;
 import com.inschos.yunda.access.http.controller.bean.*;
 import com.inschos.yunda.assist.kit.HttpClientKit;
 import com.inschos.yunda.assist.kit.JsonKit;
-import com.inschos.yunda.data.dao.BankVerifyDao;
-import com.inschos.yunda.data.dao.StaffPersonDao;
-import com.inschos.yunda.model.StaffPerson;
+import com.inschos.yunda.data.dao.*;
+import com.inschos.yunda.model.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Date;
 
 import static com.inschos.yunda.access.http.controller.bean.IntersCommonUrlBean.*;
 
@@ -127,8 +127,6 @@ public class CommonAction extends BaseAction {
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
-
-
         InsureBankBean.bankSmsRequest bankSmsRequest = new InsureBankBean.bankSmsRequest();
         InsureSetupBean.accountInfoRequest accountInfoRequest = new InsureSetupBean.accountInfoRequest();
         accountInfoRequest.custId = Long.valueOf(actionBean.userId);
@@ -136,11 +134,20 @@ public class CommonAction extends BaseAction {
         //TODO 获取用户基本信息
         String userInfoRes = findUserInfoById(accountInfoRequest);
         BaseResponseBean baseResponseBean = JsonKit.json2Bean(userInfoRes, BaseResponseBean.class);
-
         bankSmsRequest.phone = request.phone;
         bankSmsRequest.bankCode = request.bankCode;
         bankSmsRequest.name = request.bankCode;
         bankSmsRequest.idCard = request.bankCode;
+        //TODO 判断是否已经发过验证码，避免重复发送
+        BankVerify bankVerify = new BankVerify();
+        long date = new Date().getTime();
+        bankVerify.cust_id = Long.valueOf(actionBean.userId);
+        bankVerify.bank_code = request.bankCode;
+        bankVerify.bank_phone = request.bankCode;
+        BankVerify bankVerifyRepeat = bankVerifyDao.findBankVerifyRepeat(bankVerify);
+        if(bankVerifyRepeat!=null){
+            //TODO 判断验证码是否已经过期,过期时间5分钟
+        }
         try {
             //TODO 请求http
             String bankSmsRes = HttpClientKit.post(toBankSms, JsonKit.bean2Json(bankSmsRequest));
@@ -151,6 +158,14 @@ public class CommonAction extends BaseAction {
             if (bankSmsResponse.code == 500) {
                 return json(BaseResponseBean.CODE_FAILURE, "获取银行卡绑定验证码接口请求失败", response);
             }
+            //TODO 数据库添加记录
+            bankVerify.verify_id = bankSmsResponse.data.requestId;
+            bankVerify.verify_code = "";
+            bankVerify.verify_time = date;
+            bankVerify.verify_status = "1";//验证码验证状态：默认1未验证/2验证成功
+            bankVerify.created_at = date;
+            bankVerify.updated_at = date;
+            long addBankVerifyRes = bankVerifyDao.addBankVerify(bankVerify);
             response.data = bankSmsResponse.data;
             return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
         } catch (IOException e) {
