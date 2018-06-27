@@ -8,6 +8,8 @@ public class InsureBankBean {
         public String phone;//用户手机号
         public long bankUseStatus;//银行卡使用状态
         public long bankAuthorizeStatus;//银行卡授权状态
+        public String verifyId;//验证id
+        public String verifyCode;//验证码
     }
 
     public static class addBankRequest {
@@ -65,6 +67,21 @@ public class InsureBankBean {
     }
 
     public static class bankSmsResponseData {
+
+    }
+
+    public static class verifyBankSmsRequest {
+        public long custId;//用户id
+        public long accountUuid;//用户account_uuid
+        public String verifyId;//验证id
+        public String verifyCode;//验证码
+    }
+
+    public static class verifyBankSmsResponse extends BaseResponseBean {
+        public verifyBankSmsResponseData data;
+    }
+
+    public static class verifyBankSmsResponseData {
 
     }
 }

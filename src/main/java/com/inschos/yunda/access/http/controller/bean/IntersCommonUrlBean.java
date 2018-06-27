@@ -70,8 +70,10 @@ public class IntersCommonUrlBean {
     public static final String toBankInfo = IntersCommonUrlBean.getServerHostCallBackYunda() + "/";
     //更改银行卡状态
     public static final String toUpdateBank = IntersCommonUrlBean.getServerHostCallBackYunda() + "/";
-    //获取银行卡绑定短信
+    //获取银行卡短信验证码
     public static final String toBankSms = IntersCommonUrlBean.getServerHostCallBackYunda() + "/";
+    //校验银行卡短信验证码
+    public static final String toVerifyBankSms = IntersCommonUrlBean.getServerHostCallBackYunda() + "/";
 
     //5.交易服务-理赔服务接口(英大/泰康)
 

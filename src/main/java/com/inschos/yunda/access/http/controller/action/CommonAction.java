@@ -77,13 +77,15 @@ public class CommonAction extends BaseAction {
 
     /**
      * 银行卡获取短信验证码
+     * TODO 英大接口返回结果的同时会返回一个验证参数,返回给端上同时存在缓存里(还不知道改怎么存)
+     *
      * @param actionBean
      * @return
      */
-    public String findBankSms(ActionBean actionBean){
-        InsureBankBean.bankRequest request = JsonKit.json2Bean(actionBean.body,  InsureBankBean.bankRequest.class);
+    public String findBankSms(ActionBean actionBean) {
+        InsureBankBean.bankRequest request = JsonKit.json2Bean(actionBean.body, InsureBankBean.bankRequest.class);
         BaseResponseBean response = new BaseResponseBean();
-        if(request==null){
+        if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
         InsureBankBean.bankSmsRequest bankSmsRequest = new InsureBankBean.bankSmsRequest();
@@ -97,7 +99,7 @@ public class CommonAction extends BaseAction {
             if (bankSmsRes == null) {
                 return json(BaseResponseBean.CODE_FAILURE, "获取银行卡绑定验证码接口请求失败", response);
             }
-            InsureBankBean.bankSmsResponse bankSmsResponse = JsonKit.json2Bean(bankSmsRes,  InsureBankBean.bankSmsResponse.class);
+            InsureBankBean.bankSmsResponse bankSmsResponse = JsonKit.json2Bean(bankSmsRes, InsureBankBean.bankSmsResponse.class);
             if (bankSmsResponse.code == 500) {
                 return json(BaseResponseBean.CODE_FAILURE, "获取银行卡绑定验证码接口请求失败", response);
             }
@@ -105,6 +107,41 @@ public class CommonAction extends BaseAction {
             return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
         } catch (IOException e) {
             return json(BaseResponseBean.CODE_FAILURE, "获取银行卡绑定验证码接口请求失败", response);
+        }
+    }
+
+    /**
+     * 校验银行卡短信验证码
+     * TODO 返回类型是返回String 还是 boolean
+     *
+     * @param actionBean
+     * @return
+     */
+    public String verifyBankSms(ActionBean actionBean) {
+        InsureBankBean.bankRequest request = JsonKit.json2Bean(actionBean.body, InsureBankBean.bankRequest.class);
+        BaseResponseBean response = new BaseResponseBean();
+        if (request == null) {
+            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
+        }
+        InsureBankBean.verifyBankSmsRequest verifyBankSmsRequest = new InsureBankBean.verifyBankSmsRequest();
+        verifyBankSmsRequest.custId = Long.valueOf(actionBean.userId);
+        verifyBankSmsRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
+        verifyBankSmsRequest.verifyId = request.verifyId;
+        verifyBankSmsRequest.verifyCode = request.verifyCode;
+        try {
+            //TODO 请求http
+            String verifyBankSmsRes = HttpClientKit.post(toVerifyBankSms, JsonKit.bean2Json(verifyBankSmsRequest));
+            if (verifyBankSmsRes == null) {
+                return json(BaseResponseBean.CODE_FAILURE, "校验银行卡绑定验证码接口请求失败", response);
+            }
+            InsureBankBean.verifyBankSmsResponse verifyBankSmsResponse = JsonKit.json2Bean(verifyBankSmsRes, InsureBankBean.verifyBankSmsResponse.class);
+            if (verifyBankSmsResponse.code == 500) {
+                return json(BaseResponseBean.CODE_FAILURE, "校验银行卡绑定验证码接口请求失败", response);
+            }
+            response.data = verifyBankSmsResponse.data;
+            return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
+        } catch (IOException e) {
+            return json(BaseResponseBean.CODE_FAILURE, "校验银行卡绑定验证码接口请求失败", response);
         }
     }
 }
