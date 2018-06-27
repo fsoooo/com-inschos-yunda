@@ -55,25 +55,25 @@ public class IntersCommonUrlBean {
 
     //4.交易服务-保单接口
     //获取投保结果
-    public static final String toInsureResult = IntersCommonUrlBean.getServerHostCallBackYunda() + "/";
+    public static final String toInsureResult = IntersCommonUrlBean.getServerHostInsure() + "/";
     //获取保单列表
-    public static final String toWarrantyList = IntersCommonUrlBean.getServerHostCallBackYunda() + "/";
+    public static final String toWarrantyList = IntersCommonUrlBean.getServerHostInsure() + "/";
     //获取保单详情
-    public static final String toWarrantyInfo = IntersCommonUrlBean.getServerHostCallBackYunda() + "/";
+    public static final String toWarrantyInfo = IntersCommonUrlBean.getServerHostInsure() + "/";
 
     //4.交易服务-银行卡接口
     //添加银行卡
-    public static final String toAddBank = IntersCommonUrlBean.getServerHostCallBackYunda() + "/";
+    public static final String toAddBank = IntersCommonUrlBean.getServerHostInsure() + "/";
     //获取银行卡列表
-    public static final String toBankList = IntersCommonUrlBean.getServerHostCallBackYunda() + "/";
+    public static final String toBankList = IntersCommonUrlBean.getServerHostInsure() + "/";
     //获取银行卡详情
-    public static final String toBankInfo = IntersCommonUrlBean.getServerHostCallBackYunda() + "/";
+    public static final String toBankInfo = IntersCommonUrlBean.getServerHostInsure() + "/";
     //更改银行卡状态
-    public static final String toUpdateBank = IntersCommonUrlBean.getServerHostCallBackYunda() + "/";
+    public static final String toUpdateBank = IntersCommonUrlBean.getServerHostInsure() + "/";
     //获取银行卡短信验证码
-    public static final String toBankSms = IntersCommonUrlBean.getServerHostCallBackYunda() + "/";
+    public static final String toBankSms = IntersCommonUrlBean.getServerHostInsure() + "/proposal/auth/apply";
     //校验银行卡短信验证码
-    public static final String toVerifyBankSms = IntersCommonUrlBean.getServerHostCallBackYunda() + "/";
+    public static final String toVerifyBankSms = IntersCommonUrlBean.getServerHostInsure() + "/proposal/auth/confirm";
 
     //5.交易服务-理赔服务接口(英大/泰康)
 

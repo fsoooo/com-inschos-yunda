@@ -56,9 +56,9 @@ public class InsureBankBean {
     }
 
     public static class bankSmsRequest {
-        public long custId;//用户id
-        public long accountUuid;//用户account_uuid
-        public String bankPhone;//银行卡手机号
+        public String name;//用户姓名
+        public String phone;//银行卡绑定手机
+        public String idCard;//用户身份证号
         public String bankCode;//用户银行卡号
     }
 
@@ -67,21 +67,15 @@ public class InsureBankBean {
     }
 
     public static class bankSmsResponseData {
-
+        public String requestId;//响应ID
     }
 
     public static class verifyBankSmsRequest {
-        public long custId;//用户id
-        public long accountUuid;//用户account_uuid
-        public String verifyId;//验证id
-        public String verifyCode;//验证码
+        public String requestId;//验证id
+        public String vdCode;//验证码
     }
 
     public static class verifyBankSmsResponse extends BaseResponseBean {
-        public verifyBankSmsResponseData data;
-    }
-
-    public static class verifyBankSmsResponseData {
-
+        public Object data;
     }
 }
