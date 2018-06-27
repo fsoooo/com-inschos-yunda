@@ -3,6 +3,7 @@ package com.inschos.yunda.access.http.controller.action;
 import com.inschos.yunda.access.http.controller.bean.*;
 import com.inschos.yunda.assist.kit.HttpClientKit;
 import com.inschos.yunda.assist.kit.JsonKit;
+import com.inschos.yunda.data.dao.BankVerifyDao;
 import com.inschos.yunda.data.dao.StaffPersonDao;
 import com.inschos.yunda.model.StaffPerson;
 import org.apache.log4j.Logger;
@@ -20,6 +21,9 @@ public class CommonAction extends BaseAction {
 
     @Autowired
     private StaffPersonDao staffPersonDao;
+
+    @Autowired
+    private BankVerifyDao bankVerifyDao;
 
     /**
      * 通过token获取用户信息
@@ -109,11 +113,10 @@ public class CommonAction extends BaseAction {
     }
 
 
-
     /**
      * 银行卡获取短信验证码
      * TODO 英大接口返回结果的同时会返回一个验证参数,返回给端上同时存在数据库里
-     * TODO 获取短信验证码必要参数校验:银行号和绑定手机号
+     * TODO 获取短信验证码必要参数校验:银行卡号和绑定手机号
      *
      * @param actionBean
      * @return
@@ -124,6 +127,8 @@ public class CommonAction extends BaseAction {
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
+
+
         InsureBankBean.bankSmsRequest bankSmsRequest = new InsureBankBean.bankSmsRequest();
         InsureSetupBean.accountInfoRequest accountInfoRequest = new InsureSetupBean.accountInfoRequest();
         accountInfoRequest.custId = Long.valueOf(actionBean.userId);
