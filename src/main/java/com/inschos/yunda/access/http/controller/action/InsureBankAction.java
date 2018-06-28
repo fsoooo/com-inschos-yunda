@@ -191,10 +191,10 @@ public class InsureBankAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
         long bankCount = findBankCount(actionBean);
-        if(bankCount<0){
+        if (bankCount < 0) {
             return json(BaseResponseBean.CODE_FAILURE, "获取银行卡信息失败", response);
         }
-        if(bankCount==0){
+        if (bankCount == 0) {
             //TODO 修改本地库的银行卡授权状态??
             InsureSetup insureSetup = new InsureSetup();
             insureSetup.authorize_status = 1;
@@ -202,11 +202,11 @@ public class InsureBankAction extends BaseAction {
             long updateRes = insureSetupDao.updateInsureAuthorize(insureSetup);
             return json(BaseResponseBean.CODE_FAILURE, "您没有可用银行卡,请绑定后使用", response);
         }
-        if(bankCount==1){
-            if(request.bankAuthorizeStatus==2){
+        if (bankCount == 1) {
+            if (request.bankAuthorizeStatus == 2) {
                 return json(BaseResponseBean.CODE_FAILURE, "您还剩最后一张可使用银行卡", response);
             }
-            if(request.bankUseStatus==2){
+            if (request.bankUseStatus == 2) {
                 //TODO 做银行卡短信检验
                 //获取verifyId
                 InsureBankBean.bankVerifyIdRequest bankVerifyIdRequest = new InsureBankBean.bankVerifyIdRequest();

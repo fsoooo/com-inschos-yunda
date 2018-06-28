@@ -1,15 +1,20 @@
 package com.inschos.yunda.access.http.controller.action;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.inschos.yunda.access.http.controller.bean.*;
-import com.inschos.yunda.assist.kit.*;
-import com.inschos.yunda.data.dao.*;
-import com.inschos.yunda.model.*;
+import com.inschos.yunda.assist.kit.Base64Kit;
+import com.inschos.yunda.assist.kit.HttpClientKit;
+import com.inschos.yunda.assist.kit.HttpKit;
+import com.inschos.yunda.assist.kit.JsonKit;
+import com.inschos.yunda.data.dao.JointLoginDao;
+import com.inschos.yunda.data.dao.StaffPersonDao;
+import com.inschos.yunda.data.dao.WarrantyRecordDao;
+import com.inschos.yunda.model.JointLogin;
+import com.inschos.yunda.model.StaffPerson;
+import com.inschos.yunda.model.WarrantyRecord;
 import org.apache.log4j.Logger;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;

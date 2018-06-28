@@ -1,22 +1,14 @@
 package com.inschos.yunda.access.http.controller.action;
 
 import com.inschos.yunda.access.http.controller.bean.BaseResponseBean;
-import com.inschos.yunda.access.http.controller.bean.IntersCommonUrlBean;
-import com.inschos.yunda.access.http.controller.bean.JointLoginBean;
 import com.inschos.yunda.access.http.controller.bean.PageBean;
 import com.inschos.yunda.annotation.CheckParamsKit;
 import com.inschos.yunda.assist.kit.JsonKit;
-import com.inschos.yunda.assist.kit.*;
-import com.inschos.yunda.data.dao.StaffPersonDao;
+import com.inschos.yunda.assist.kit.StringKit;
 import com.inschos.yunda.model.Page;
-import com.inschos.yunda.model.StaffPerson;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
-import static com.inschos.yunda.access.http.controller.bean.IntersCommonUrlBean.toHttpTest;
 
 public class BaseAction {
     public <T> T requst2Bean(String body, Class<T> clazz) {

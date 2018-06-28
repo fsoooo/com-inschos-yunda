@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.List;
 
 import static com.inschos.yunda.access.http.controller.bean.IntersCommonUrlBean.*;
 
@@ -137,7 +136,7 @@ public class InsureWarrantyAction extends BaseAction {
             } catch (IOException e) {
                 return json(BaseResponseBean.CODE_FAILURE, "获取投保结果失败", response);
             }
-        }else{
+        } else {
             InsureResultBean insureResultBean = new InsureResultBean();
             insureResultBean.id = insureResult.id;
             insureResultBean.custId = insureResult.cust_id;

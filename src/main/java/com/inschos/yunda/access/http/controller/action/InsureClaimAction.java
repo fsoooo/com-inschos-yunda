@@ -4,9 +4,7 @@ import com.inschos.yunda.access.http.controller.bean.ActionBean;
 import com.inschos.yunda.access.http.controller.bean.BaseResponseBean;
 import com.inschos.yunda.access.http.controller.bean.InsureSetupBean;
 import com.inschos.yunda.assist.kit.JsonKit;
-import com.inschos.yunda.data.dao.JointLoginDao;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component

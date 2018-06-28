@@ -1,9 +1,11 @@
 package com.inschos.yunda.access.http.controller.action;
 
-import com.inschos.yunda.access.http.controller.bean.*;
+import com.inschos.yunda.access.http.controller.bean.ActionBean;
+import com.inschos.yunda.access.http.controller.bean.BaseResponseBean;
+import com.inschos.yunda.access.http.controller.bean.InsureSetupBean;
 import com.inschos.yunda.assist.kit.JsonKit;
 import com.inschos.yunda.data.dao.InsureSetupDao;
-import com.inschos.yunda.model.*;
+import com.inschos.yunda.model.InsureSetup;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
