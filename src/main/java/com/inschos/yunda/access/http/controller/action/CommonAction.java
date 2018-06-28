@@ -55,21 +55,85 @@ public class CommonAction extends BaseAction {
     }
 
     /**
+     * 获取微信签约状态
+     *
+     * @param request
+     * @return
+     */
+    public CommonBean.findWecahtContractResponse findWechatContractStatus(CommonBean.findWecahtContractRequset request) {
+        String interName = "获取微信签约状态";
+        String result = httpRequest(toAuthorizeQueryWechat, JsonKit.bean2Json(request), interName);
+        CommonBean.findWecahtContractResponse wecahtContractResponse = JsonKit.json2Bean(result, CommonBean.findWecahtContractResponse.class);
+        return wecahtContractResponse;
+    }
+
+    /**
+     * 执行微信签约操作(获取微信签约URL)
+     *
+     * @param request
+     * @return
+     */
+    public CommonBean.doWecahtContractResponse doWechatContract(CommonBean.doWecahtContractRequset request) {
+        String interName = "执行微信签约操作";
+        String result = httpRequest(toAuthorizeQueryWechat, JsonKit.bean2Json(request), interName);
+        CommonBean.doWecahtContractResponse response = JsonKit.json2Bean(result, CommonBean.doWecahtContractResponse.class);
+        return response;
+    }
+
+    /**
+     * 获取银行卡授权状态
+     *
+     * @param request
+     * @return
+     */
+    public CommonBean.findBankAuthorizeResponse findBankAuthorizeStatus(CommonBean.findBankAuthorizeRequset request) {
+        String interName = "获取银行卡授权状态";
+        String result = httpRequest(toAuthorizeQueryWechat, JsonKit.bean2Json(request), interName);
+        CommonBean.findBankAuthorizeResponse response = JsonKit.json2Bean(result, CommonBean.findBankAuthorizeResponse.class);
+        return response;
+    }
+
+    /**
+     * 执行银行卡授权
+     *
+     * @param request
+     * @return
+     */
+    public CommonBean.doBankAuthorizeResponse doBankAuthorize(CommonBean.doBankAuthorizeRequset request) {
+        String interName = "执行银行卡授权";
+        String result = httpRequest(toAuthorizeQueryWechat, JsonKit.bean2Json(request), interName);
+        CommonBean.doBankAuthorizeResponse response = JsonKit.json2Bean(result, CommonBean.doBankAuthorizeResponse.class);
+        return response;
+    }
+
+    /**
      * 通过token获取用户信息
      *
      * @param actionBean
      * @return
      */
     public String findUserInfo(ActionBean actionBean) {
+        BaseResponseBean response = new BaseResponseBean();
         InsureSetupBean request = JsonKit.json2Bean(actionBean.body, InsureSetupBean.class);
-        BaseResponseBean response = new BaseResponseBean();
-        if (request == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
-        }
-        StaffPerson staffPerson = new StaffPerson();
-        staffPerson.cust_id = Long.valueOf(actionBean.userId);
-        staffPerson.account_uuid = Long.valueOf(actionBean.accountUuid);
-        String userInfoRes = findUserInfoInter(staffPerson);
+        CommonBean.findUserInfoRequset findUserInfoRequset = new CommonBean.findUserInfoRequset();
+        findUserInfoRequset.userId = actionBean.userId;
+        findUserInfoRequset.accountUuid = actionBean.accountUuid;
+        CommonBean.findUserInfoResponse userInfoRes = findUserInfoInter(findUserInfoRequset);
+        response.data = userInfoRes.data;
+        return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
+    }
+
+    /**
+     * 通过cust_id,account_id获取用户信息
+     *
+     * @param request
+     * @return
+     */
+    public CommonBean.findUserInfoResponse  findUserInfoById(InsureSetupBean.accountInfoRequest request) {
+        CommonBean.findUserInfoRequset findUserInfoRequset = new CommonBean.findUserInfoRequset();
+        findUserInfoRequset.userId = request.custId+"";
+        findUserInfoRequset.accountUuid = request.accountUuid+"";
+        CommonBean.findUserInfoResponse userInfoRes = findUserInfoInter(findUserInfoRequset);
         return userInfoRes;
     }
 
@@ -79,37 +143,18 @@ public class CommonAction extends BaseAction {
      * @param request
      * @return
      */
-    public String findUserInfoById(InsureSetupBean.accountInfoRequest request) {
-        BaseResponseBean response = new BaseResponseBean();
-        if (request == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
-        }
+    public CommonBean.findUserInfoResponse  findUserInfoInter(CommonBean.findUserInfoRequset request) {
         StaffPerson staffPerson = new StaffPerson();
-        staffPerson.cust_id = request.custId;
-        staffPerson.account_uuid = request.accountUuid;
-        String userInfoRes = findUserInfoInter(staffPerson);
-        return userInfoRes;
-    }
-
-    /**
-     * 通过cust_id,account_id获取用户信息
-     *
-     * @param request
-     * @return
-     */
-    public String findUserInfoInter(StaffPerson request) {
-        BaseResponseBean response = new BaseResponseBean();
-        StaffPerson staffPerson = new StaffPerson();
-        staffPerson.cust_id = request.cust_id;
-        staffPerson.account_uuid = request.account_uuid;
+        staffPerson.cust_id = Long.valueOf(request.userId);
+        staffPerson.account_uuid = Long.valueOf(request.accountUuid);
         StaffPerson staffPersonInfo = staffPersonDao.findStaffPersonInfo(staffPerson);
-        StaffPersonBean staffPersonBean = new StaffPersonBean();
+        CommonBean.findUserInfoResponse userInfoResponse = new CommonBean.findUserInfoResponse();
         String interName = "获取用户信息";
         if (staffPersonInfo == null) {
             //没有查到用户信息,从接口里拿,然后插入数据同时返回
             InsureSetupBean.accountInfoRequest accountInfoRequest = new InsureSetupBean.accountInfoRequest();
-            accountInfoRequest.custId = request.cust_id;
-            accountInfoRequest.accountUuid = request.account_uuid;
+            accountInfoRequest.custId = Long.valueOf(request.userId);
+            accountInfoRequest.accountUuid = Long.valueOf(request.accountUuid);
 
             String result = httpRequest(toAccountInfo, JsonKit.bean2Json(accountInfoRequest), interName);
             InsureSetupBean.accountInfoResponse accountInfoResponse = JsonKit.json2Bean(result, InsureSetupBean.accountInfoResponse.class);
@@ -123,85 +168,32 @@ public class CommonAction extends BaseAction {
             staffPerson.updated_at = date;
             long addRes = staffPersonDao.addStaffPerson(staffPerson);
             if (addRes != 0) {
-                staffPersonBean.id = addRes;
+                userInfoResponse.data.id = addRes;
             }
-            staffPersonBean.custId = staffPerson.cust_id;
-            staffPersonBean.accountUuid = staffPerson.account_uuid;
-            staffPersonBean.loginToken = staffPerson.login_token;
-            staffPersonBean.name = staffPerson.name;
-            staffPersonBean.papersType = staffPerson.papers_type;
-            staffPersonBean.papersCode = staffPerson.papers_code;
-            staffPersonBean.phone = staffPerson.phone;
-            staffPersonBean.createdAt = staffPerson.created_at;
-            staffPersonBean.updatedAt = staffPerson.updated_at;
-            response.data = staffPersonBean;
+            userInfoResponse.data.custId = staffPerson.cust_id;
+            userInfoResponse.data.accountUuid = staffPerson.account_uuid;
+            userInfoResponse.data.loginToken = staffPerson.login_token;
+            userInfoResponse.data.name = staffPerson.name;
+            userInfoResponse.data.papersType = staffPerson.papers_type;
+            userInfoResponse.data.papersCode = staffPerson.papers_code;
+            userInfoResponse.data.phone = staffPerson.phone;
+            userInfoResponse.data.createdAt = staffPerson.created_at;
+            userInfoResponse.data.updatedAt = staffPerson.updated_at;
         } else {
-            staffPersonBean.id = staffPersonInfo.id;
-            staffPersonBean.custId = staffPersonInfo.cust_id;
-            staffPersonBean.accountUuid = staffPersonInfo.account_uuid;
-            staffPersonBean.loginToken = staffPersonInfo.login_token;
-            staffPersonBean.name = staffPersonInfo.name;
-            staffPersonBean.papersType = staffPersonInfo.papers_type;
-            staffPersonBean.papersCode = staffPersonInfo.papers_code;
-            staffPersonBean.phone = staffPersonInfo.phone;
-            staffPersonBean.createdAt = staffPersonInfo.created_at;
-            staffPersonBean.updatedAt = staffPersonInfo.updated_at;
-            response.data = staffPersonBean;
+            userInfoResponse.data.id = staffPersonInfo.id;
+            userInfoResponse.data.custId = staffPersonInfo.cust_id;
+            userInfoResponse.data.accountUuid = staffPersonInfo.account_uuid;
+            userInfoResponse.data.loginToken = staffPersonInfo.login_token;
+            userInfoResponse.data.name = staffPersonInfo.name;
+            userInfoResponse.data.papersType = staffPersonInfo.papers_type;
+            userInfoResponse.data.papersCode = staffPersonInfo.papers_code;
+            userInfoResponse.data.phone = staffPersonInfo.phone;
+            userInfoResponse.data.createdAt = staffPersonInfo.created_at;
+            userInfoResponse.data.updatedAt = staffPersonInfo.updated_at;
         }
-        return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
+        return userInfoResponse;
     }
 
-    /**
-     * 获取微信签约状态
-     *
-     * @param request
-     * @return
-     */
-    public PayCommonBean.findWecahtContractResponse findWechatContractStatus(PayCommonBean.findWecahtContractRequset request) {
-        String interName = "获取微信签约状态";
-        String result = httpRequest(toAuthorizeQueryWechat, JsonKit.bean2Json(request), interName);
-        PayCommonBean.findWecahtContractResponse wecahtContractResponse = JsonKit.json2Bean(result, PayCommonBean.findWecahtContractResponse.class);
-        return wecahtContractResponse;
-    }
-
-    /**
-     * 执行微信签约操作(获取微信签约URL)
-     *
-     * @param request
-     * @return
-     */
-    public PayCommonBean.doWecahtContractResponse doWechatContract(PayCommonBean.doWecahtContractRequset request) {
-        String interName = "执行微信签约操作";
-        String result = httpRequest(toAuthorizeQueryWechat, JsonKit.bean2Json(request), interName);
-        PayCommonBean.doWecahtContractResponse response = JsonKit.json2Bean(result, PayCommonBean.doWecahtContractResponse.class);
-        return response;
-    }
-
-    /**
-     * 获取银行卡授权状态
-     *
-     * @param request
-     * @return
-     */
-    public PayCommonBean.findBankAuthorizeResponse findBankAuthorizeStatus(PayCommonBean.findBankAuthorizeRequset request) {
-        String interName = "获取银行卡授权状态";
-        String result = httpRequest(toAuthorizeQueryWechat, JsonKit.bean2Json(request), interName);
-        PayCommonBean.findBankAuthorizeResponse response = JsonKit.json2Bean(result, PayCommonBean.findBankAuthorizeResponse.class);
-        return response;
-    }
-
-    /**
-     * 执行银行卡授权
-     *
-     * @param request
-     * @return
-     */
-    public PayCommonBean.doBankAuthorizeResponse doBankAuthorize(PayCommonBean.doBankAuthorizeRequset request) {
-        String interName = "执行银行卡授权";
-        String result = httpRequest(toAuthorizeQueryWechat, JsonKit.bean2Json(request), interName);
-        PayCommonBean.doBankAuthorizeResponse response = JsonKit.json2Bean(result, PayCommonBean.doBankAuthorizeResponse.class);
-        return response;
-    }
 
     /**
      * 获取银行卡绑定验证码
@@ -226,8 +218,7 @@ public class CommonAction extends BaseAction {
         accountInfoRequest.custId = Long.valueOf(actionBean.userId);
         accountInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
         //获取用户基本信息
-        String userInfoRes = findUserInfoById(accountInfoRequest);
-        StaffPersonBean.userInfoResponse userInfoResponse = JsonKit.json2Bean(userInfoRes, StaffPersonBean.userInfoResponse.class);
+        CommonBean.findUserInfoResponse userInfoResponse = findUserInfoById(accountInfoRequest);
         bankSmsRequest.phone = request.phone;
         bankSmsRequest.bankCode = request.bankCode;
         bankSmsRequest.name = userInfoResponse.data.name;
@@ -301,15 +292,10 @@ public class CommonAction extends BaseAction {
      * @param request
      * @return String
      */
-    public String verifyBankSms(InsureBankBean.bankRequest request) {
+    public InsureBankBean.verifyBankSmsResponse verifyBankSms(InsureBankBean.bankRequest request) {
         BaseResponseBean response = new BaseResponseBean();
+        InsureBankBean.verifyBankSmsResponse verifyResponse = new InsureBankBean.verifyBankSmsResponse();
         String interName = "校验银行卡短信验证码";
-        if (request == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
-        }
-        if (request.verifyId == null || request.verifyCode == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "必要参数不能为空", response);
-        }
         InsureBankBean.verifyBankSmsRequest verifyBankSmsRequest = new InsureBankBean.verifyBankSmsRequest();
         verifyBankSmsRequest.requestId = request.verifyId;
         verifyBankSmsRequest.vdCode = request.verifyCode;
@@ -320,17 +306,16 @@ public class CommonAction extends BaseAction {
         if (bankVerifyRes != null) {
             //避免重复请求接口
             if (bankVerifyRes.verify_status == "2") {
-                return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
+                verifyResponse.data.verifyStatus =  true;
+                return verifyResponse;
             }
         }
         String result = httpRequest(toVerifyBankSms, JsonKit.bean2Json(verifyBankSmsRequest), interName);
         InsureBankBean.verifyBankSmsResponse verifyBankSmsResponse = JsonKit.json2Bean(result, InsureBankBean.verifyBankSmsResponse.class);
-        response.data = verifyBankSmsResponse.data;
         long date = new Date().getTime();
         bankVerify.verify_status = "2";
         bankVerify.updated_at = date;
         long updateRes = bankVerifyDao.updateBankVerify(bankVerify);
-        return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
+        return verifyResponse;
     }
-
 }

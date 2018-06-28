@@ -97,6 +97,10 @@ public class InsureBankBean {
     }
 
     public static class verifyBankSmsResponse extends BaseResponseBean {
-        public Object data;
+        public verifyBankSmsResponseData data;
+    }
+
+    public static class verifyBankSmsResponseData{
+        public boolean verifyStatus;
     }
 }

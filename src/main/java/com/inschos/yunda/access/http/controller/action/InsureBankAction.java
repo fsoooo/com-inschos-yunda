@@ -57,8 +57,8 @@ public class InsureBankAction extends BaseAction {
         InsureBankBean.bankRequest verifyBankSmsRequest = new InsureBankBean.bankRequest();
         verifyBankSmsRequest.verifyId = verifyId;
         verifyBankSmsRequest.verifyCode = request.verifyCode;
-        boolean verifyStatud = commonAction.verifyBankSms(verifyBankSmsRequest);
-        if (!verifyStatud) {
+        InsureBankBean.verifyBankSmsResponse verifyBankSmsResponse = commonAction.verifyBankSms(verifyBankSmsRequest);
+        if (!verifyBankSmsResponse.data.verifyStatus) {
             return json(BaseResponseBean.CODE_FAILURE, "短信验证码校验失败", response);
         }
         try {
@@ -218,8 +218,8 @@ public class InsureBankAction extends BaseAction {
                 InsureBankBean.bankRequest verifyBankSmsRequest = new InsureBankBean.bankRequest();
                 verifyBankSmsRequest.verifyId = verifyId;
                 verifyBankSmsRequest.verifyCode = request.verifyCode;
-                boolean verifyStatud = commonAction.verifyBankSms(verifyBankSmsRequest);
-                if (!verifyStatud) {
+                InsureBankBean.verifyBankSmsResponse verifyBankSmsResponse = commonAction.verifyBankSms(verifyBankSmsRequest);
+                if (!verifyBankSmsResponse.data.verifyStatus) {
                     return json(BaseResponseBean.CODE_FAILURE, "短信验证码校验失败", response);
                 }
             }
