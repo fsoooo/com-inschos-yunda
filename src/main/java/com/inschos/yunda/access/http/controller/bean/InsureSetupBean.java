@@ -37,6 +37,10 @@ public class InsureSetupBean {
     }
 
     public static class accountInfoResponseData {
+        public String name;
+        public String idCard;
+        public String phone;
+        public String loginToken;
 
     }
 

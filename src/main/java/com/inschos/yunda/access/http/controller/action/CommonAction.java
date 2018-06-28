@@ -3,8 +3,10 @@ package com.inschos.yunda.access.http.controller.action;
 import com.inschos.yunda.access.http.controller.bean.*;
 import com.inschos.yunda.assist.kit.HttpClientKit;
 import com.inschos.yunda.assist.kit.JsonKit;
-import com.inschos.yunda.data.dao.*;
-import com.inschos.yunda.model.*;
+import com.inschos.yunda.data.dao.BankVerifyDao;
+import com.inschos.yunda.data.dao.StaffPersonDao;
+import com.inschos.yunda.model.BankVerify;
+import com.inschos.yunda.model.StaffPerson;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,7 +36,6 @@ public class CommonAction extends BaseAction {
     public String findUserInfo(ActionBean actionBean) {
         InsureSetupBean request = JsonKit.json2Bean(actionBean.body, InsureSetupBean.class);
         BaseResponseBean response = new BaseResponseBean();
-        //判空
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
@@ -53,7 +54,6 @@ public class CommonAction extends BaseAction {
      */
     public String findUserInfoById(InsureSetupBean.accountInfoRequest request) {
         BaseResponseBean response = new BaseResponseBean();
-        //判空
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
@@ -77,11 +77,12 @@ public class CommonAction extends BaseAction {
         staffPerson.account_uuid = request.account_uuid;
         StaffPerson staffPersonInfo = staffPersonDao.findStaffPersonInfo(staffPerson);
         if (staffPersonInfo == null) {
+            //TODO 没有查到用户信息,从接口里拿,然后插入数据同时返回
             InsureSetupBean.accountInfoRequest accountInfoRequest = new InsureSetupBean.accountInfoRequest();
             accountInfoRequest.custId = request.cust_id;
             accountInfoRequest.accountUuid = request.account_uuid;
             try {
-                //TODO 请求http
+                //请求http
                 String accountInfoRes = HttpClientKit.post(toAccountInfo, JsonKit.bean2Json(accountInfoRequest));
                 if (accountInfoRes == null) {
                     return json(BaseResponseBean.CODE_FAILURE, "获取用户信息接口请求失败", response);
@@ -90,8 +91,30 @@ public class CommonAction extends BaseAction {
                 if (accountInfoResponse.code == 500) {
                     return json(BaseResponseBean.CODE_FAILURE, "获取用户信息接口请求失败", response);
                 }
-                response.data = accountInfoResponse.data;
-                return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
+                //获取数据成功,数据入库
+                long date = new Date().getTime();
+                staffPerson.name = accountInfoResponse.data.name;
+                staffPerson.papers_code = accountInfoResponse.data.idCard;
+                staffPerson.phone = accountInfoResponse.data.phone;
+                staffPerson.login_token = accountInfoResponse.data.loginToken;
+                staffPerson.created_at = date;
+                staffPerson.updated_at = date;
+                long addRes = staffPersonDao.addStaffPerson(staffPerson);
+                StaffPersonBean staffPersonBean = new StaffPersonBean();
+                if (addRes != 0) {
+                    staffPersonBean.id = addRes;
+                }
+                staffPersonBean.custId = staffPerson.cust_id;
+                staffPersonBean.accountUuid = staffPerson.account_uuid;
+                staffPersonBean.loginToken = staffPerson.login_token;
+                staffPersonBean.name = staffPerson.name;
+                staffPersonBean.papersType = staffPerson.papers_type;
+                staffPersonBean.papersCode = staffPerson.papers_code;
+                staffPersonBean.phone = staffPerson.phone;
+                staffPersonBean.createdAt = staffPerson.created_at;
+                staffPersonBean.updatedAt = staffPerson.updated_at;
+                response.data = staffPersonBean;
+                return json(BaseResponseBean.CODE_SUCCESS, "获取用户信息成功", response);
             } catch (IOException e) {
                 return json(BaseResponseBean.CODE_FAILURE, "获取用户信息接口请求失败", response);
             }
@@ -112,11 +135,11 @@ public class CommonAction extends BaseAction {
         }
     }
 
-
     /**
      * 银行卡获取短信验证码
-     * TODO 英大接口返回结果的同时会返回一个验证参数,返回给端上同时存在数据库里
-     * TODO 获取短信验证码必要参数校验:银行卡号和绑定手机号
+     * 英大接口返回结果的同时会返回一个验证参数,返回给端上同时存在数据库里
+     * 是否获取短信验证码,根据获取验证码的时间来判断,有时间限制,过期失效:verify_time
+     * 获取短信验证码必要参数校验:银行卡号和绑定手机号
      *
      * @param actionBean
      * @return
@@ -127,29 +150,35 @@ public class CommonAction extends BaseAction {
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
+        if (request.phone == null || request.bankCode == null) {
+            return json(BaseResponseBean.CODE_FAILURE, "银行卡号和手机号不能为空", response);
+        }
         InsureBankBean.bankSmsRequest bankSmsRequest = new InsureBankBean.bankSmsRequest();
         InsureSetupBean.accountInfoRequest accountInfoRequest = new InsureSetupBean.accountInfoRequest();
         accountInfoRequest.custId = Long.valueOf(actionBean.userId);
         accountInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
-        //TODO 获取用户基本信息
+        //获取用户基本信息
         String userInfoRes = findUserInfoById(accountInfoRequest);
-        BaseResponseBean baseResponseBean = JsonKit.json2Bean(userInfoRes, BaseResponseBean.class);
+        StaffPersonBean.userInfoResponse userInfoResponse = JsonKit.json2Bean(userInfoRes, StaffPersonBean.userInfoResponse.class);
         bankSmsRequest.phone = request.phone;
         bankSmsRequest.bankCode = request.bankCode;
-        bankSmsRequest.name = request.bankCode;
-        bankSmsRequest.idCard = request.bankCode;
-        //TODO 判断是否已经发过验证码，避免重复发送
+        bankSmsRequest.name = userInfoResponse.data.name;
+        bankSmsRequest.idCard = userInfoResponse.data.papersCode;
+        //判断是否已经发过验证码，避免重复发送
         BankVerify bankVerify = new BankVerify();
         long date = new Date().getTime();
         bankVerify.cust_id = Long.valueOf(actionBean.userId);
         bankVerify.bank_code = request.bankCode;
         bankVerify.bank_phone = request.bankCode;
         BankVerify bankVerifyRepeat = bankVerifyDao.findBankVerifyRepeat(bankVerify);
-        if(bankVerifyRepeat!=null){
-            //TODO 判断验证码是否已经过期,过期时间5分钟
+        if (bankVerifyRepeat != null) {
+            //判断验证码是否已经过期,过期时间5分钟(暂定五分钟)
+            if (bankVerifyRepeat.verify_time + 60 * 5 * 1000 > date) {
+                return json(BaseResponseBean.CODE_FAILURE, "您已获取验证码成功,请稍后重试", response);
+            }
         }
         try {
-            //TODO 请求http
+            //请求http
             String bankSmsRes = HttpClientKit.post(toBankSms, JsonKit.bean2Json(bankSmsRequest));
             if (bankSmsRes == null) {
                 return json(BaseResponseBean.CODE_FAILURE, "获取银行卡绑定验证码接口请求失败", response);
@@ -158,7 +187,7 @@ public class CommonAction extends BaseAction {
             if (bankSmsResponse.code == 500) {
                 return json(BaseResponseBean.CODE_FAILURE, "获取银行卡绑定验证码接口请求失败", response);
             }
-            //TODO 数据库添加记录
+            //数据库添加记录
             bankVerify.verify_id = bankSmsResponse.data.requestId;
             bankVerify.verify_code = "";
             bankVerify.verify_time = date;
@@ -175,9 +204,6 @@ public class CommonAction extends BaseAction {
 
     /**
      * 校验银行卡短信验证码
-     * TODO 返回类型是返回String 还是 boolean
-     * TODO 有两个状态值:是否获取短信验证码 bankSmsStatus/是否验证通过短信验证码 verifyBankSmsStatus
-     * TODO 把状态值放在数据库里,有时间限制,过期失效
      * <p>
      * TODO 新增银行验证码记录表,逻辑如下
      * TODO 1.每次发送验证码之前查询是否已发过或者是还在有效期内 findBankVerifyRepeat
@@ -185,32 +211,48 @@ public class CommonAction extends BaseAction {
      * TODO 3.校验验证码需要查询记录表获取verifyId findBankVerifyid
      * TODO 4.验证码校验成功,更新记录表 updateBankVerify
      *
-     * @param actionBean
-     * @return
+     * @param request
+     * @return boolean
      */
-    public String verifyBankSms(ActionBean actionBean) {
-        InsureBankBean.bankRequest request = JsonKit.json2Bean(actionBean.body, InsureBankBean.bankRequest.class);
+    public boolean verifyBankSms(InsureBankBean.bankRequest request) {
         BaseResponseBean response = new BaseResponseBean();
         if (request == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
+            return false;
+        }
+        if(request.verifyId == null||request.verifyCode == null){
+            return false;
         }
         InsureBankBean.verifyBankSmsRequest verifyBankSmsRequest = new InsureBankBean.verifyBankSmsRequest();
         verifyBankSmsRequest.requestId = request.verifyId;
         verifyBankSmsRequest.vdCode = request.verifyCode;
+        BankVerify bankVerify = new BankVerify();
+        bankVerify.verify_id = request.verifyId;
+        bankVerify.verify_code = request.verifyCode;
+        BankVerify bankVerifyRes = bankVerifyDao.findBankVerify(bankVerify);
+        if(bankVerifyRes!=null){
+            //避免重复请求接口
+            if(bankVerifyRes.verify_status=="2"){
+                return true;
+            }
+        }
         try {
-            //TODO 请求http
+            //请求http
             String verifyBankSmsRes = HttpClientKit.post(toVerifyBankSms, JsonKit.bean2Json(verifyBankSmsRequest));
             if (verifyBankSmsRes == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "校验银行卡绑定验证码接口请求失败", response);
+                return false;
             }
             InsureBankBean.verifyBankSmsResponse verifyBankSmsResponse = JsonKit.json2Bean(verifyBankSmsRes, InsureBankBean.verifyBankSmsResponse.class);
             if (verifyBankSmsResponse.code == 500) {
-                return json(BaseResponseBean.CODE_FAILURE, "校验银行卡绑定验证码接口请求失败", response);
+                return false;
             }
             response.data = verifyBankSmsResponse.data;
-            return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
+            long date = new Date().getTime();
+            bankVerify.verify_status = "2";
+            bankVerify.updated_at = date;
+            long updateRes = bankVerifyDao.updateBankVerify(bankVerify);
+            return true;
         } catch (IOException e) {
-            return json(BaseResponseBean.CODE_FAILURE, "校验银行卡绑定验证码接口请求失败", response);
+            return false;
         }
     }
 }
