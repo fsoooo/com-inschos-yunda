@@ -203,6 +203,34 @@ public class CommonAction extends BaseAction {
     }
 
     /**
+     * 获取verifyId
+     * @param request
+     * @return
+     */
+    public String findBankVerifyId(InsureBankBean.bankVerifyIdRequest request){
+        if (request == null) {
+            return "";
+        }
+        if(request.cust_id == 0||request.bank_code == null||request.bank_phone == null) {
+            return "";
+        }
+        long date = new Date().getTime();
+        BankVerify bankVerifyId = new BankVerify();
+        bankVerifyId.cust_id = request.cust_id;
+        bankVerifyId.bank_code = request.bank_code;
+        bankVerifyId.bank_phone = request.bank_phone;
+        bankVerifyId.verify_status = "1";
+        bankVerifyId.verify_time = date-60*5*100;
+        BankVerify bankVerify = bankVerifyDao.findBankVerifyId(bankVerifyId);
+        if(bankVerify==null){
+            return "";
+        }else{
+           String verifyId = bankVerify.verify_id;
+           return verifyId;
+        }
+    }
+
+    /**
      * 校验银行卡短信验证码
      * <p>
      * TODO 新增银行验证码记录表,逻辑如下

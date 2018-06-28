@@ -62,6 +62,12 @@ public class InsureBankBean {
         public String bankCode;//用户银行卡号
     }
 
+    public static class bankVerifyIdRequest {
+        public long cust_id;
+        public String bank_code;
+        public String bank_phone;
+    }
+
     public static class bankSmsResponse extends BaseResponseBean {
         public bankSmsResponseData data;
     }
@@ -78,4 +84,6 @@ public class InsureBankBean {
     public static class verifyBankSmsResponse extends BaseResponseBean {
         public Object data;
     }
+
+
 }
