@@ -129,10 +129,10 @@ public class CommonAction extends BaseAction {
      * @param request
      * @return
      */
-    public CommonBean.findUserInfoResponse  findUserInfoById(InsureSetupBean.accountInfoRequest request) {
+    public CommonBean.findUserInfoResponse  findUserInfoById(CommonBean.findUserInfoRequset request) {
         CommonBean.findUserInfoRequset findUserInfoRequset = new CommonBean.findUserInfoRequset();
-        findUserInfoRequset.userId = request.custId+"";
-        findUserInfoRequset.accountUuid = request.accountUuid+"";
+        findUserInfoRequset.userId = request.userId;
+        findUserInfoRequset.accountUuid = request.accountUuid;
         CommonBean.findUserInfoResponse userInfoRes = findUserInfoInter(findUserInfoRequset);
         return userInfoRes;
     }
@@ -214,11 +214,11 @@ public class CommonAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, "银行卡号和手机号不能为空", response);
         }
         InsureBankBean.bankSmsRequest bankSmsRequest = new InsureBankBean.bankSmsRequest();
-        InsureSetupBean.accountInfoRequest accountInfoRequest = new InsureSetupBean.accountInfoRequest();
-        accountInfoRequest.custId = Long.valueOf(actionBean.userId);
-        accountInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
+        CommonBean.findUserInfoRequset findUserInfoRequset = new  CommonBean.findUserInfoRequset();
+        findUserInfoRequset.userId = actionBean.userId;
+        findUserInfoRequset.accountUuid = actionBean.accountUuid;
         //获取用户基本信息
-        CommonBean.findUserInfoResponse userInfoResponse = findUserInfoById(accountInfoRequest);
+        CommonBean.findUserInfoResponse userInfoResponse = findUserInfoById(findUserInfoRequset);
         bankSmsRequest.phone = request.phone;
         bankSmsRequest.bankCode = request.bankCode;
         bankSmsRequest.name = userInfoResponse.data.name;

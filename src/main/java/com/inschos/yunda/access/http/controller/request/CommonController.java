@@ -1,6 +1,7 @@
 package com.inschos.yunda.access.http.controller.request;
 
-import com.inschos.yunda.access.http.controller.bean.ActionBean;
+import com.inschos.yunda.access.http.controller.bean.*;
+import com.inschos.yunda.access.http.controller.action.*;
 import com.inschos.yunda.annotation.GetActionBeanAnnotation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

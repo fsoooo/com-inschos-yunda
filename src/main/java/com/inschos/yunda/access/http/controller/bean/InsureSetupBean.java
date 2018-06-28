@@ -44,4 +44,15 @@ public class InsureSetupBean {
 
     }
 
+    public static class doBankAuthorizeRequest {
+        public String name;//用户姓名
+        public String bankCode;//用户银行卡号
+        public String phone;//用户手机号
+        public String verifyId;//验证id
+        public String verifyCode;//验证码
+    }
+
+    public static class doBankAuthorizeResponse extends BaseResponseBean {
+        public Object data;
+    }
 }
