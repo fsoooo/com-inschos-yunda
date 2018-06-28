@@ -1,7 +1,5 @@
 package com.inschos.yunda.access.http.controller.bean;
 
-import com.inschos.yunda.model.WarrantyRecord;
-
 import java.util.List;
 
 public class InsureWarrantyBean {

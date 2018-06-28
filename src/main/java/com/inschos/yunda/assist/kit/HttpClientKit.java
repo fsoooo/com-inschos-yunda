@@ -12,6 +12,14 @@ public class HttpClientKit {
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private static OkHttpClient client;
 
+    /**
+     * http请求公共函数(Post,超时时间30s)
+     *
+     * @param url
+     * @param json
+     * @return
+     * @throws IOException
+     */
     public static String post(String url, String json) throws IOException {
         if (client == null) {
             client = new OkHttpClient.Builder()
