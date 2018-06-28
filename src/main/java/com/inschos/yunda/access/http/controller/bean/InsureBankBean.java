@@ -38,6 +38,7 @@ public class InsureBankBean {
     }
 
     public static class bankListResponseData {
+        public long bankCount;
 
     }
 
@@ -52,7 +53,21 @@ public class InsureBankBean {
     }
 
     public static class bankInfoResponseData {
+        public long bankId;
+    }
 
+    public static class updateBankStatusRequest {
+        public long custId;//用户id
+        public long accountUuid;//用户account_uuid
+        public String name;//用户姓名
+        public String bankCode;//用户银行卡号
+        public String phone;//用户手机号
+        public long bankUseStatus;//银行卡使用状态
+        public long bankAuthorizeStatus;//银行卡授权状态
+    }
+
+    public static class updateBankStatusResponse extends BaseResponseBean {
+        public Object data;
     }
 
     public static class bankSmsRequest {
@@ -84,6 +99,4 @@ public class InsureBankBean {
     public static class verifyBankSmsResponse extends BaseResponseBean {
         public Object data;
     }
-
-
 }
