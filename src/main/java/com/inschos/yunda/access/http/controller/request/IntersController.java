@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
  * User: wangsl
  * Date: 2018/06/23
  * Time: 17:12
- * 韵达项目对外接口:联合登录接口,授权查询接口,预投保接口
+ * 韵达项目对外接口:联合登录接口,授权查询接口,预投保接口,保险结果推送韵达
  */
 @Controller
 @RequestMapping("/webapi")

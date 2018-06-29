@@ -11,9 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * User: wangsl
- * Date: 2018/06/23
+ * Date: 2018/06/29
  * Time: 17:12
- * 韵达项目对外接口:联合登录接口,授权查询接口,预投保接口
+ * 韵达项目-我的理赔:理赔发起提交，理赔审核，理赔记录查询
  */
 @Controller
 @RequestMapping("/webapi")

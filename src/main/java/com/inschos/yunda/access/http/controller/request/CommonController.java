@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * User: wangsl
  * Date: 2018/06/22
  * Time: 17:12
- * 韵达项目对外接口:联合登录接口,授权查询接口,预投保接口
+ * 韵达项目-公共方法：获取用户基本信息和发送短信验证码
  */
 @Controller
 @RequestMapping("/webapi")
