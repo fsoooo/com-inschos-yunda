@@ -79,9 +79,29 @@ public class InsureWarrantyAction extends BaseAction {
         warrantyInfoRequest.custId = Long.valueOf(actionBean.userId);
         warrantyInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
         warrantyInfoRequest.warrantyUuid = request.warrantyUuid;
+        String warrantyInfoRes = findInsureWarrantyInfoById(warrantyInfoRequest);
+        return warrantyInfoRes;
+    }
+
+    /**
+     * 获取保单详情
+     * TODO 根据warranty_uuid,从远程接口取数据
+     *
+     * @param request
+     * @return
+     */
+    public String findInsureWarrantyInfoById(InsureWarrantyBean.warrantyInfoRequest request) {
+        BaseResponseBean response = new BaseResponseBean();
+        //判空
+        if (request == null) {
+            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
+        }
+        if(request.warrantyUuid==null||request.custId==0||request.accountUuid==0){
+            return json(BaseResponseBean.CODE_FAILURE, "必要参数为空", response);
+        }
         try {
             //TODO 请求http
-            String warrantyInfoRes = HttpClientKit.post(toWarrantyInfo, JsonKit.bean2Json(warrantyInfoRequest));
+            String warrantyInfoRes = HttpClientKit.post(toWarrantyInfo, JsonKit.bean2Json(request));
             if (warrantyInfoRes == null) {
                 return json(BaseResponseBean.CODE_FAILURE, "获取保单详情接口请求失败", response);
             }

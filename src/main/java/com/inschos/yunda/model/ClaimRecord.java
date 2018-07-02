@@ -5,10 +5,11 @@ import javafx.scene.text.Text;
 public class ClaimRecord {
     public long id;
     public long cust_id;
-    public String account_uuid;
+    public long account_uuid;
     public String warranty_uuid;
     public String name;
     public String idcard;
+    public String phone;
     public String email;
     public String address;
     public String claim_type;//出险类型:普通General/残疾Disabled/身故Dead

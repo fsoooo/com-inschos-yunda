@@ -1,5 +1,7 @@
 package com.inschos.yunda.access.http.controller.bean;
 
+import javafx.scene.text.Text;
+
 import java.util.List;
 
 /**
@@ -36,11 +38,12 @@ public class InsureClaimBean {
         public String IdCard;
         public String phone;
         public String email;
-        public String address;//当前住址
+        public String address;//idcard
+        public String warrantyUuid;
         public List<claimType> claimTypes;//出险类型
-        public String claimStart;//出险时间
+        public long claimStart;//出险时间
         public String claimArea;//出险地区
-        public String ClaimDescription;//出险经过描述
+        public Text ClaimDescription;//出险经过描述
     }
 
     public static class claimType {
@@ -48,6 +51,7 @@ public class InsureClaimBean {
     }
 
     public static class claimMaterialGeneralRequest {//（一）普通案件保险金申请
+        public long claimId;
         public String claimApplication;//理赔申请书
         public String medicalInformation;//病历、诊断证明、出院记录等医疗资料
         public String medicalInvoice;//医疗发票
@@ -71,6 +75,15 @@ public class InsureClaimBean {
 
     public static class claimVerifyRequest {//获取理赔审核
         public long claimId;//理赔id
+    }
+
+    public static class claimVerifyResponse {
+        public String productName;//产品名称
+        public String insureName;//被保人姓名
+        public String insureDays;//保障天数
+        public String warrantyCode;//保单号
+        public String insurePrice;//价格
+        public String claimType;//出险类型
     }
 
     public static class doClaimVerifyRequest {//理赔审核提交
