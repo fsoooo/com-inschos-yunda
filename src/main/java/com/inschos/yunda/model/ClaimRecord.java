@@ -20,4 +20,5 @@ public class ClaimRecord {
     public long updated_at;
 
     public ClaimInfo claimInfo;
+    public Page page;
 }

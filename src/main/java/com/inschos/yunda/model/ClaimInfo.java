@@ -1,5 +1,7 @@
 package com.inschos.yunda.model;
 
+import javax.xml.soap.Text;
+
 public class ClaimInfo {
     public long id;
     public long claim_id;//理赔进度id
@@ -14,8 +16,8 @@ public class ClaimInfo {
     public String disability_report;//二级以上（含二级）或保险人认可的医疗机构或司法鉴定机构出具的伤残鉴定报告
     public String death_certificate;//公安部门或医疗机构出具的被保险人死亡证明书，火化证，户籍注销证明复印件
     public String beneficiary_material;//受益人资料
-    public String status;//审核状态：默认1未审核 /2审核通过/3需要重新提交资料/4审核驳回
-    public String remarks;//审核备注
-    public String created_at;
-    public String updated_at;
+    public int status;//审核状态：默认1未审核 /2审核通过/3需要重新提交资料/4审核驳回
+    public Text remarks;//审核备注
+    public long created_at;
+    public long updated_at;
 }

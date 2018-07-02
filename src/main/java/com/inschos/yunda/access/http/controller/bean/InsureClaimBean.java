@@ -9,6 +9,28 @@ import java.util.List;
  * 韵达项目-理赔-参数Bean
  */
 public class InsureClaimBean {
+    public static String getListStatus(int listStatus) {
+        String result = "--";
+        switch (listStatus) {
+            case 1:
+                result = "申请理赔";
+                break;
+            case 2:
+                result = "申请理赔";
+                break;
+            case 3:
+                result = "等待审核";
+                break;
+            case 4:
+                result = "审核通过";
+                break;
+            case -1:
+                result = "审核失败";
+                break;
+        }
+        return result;
+    }
+
     public static class claimApplyRequest {//理赔申请
         public String name;
         public String IdCard;
@@ -58,10 +80,47 @@ public class InsureClaimBean {
     }
 
     public static class claimProgressListRequest {//获取理赔进度列表
-        public String claimProgressStaus;//理赔进度状态:1进行中/2已完结
+        public int claimProgressStaus;//理赔进度状态:1进行中/2已完结
+        public String pageNum = "1";//分页数据
+        public String lastId;//分页数据
+        public String pageSize = "10";//分页数据
+    }
+
+    public static class claimProgressListResponse {
+        public String name;
+        public String productName;
+        public int claimProgressStaus;//理赔进度状态:1进行中/2已完结
+        public String claimProgressStausText;//理赔进度状态:1进行中/2已完结
+        public long createdAt;
+        public String createdAtText;
+        public long updatedAt;
+        public String updatedAtText;
     }
 
     public static class claimProgressInfoRequest {//获取理赔进度详情
         public long claimId;//理赔id
+    }
+
+    public static class claimProgressInfoResponse {
+        public String name;
+        public String productName;
+        public int claimProgressStaus;//理赔进度状态:1进行中/2已完结
+        public String claimProgressStausText;//理赔进度状态:1进行中/2已完结
+        public long createdAt;
+        public String createdAtText;
+        public long updatedAt;
+        public String updatedAtText;
+        //申请完成
+        public long applyEnd;
+        public String applyEndText;
+        //资料上传
+        public long uploadEnd;
+        public String uploadEndText;
+        //专员审核
+        public long verifyEnd;
+        public String verifyEndText;
+        //理赔结案
+        public long claimEnd;
+        public String claimEndText;
     }
 }

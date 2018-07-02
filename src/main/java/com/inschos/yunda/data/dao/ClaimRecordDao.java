@@ -32,4 +32,8 @@ public class ClaimRecordDao {
     public ClaimInfo findClaimInfo(ClaimInfo claimInfo) {
         return claimRecordMapper.findClaimInfo(claimInfo);
     }
+
+    public ClaimRecord findClaimVerify(ClaimRecord claimRecord) {
+        return claimRecordMapper.findClaimRecord(claimRecord);
+    }
 }

@@ -26,8 +26,28 @@
         <include refid="Record_Column_List"/>
         from claim_record_yingda
         <where>
-            cust_id =#{cust_id} AND account_uuid =#{account_uuid}
+            <choose>
+                <when test="status==1">
+                    `type` in (1,2,3)
+                </when>
+                <when test="status==2">
+                    `type` in (-1,4)
+                </when>
+            </choose>
+            <choose>
+                <when test="page.lastId>0">
+                    id&lt;#{page.lastId}
+                </when>
+                <when test="page.start>0">
+                    id&lt;=(select id from claim_record_yingda where cust_id =#{cust_id} AND account_uuid =#{account_uuid} order by id desc limit #{page.start},1)
+                </when>
+                <otherwise>
+                    1=1
+                </otherwise>
+            </choose>
+            AND cust_id =#{cust_id} AND account_uuid =#{account_uuid}
         </where>
+        order by id desc limit #{page.offset}
     </select>
 
     <select id="findClaimRecord" parameterType="ClaimRecord" resultType="ClaimRecord">
