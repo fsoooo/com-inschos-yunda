@@ -13,12 +13,12 @@ public class InsureClaimYdAction extends BaseAction {
     private static final Logger logger = Logger.getLogger(InsureClaimYdAction.class);
 
     /**
-     * 获取理赔审核详情
+     * 提交理赔申请信息
      *
      * @param actionBean
      * @return
      */
-    public String findInsureClaimVerifyInfo(ActionBean actionBean) {
+    public String claimApplyPost(ActionBean actionBean) {
         InsureSetupBean request = JsonKit.json2Bean(actionBean.body, InsureSetupBean.class);
         BaseResponseBean response = new BaseResponseBean();
         //判空
@@ -29,12 +29,12 @@ public class InsureClaimYdAction extends BaseAction {
     }
 
     /**
-     * 处理理赔审核
+     * 提交理赔申请资料
      *
      * @param actionBean
      * @return
      */
-    public String doInsureClaimVerify(ActionBean actionBean) {
+    public String claimMaterialPost(ActionBean actionBean) {
         InsureSetupBean request = JsonKit.json2Bean(actionBean.body, InsureSetupBean.class);
         BaseResponseBean response = new BaseResponseBean();
         //判空
@@ -44,5 +44,35 @@ public class InsureClaimYdAction extends BaseAction {
         return json(BaseResponseBean.CODE_SUCCESS, "业务完善中...", response);
     }
 
+    /**
+     * 获取理赔审核页面信息
+     *
+     * @param actionBean
+     * @return
+     */
+    public String findClaimVerifyInfo(ActionBean actionBean) {
+        InsureSetupBean request = JsonKit.json2Bean(actionBean.body, InsureSetupBean.class);
+        BaseResponseBean response = new BaseResponseBean();
+        //判空
+        if (request == null) {
+            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
+        }
+        return json(BaseResponseBean.CODE_SUCCESS, "业务完善中...", response);
+    }
 
+    /**
+     * 理赔审核页面提交
+     *
+     * @param actionBean
+     * @return
+     */
+    public String doClaimVirify(ActionBean actionBean) {
+        InsureSetupBean request = JsonKit.json2Bean(actionBean.body, InsureSetupBean.class);
+        BaseResponseBean response = new BaseResponseBean();
+        //判空
+        if (request == null) {
+            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
+        }
+        return json(BaseResponseBean.CODE_SUCCESS, "业务完善中...", response);
+    }
 }
