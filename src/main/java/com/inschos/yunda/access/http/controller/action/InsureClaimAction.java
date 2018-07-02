@@ -1,8 +1,7 @@
 package com.inschos.yunda.access.http.controller.action;
 
-import com.inschos.yunda.access.http.controller.bean.ActionBean;
-import com.inschos.yunda.access.http.controller.bean.BaseResponseBean;
-import com.inschos.yunda.access.http.controller.bean.InsureSetupBean;
+
+import com.inschos.yunda.access.http.controller.bean.*;
 import com.inschos.yunda.assist.kit.JsonKit;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -19,12 +18,13 @@ public class InsureClaimAction extends BaseAction {
      * @return
      */
     public String findClaimProgressList(ActionBean actionBean) {
-        InsureSetupBean request = JsonKit.json2Bean(actionBean.body, InsureSetupBean.class);
+        InsureClaimBean.claimProgressListRequest request = JsonKit.json2Bean(actionBean.body, InsureClaimBean.claimProgressListRequest.class);
         BaseResponseBean response = new BaseResponseBean();
         //判空
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
+
         return json(BaseResponseBean.CODE_SUCCESS, "业务完善中...", response);
     }
 

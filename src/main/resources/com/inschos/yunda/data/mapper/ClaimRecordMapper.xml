@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 命名空间，对sql进行分类化管理（sql隔离） -->
+<mapper namespace="com.inschos.yunda.data.mapper.ClaimRecordMapper">
+
+    <!--claim_record_yingda表查询字段-->
+    <sql id="Record_Column_List">
+        `id`,`cust_id`,`account_uuid`,`warranty_uuid`,`name`,`idcard`,`phone`,`email`,`address`,`claim_type`,`claim_start`,`claim_area`,`claim_desc`,`status`,`created_at`,`updated_at`
+    </sql>
+
+    <!--claim_info_yingda表查询字段-->
+    <sql id="Info_Column_List">
+        `id`,`claim_id`,`claim_application`,`medical_information`,`medical_invoice`,`fees_list`,`idcard_copy`,`bank_account`,`traffic_accident_certification`,`third_material`,`disability_report`,`death_certificate`,`beneficiary_material`,`status`,`remarks`,`created_at`,`updated_at`
+    </sql>
+
+    <insert id="addClaimRecord" parameterType="ClaimRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into claim_record_yingda(`cust_id`,`warranty_uuid`,`warranty_status`,`warranty_status_text`,`created_at`,`updated_at`) values(#{cust_id},#{warranty_uuid},#{warranty_status},#{warranty_status_text},#{created_at},#{updated_at})
+    </insert>
+
+    <insert id="addClaimInfo" parameterType="ClaimInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into claim_info_yingda(`cust_id`,`warranty_uuid`,`warranty_status`,`warranty_status_text`,`created_at`,`updated_at`) values(#{cust_id},#{warranty_uuid},#{warranty_status},#{warranty_status_text},#{created_at},#{updated_at})
+    </insert>
+
+    <select id="findClaimRecordList" parameterType="ClaimRecord" resultType="ClaimRecord">
+        select
+        <include refid="Record_Column_List"/>
+        from claim_record_yingda
+        <where>
+            cust_id =#{cust_id} AND account_uuid =#{account_uuid}
+        </where>
+    </select>
+
+    <select id="findClaimRecord" parameterType="ClaimRecord" resultType="ClaimRecord">
+        select
+        <include refid="Record_Column_List"/>
+        from claim_record_yingda
+        <where>
+            id =#{id}
+        </where>
+    </select>
+
+    <select id="findClaimInfo" parameterType="ClaimInfo" resultType="ClaimInfo">
+        select
+        <include refid="Info_Column_List"/>
+        from claim_info_yingda
+        <where>
+            claim_id =#{claim_id}
+        </where>
+    </select>
+
+    <!--TODO 两表联查-->
+    <select id="findClaimVerify" parameterType="ClaimRecord" resultMap="findClaimInfo">
+        select
+        `a`.`id`,  `a`.`cust_id`,  `a`.`account_uuid`,  `a`.`warranty_uuid`,  `a`.`name`,  `a`.`idcard`,  `a`.`phone`,  `a`.`email`,  `a`.`address`,  `a`.`claim_type`,  `a`.`claim_start`,  `a`.`claim_area`,  `a`.`claim_desc`,  `a`.`status`,  `a`.`created_at`,  `a`.`updated_at`
+        from  claim_record_yingda as a LEFT JOIN claim_info_yingda as b ON a.id = b.claim_id
+        where `a`.`id`=#{id} AND  `a`.`cust_id` =#{manager_uuid} AND `a`.`account_uuid` =#{account_uuid}
+    </select>
+    <!--联查映射-->
+    <resultMap id="findClaimInfo" type="ClaimInfo" autoMapping="true">
+        <!--主表的主键id-->
+        <id column="id" property="id"/>
+        <association property="ClaimRecord" javaType="ClaimRecord">
+            <!--todo 附表的主键id-->
+            <id column="id" property="id" />
+            <result column="claim_id" property="claim_id"/>
+            <result column="claim_application" property="claim_application"/>
+            <result column="medical_information" property="medical_information"/>
+            <result column="medical_invoice" property="medical_invoice"/>
+            <result column="fees_list" property="fees_list"/>
+            <result column="idcard_copy" property="idcard_copy"/>
+            <result column="bank_account" property="bank_account"/>
+            <result column="traffic_accident_certification" property="traffic_accident_certification"/>
+            <result column="third_material" property="third_material"/>
+            <result column="disability_report" property="disability_report"/>
+            <result column="death_certificate" property="death_certificate"/>
+            <result column="beneficiary_material" property="beneficiary_material"/>
+            <result column="status" property="status"/>
+            <result column="remarks" property="remarks"/>
+            <result column="created_at" property="created_at"/>
+            <result column="updated_at" property="updated_at"/>
+        </association>
+    </resultMap>
+</mapper>

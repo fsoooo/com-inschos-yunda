@@ -1,7 +1,6 @@
 package com.inschos.yunda.access.http.controller.request;
 
 import com.inschos.yunda.access.http.controller.action.InsureClaimAction;
-import com.inschos.yunda.access.http.controller.action.InsureClaimTkAction;
 import com.inschos.yunda.access.http.controller.action.InsureClaimYdAction;
 import com.inschos.yunda.access.http.controller.bean.ActionBean;
 import com.inschos.yunda.annotation.GetActionBeanAnnotation;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * User: wangsl
  * Date: 2018/06/29
  * Time: 17:12
- * 韵达项目-我的理赔:理赔发起提交，理赔审核，理赔记录查询
+ * 韵达项目-我的理赔:理赔申请提交，理赔资料提交，理赔审核信息获取，理赔审核提交，理赔记录列表，理赔记录详情
  */
 @Controller
 @RequestMapping("/webapi")
@@ -26,8 +25,6 @@ public class InsureClaimController {
 
     @Autowired
     private InsureClaimAction insureClaimAction;
-    @Autowired
-    private InsureClaimTkAction insureClaimTkAction;
     @Autowired
     private InsureClaimYdAction insureClaimYdAction;
 
