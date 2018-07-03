@@ -1,7 +1,10 @@
 package com.inschos.yunda.access.http.controller.action;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.inschos.yunda.access.http.controller.bean.*;
+import com.inschos.yunda.access.http.controller.bean.ActionBean;
+import com.inschos.yunda.access.http.controller.bean.BaseResponseBean;
+import com.inschos.yunda.access.http.controller.bean.InsureClaimBean;
+import com.inschos.yunda.access.http.controller.bean.InsureWarrantyBean;
 import com.inschos.yunda.assist.kit.JsonKit;
 import com.inschos.yunda.data.dao.ClaimRecordDao;
 import com.inschos.yunda.data.dao.WarrantyRecordDao;
@@ -178,9 +181,9 @@ public class InsureClaimYdAction extends BaseAction {
         claimInfo.created_at = date;
         claimInfo.updated_at = date;
         long addRes = claimRecordDao.addClaimInfo(claimInfo);
-        if(addRes==0){
+        if (addRes == 0) {
             return json(BaseResponseBean.CODE_SUCCESS, "提交理赔申请资料失败", response);
-        }else{
+        } else {
             return json(BaseResponseBean.CODE_SUCCESS, "提交理赔申请资料成功", response);
         }
     }
@@ -207,10 +210,45 @@ public class InsureClaimYdAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, "获取理赔审核页面信息失败", response);
         }
         InsureClaimBean.claimVerifyResponse claimVerifyResponse = new InsureClaimBean.claimVerifyResponse();
-        //TODO 获取保单信息
         //TODO 获取出险人信息
+        claimVerifyResponse.name = claimVerifyRes.name;
+        claimVerifyResponse.IdCard = claimVerifyRes.idcard;
+        claimVerifyResponse.phone = claimVerifyRes.phone;
+        claimVerifyResponse.email = claimVerifyRes.email;
+        claimVerifyResponse.address = claimVerifyRes.address;
         //TODO 获取出险信息
+        claimVerifyResponse.claimId = claimVerifyRes.id;
+        claimVerifyResponse.claimType = claimVerifyRes.claim_type;
+        claimVerifyResponse.claimStart = claimVerifyRes.claim_start;
+        claimVerifyResponse.claimArea = claimVerifyRes.claim_area;
+        claimVerifyResponse.claimDescription = claimVerifyRes.claim_desc;
+        //TODO 获取保单信息
+        InsureWarrantyBean.warrantyInfoRequest warrantyInfoRequest = new InsureWarrantyBean.warrantyInfoRequest();
+        warrantyInfoRequest.custId = Long.valueOf(actionBean.userId);
+        warrantyInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
+        warrantyInfoRequest.warrantyUuid = claimVerifyRes.warranty_uuid;
+        String warrantyRecordRes = insureWarrantyAction.findInsureWarrantyInfoById(warrantyInfoRequest);
+        if (warrantyRecordRes == null) {
+            return json(BaseResponseBean.CODE_FAILURE, "获取理赔申请页信息-保单信息失败", response);
+        }
+        InsureWarrantyBean.warrantyInfoResponse warrantyInfoResponse = JsonKit.json2Bean(warrantyRecordRes, InsureWarrantyBean.warrantyInfoResponse.class);
+        claimVerifyResponse.productName = "英大快递保";
+        claimVerifyResponse.insureStart = warrantyInfoResponse.data.toString();
+        claimVerifyResponse.insureEnd = warrantyInfoResponse.data.toString();
+        claimVerifyResponse.warrantyCode = warrantyInfoResponse.data.toString();
+        claimVerifyResponse.insurePrice = warrantyInfoResponse.data.toString();
         //TODO 获取理赔资料
+        claimVerifyResponse.claimApplication = claimVerifyRes.claimInfo.claim_application;
+        claimVerifyResponse.medicalInformation = claimVerifyRes.claimInfo.medical_information;
+        claimVerifyResponse.medicalInvoice = claimVerifyRes.claimInfo.medical_invoice;
+        claimVerifyResponse.feesList = claimVerifyRes.claimInfo.fees_list;
+        claimVerifyResponse.idCardCopy = claimVerifyRes.claimInfo.idcard_copy;
+        claimVerifyResponse.bankAccount = claimVerifyRes.claimInfo.bank_account;
+        claimVerifyResponse.trafficAccidentCertification = claimVerifyRes.claimInfo.traffic_accident_certification;
+        claimVerifyResponse.thirdMaterial = claimVerifyRes.claimInfo.third_material;
+        claimVerifyResponse.disabilityReport = claimVerifyRes.claimInfo.disability_report;
+        claimVerifyResponse.deathCertificate = claimVerifyRes.claimInfo.death_certificate;
+        claimVerifyResponse.beneficiaryMaterial = claimVerifyRes.claimInfo.beneficiary_material;
         response.data = claimVerifyResponse;
         return json(BaseResponseBean.CODE_SUCCESS, "获取理赔审核页面信息成功", response);
     }
@@ -222,12 +260,12 @@ public class InsureClaimYdAction extends BaseAction {
      * @return
      */
     public String doClaimVirify(ActionBean actionBean) {
-        InsureClaimBean.doClaimVerifyRequest request = JsonKit.json2Bean(actionBean.body,  InsureClaimBean.doClaimVerifyRequest.class);
+        InsureClaimBean.doClaimVerifyRequest request = JsonKit.json2Bean(actionBean.body, InsureClaimBean.doClaimVerifyRequest.class);
         BaseResponseBean response = new BaseResponseBean();
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
-        if(request.claimId == 0||request.verifyStatus==0){
+        if (request.claimId == 0 || request.verifyStatus == 0) {
             return json(BaseResponseBean.CODE_FAILURE, "必要参数为空", response);
         }
         ClaimInfo claimInfo = new ClaimInfo();
@@ -235,9 +273,9 @@ public class InsureClaimYdAction extends BaseAction {
         claimInfo.status = request.verifyStatus;
         claimInfo.remarks = request.verifyContent;
         long updateRes = claimRecordDao.updateClaimInfo(claimInfo);
-        if(updateRes==0){
+        if (updateRes == 0) {
             return json(BaseResponseBean.CODE_FAILURE, "理赔审核页面提交失败", response);
-        }else{
+        } else {
             return json(BaseResponseBean.CODE_SUCCESS, "理赔审核页面提交成功", response);
         }
     }

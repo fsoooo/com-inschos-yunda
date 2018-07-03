@@ -98,12 +98,12 @@ public class InsureClaimBean {
         public String phone;
         public String email;
         public String address;
-        //出现信息
-        public long claimStart;//出险时间
-        public String claimArea;//出险地区
-        public String ClaimDescription;//出险经过描述
+        //出险信息
         public long claimId;//理赔id
         public String claimType;//出险类型:1普通案件保险金申请/2残疾保险金申请/3身故保险金申请
+        public long claimStart;//出险时间
+        public String claimArea;//出险地区
+        public String claimDescription;//出险经过描述
         //理赔资料
         //（一）普通案件保险金申请
         public String claimApplication = "";//理赔申请书
