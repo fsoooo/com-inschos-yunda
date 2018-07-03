@@ -36,4 +36,8 @@ public class ClaimRecordDao {
     public ClaimRecord findClaimVerify(ClaimRecord claimRecord) {
         return claimRecordMapper.findClaimRecord(claimRecord);
     }
+
+    public long updateClaimInfo(ClaimInfo claimInfo){
+        return claimRecordMapper.updateClaimInfo(claimInfo);
+    }
 }
