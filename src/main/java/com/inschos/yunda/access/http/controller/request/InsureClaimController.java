@@ -43,6 +43,20 @@ public class InsureClaimController {
     }
 
     /**
+     * 获取理赔资料提交页信息
+     *
+     * @return json
+     * @params actionBean
+     * @access public
+     */
+    @GetActionBeanAnnotation
+    @RequestMapping("/findClaimMaterialInfo/**")
+    @ResponseBody
+    public String findClaimMaterialInfo(ActionBean actionBean) {
+        return insureClaimYdAction.findClaimMaterialInfo(actionBean);
+    }
+
+    /**
      * 提交理赔申请资料
      *
      * @return json

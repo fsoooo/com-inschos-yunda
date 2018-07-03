@@ -135,6 +135,7 @@ public class InsureClaimBean {
     }
 
     public static class claimProgressListResponse {
+        public long claimId;
         public String name;
         public String productName;
         public int claimProgressStaus;//理赔进度状态:1进行中/2已完结

@@ -37,7 +37,7 @@ public class InsureClaimAction extends BaseAction {
         }
         ClaimRecord claimRecord = new ClaimRecord();
         claimRecord.cust_id = Long.valueOf(actionBean.userId);
-        claimRecord.cust_id = Long.valueOf(actionBean.accountUuid);
+        claimRecord.account_uuid = Long.valueOf(actionBean.accountUuid);
         if (request.claimProgressStaus == 0) {//理赔进度状态:1进行中(待审核状态:申请理赔/申请理赔/等待审核)/2已完结(审核通过,审核失败)
             claimRecord.status = 1;
         } else {
@@ -51,6 +51,7 @@ public class InsureClaimAction extends BaseAction {
         List<InsureClaimBean.claimProgressListResponse> returnResponseList = new ArrayList<>();
         for (ClaimRecord record : claimRecords) {
             InsureClaimBean.claimProgressListResponse returnResponse = new InsureClaimBean.claimProgressListResponse();
+            returnResponse.claimId = record.id;
             returnResponse.name = record.name;
             returnResponse.productName = "英大快递保";
             returnResponse.claimProgressStaus = record.status;

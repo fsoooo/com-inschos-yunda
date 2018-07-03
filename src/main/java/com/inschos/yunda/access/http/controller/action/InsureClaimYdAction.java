@@ -73,7 +73,7 @@ public class InsureClaimYdAction extends BaseAction {
     }
 
     /**
-     * 获取理赔申请页信息
+     * 获取理赔资料提交页信息
      * TODO 会返给端上 保单信息和出险类型，来确定页面的显示
      *
      * @param actionBean
