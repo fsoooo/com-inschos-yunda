@@ -36,7 +36,7 @@ public class InsureClaimBean {
         public String IdCard;
         public String phone;
         public String email;
-        public String address;//idcard
+        public String address;
         public String warrantyUuid;
         public List<claimType> claimTypes;//出险类型
         public long claimStart;//出险时间

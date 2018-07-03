@@ -68,6 +68,7 @@ public class InsureClaimYdAction extends BaseAction {
         if (addRes == 0) {
             return json(BaseResponseBean.CODE_FAILURE, "理赔申请提交失败", response);
         } else {
+            response.data = addRes;
             return json(BaseResponseBean.CODE_SUCCESS, "理赔申请提交成功", response);
         }
     }
