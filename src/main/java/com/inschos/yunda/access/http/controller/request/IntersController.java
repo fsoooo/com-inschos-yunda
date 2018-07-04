@@ -90,7 +90,7 @@ public class IntersController {
      * @params companyName
      * @return
      */
-    @RequestMapping("/call_bank_yunda/**")
+    @RequestMapping("/call_back_yunda/**")
     @ResponseBody
     public String CallBackYunda(HttpServletRequest request){
         return intersAction.CallBackYunda(request);

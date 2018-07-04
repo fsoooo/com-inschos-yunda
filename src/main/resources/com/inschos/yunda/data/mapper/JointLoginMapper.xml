@@ -4,7 +4,7 @@
 <mapper namespace="com.inschos.yunda.data.mapper.JointLoginMapper">
 
     <insert id="addLoginRecord" parameterType="JointLogin"  useGeneratedKeys="true" keyProperty="id">
-        insert into joint_login(`phone`,`login_start`) values(#{phone},#{login_start})
+        insert into joint_login(`phone`,`login_start`,`created_at`,`updated_at`) values(#{phone},#{login_start},#{created_at},#{updated_at})
     </insert>
 
     <select id="findLoginRecord" parameterType="JointLogin" resultType="long">

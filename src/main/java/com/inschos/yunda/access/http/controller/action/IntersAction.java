@@ -63,7 +63,9 @@ public class IntersAction extends BaseAction {
         JointLogin jointLogin = new JointLogin();
         jointLogin.login_start = date;
         jointLogin.phone = request.insured_phone;
-        jointLogin.day_start = TimeKit.currentTimeMillis();//获取当前时间戳(毫秒值)
+        jointLogin.created_at = date;
+        jointLogin.updated_at = date;
+        jointLogin.day_start = TimeKit.getDayStartTime();//获取当天开始时间戳(毫秒值)
         jointLogin.day_end = TimeKit.getDayEndTime();//获取当天结束时间戳(毫秒值)
         long repeatRes = jointLoginDao.findLoginRecord(jointLogin);
         if (repeatRes == 0) {
@@ -101,7 +103,6 @@ public class IntersAction extends BaseAction {
         JointLoginBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), JointLoginBean.Requset.class);
         BaseResponseBean response = new BaseResponseBean();
         AuthorizeQueryBean.ResponseData authorizeQueryResponseData = new AuthorizeQueryBean.ResponseData();
-        //判空
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "请检查报文格式是否正确", response);
         }
