@@ -5,6 +5,8 @@ public class InsureBankBean {
         public long bankId;
         public String name;//用户姓名
         public String bankCode;//用户银行卡号
+        public String bankName;//银行名称
+        public String bankCity;//开户行地址
         public String phone;//用户手机号
         public long bankUseStatus;//银行卡使用状态
         public long bankAuthorizeStatus;//银行卡授权状态
@@ -100,7 +102,7 @@ public class InsureBankBean {
         public verifyBankSmsResponseData data;
     }
 
-    public static class verifyBankSmsResponseData{
+    public static class verifyBankSmsResponseData {
         public boolean verifyStatus;
     }
 }
