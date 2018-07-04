@@ -39,8 +39,11 @@ public class IntersAction extends BaseAction {
     @Autowired
     private StaffPersonDao staffPersonDao;
 
+    @Autowired
+    private CommonAction commonAction;
+
     /**
-     * 联合登录
+     * 联合登录 todo
      *
      * @return json
      * @params actionBean
@@ -72,32 +75,22 @@ public class IntersAction extends BaseAction {
             long login_id = jointLoginDao.addLoginRecord(jointLogin);
         }
         //TODO 触发联合登录,同步操作 http 请求 账号服务
-        String loginRes = doAccount(request);
-        if (loginRes == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
-        }
-        JointLoginBean.Response loginResponse = JsonKit.json2Bean(loginRes, JointLoginBean.Response.class);
-        if (loginResponse == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
-        }
-        if (loginResponse.code == 500) {
-            return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
-        }
+        JointLoginBean.AccountResponse loginResponse = doAccount(request);
         response.data = loginResponse.data;
         //return json(BaseResponseBean.CODE_SUCCESS, "操作成功", response);
         //TODO 触发联合登录,异步操作 http 请求 投保服务
-        String insureRes = doInsured(request);
+        String insureRes = doInsuredPay(request);
         if (insureRes == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
         }
         InsureParamsBean.Response insureResponse = JsonKit.json2Bean(insureRes, InsureParamsBean.Response.class);
         if (insureResponse == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
         }
         if (insureResponse.code != 200) {
-            return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
         }
-        return json(BaseResponseBean.CODE_SUCCESS, "操作成功", response);
+        return json(BaseResponseBean.CODE_SUCCESS, "投保成功", response);
     }
 
     /**
@@ -217,7 +210,7 @@ public class IntersAction extends BaseAction {
     }
 
     /**
-     * 保险推送接口,做异步处理
+     * 保险推送接口,做异步处理 todo
      *
      * @param httpServletRequest
      * @return
@@ -239,59 +232,50 @@ public class IntersAction extends BaseAction {
         callbackYundaRequest.status = request.status;
         callbackYundaRequest.ordersName = request.ordersName;
         callbackYundaRequest.companyName = request.companyName;
-        try {
-            //TODO 请求http
-            String result = HttpClientKit.post(toCallBackYunda, JsonKit.bean2Json(callbackYundaRequest));
-            if (result == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "投保推送韵达请求失败", response);
-            }
-            CallbackYundaBean.Response responseData = JsonKit.json2Bean(result, CallbackYundaBean.Response.class);
-            if (response.code != 200) {
-                return json(BaseResponseBean.CODE_FAILURE, "投保推送韵达请求失败", response);
-            }
-            response.data = responseData;
-            return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
-        } catch (IOException e) {
-            return json(BaseResponseBean.CODE_FAILURE, "投保推送韵达请求失败", response);
-        }
+        String interName = "投保推送韵达";
+        String result = commonAction.httpRequest(toCallBackYunda, JsonKit.bean2Json(callbackYundaRequest), interName);
+        return result;
     }
 
     /**
-     * 获取授权详情(微信+银行卡)
+     * 获取银行卡授权详情 todo
      *
      * @return
      */
-    private String doAuthorizeRes(JointLoginBean.Requset request) {
+    private String doBankAuthorizeRes(JointLoginBean.Requset request) {
         BaseResponseBean response = new BaseResponseBean();
         JointLoginBean.Requset jointLoginRequest = new JointLoginBean.Requset();
         jointLoginRequest.insured_name = request.insured_name;
         jointLoginRequest.insured_code = request.insured_code;
         jointLoginRequest.insured_phone = request.insured_phone;
-        try {
-            //TODO 请求http
-            //String authorizeRes = HttpClientKit.post(toAuthorizeQuery, JsonKit.bean2Json(jointLoginRequest));
-            String authorizeRes = HttpClientKit.post(toHttpTest, JsonKit.bean2Json(jointLoginRequest));
-            if (authorizeRes == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "授权查询请求失败", response);
-            }
-            AuthorizeQueryBean.Response authorizeResponse = JsonKit.json2Bean(authorizeRes, AuthorizeQueryBean.Response.class);
-            if (authorizeResponse.code != 200) {
-                return json(BaseResponseBean.CODE_FAILURE, "授权查询请求失败", response);
-            }
-            response.data = authorizeResponse;
-            return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
-        } catch (IOException e) {
-            return json(BaseResponseBean.CODE_FAILURE, "授权查询请求失败", response);
-        }
+        String interName = "银行卡授权查询";
+        String result = commonAction.httpRequest(toAuthorizeQueryBank, JsonKit.bean2Json(jointLoginRequest), interName);
+        return result;
     }
 
     /**
-     * 调用账号服务
+     * 获取微信签约详情 todo
+     *
+     * @return
+     */
+    private String doWechatContractRes(JointLoginBean.Requset request) {
+        BaseResponseBean response = new BaseResponseBean();
+        JointLoginBean.Requset jointLoginRequest = new JointLoginBean.Requset();
+        jointLoginRequest.insured_name = request.insured_name;
+        jointLoginRequest.insured_code = request.insured_code;
+        jointLoginRequest.insured_phone = request.insured_phone;
+        String interName = "微信签约查询";
+        String result = commonAction.httpRequest(toAuthorizeQueryWechat, JsonKit.bean2Json(jointLoginRequest), interName);
+        return result;
+    }
+
+    /**
+     * 调用账号服务 todo  bean
      *
      * @param request
      * @return
      */
-    private String doAccount(JointLoginBean.Requset request) {
+    private JointLoginBean.AccountResponse doAccount(JointLoginBean.Requset request) {
         BaseResponseBean response = new BaseResponseBean();
         JointLoginBean.Requset jointLoginRequest = new JointLoginBean.Requset();
         jointLoginRequest.channel_code = request.channel_code;
@@ -308,30 +292,18 @@ public class IntersAction extends BaseAction {
         jointLoginRequest.bank_phone = request.bank_phone;
         jointLoginRequest.bank_address = request.bank_address;
         jointLoginRequest.channel_order_code = request.channel_order_code;
-        try {
-            //TODO 请求http
-//            String accountRes = HttpClientKit.post(toJointLogin,JsonKit.bean2Json(jointLoginRequest));
-            String accountRes = HttpClientKit.post(toHttpTest, JsonKit.bean2Json(jointLoginRequest));
-            if (accountRes == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败", response);
-            }
-            JointLoginBean.AccountResponse accountResponse = JsonKit.json2Bean(accountRes, JointLoginBean.AccountResponse.class);
-            if (accountResponse.code == 500) {
-                return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败", response);
-            }
-            response.data = accountResponse.data;
-            return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
-        } catch (IOException e) {
-            return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败", response);
-        }
+        String interName = "账号服务";
+        String result = commonAction.httpRequest(toJointLogin, JsonKit.bean2Json(jointLoginRequest), interName);
+        JointLoginBean.AccountResponse accountResponse = JsonKit.json2Bean(result, JointLoginBean.AccountResponse.class);
+        return accountResponse;
     }
 
     /**
-     * 投保操作，先走英大投保，再进行泰康投保
+     * 投保操作，先走英大投保，再进行泰康投保 todo
      *
      * @return
      */
-    private String doInsured(JointLoginBean.Requset request) {
+    private String doInsuredPay(JointLoginBean.Requset request) {
         BaseResponseBean response = new BaseResponseBean();
         //投保人基础信息
         InsureParamsBean.PolicyHolder policyHolder = new InsureParamsBean.PolicyHolder();
@@ -376,133 +348,99 @@ public class IntersAction extends BaseAction {
         insuredRequest.policyholder = policyHolder;
         insuredRequest.recognizees = recognizees;
         insuredRequest.beneficiary = policyHolder;
-        try {
-            //TODO 请求http
-            String insureRes = HttpClientKit.post(toInsured, JsonKit.bean2Json(insuredRequest));
-            if (insureRes == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "投保接口请求失败", response);
-            }
-            InsureParamsBean.Response insureResponse = JsonKit.json2Bean(insureRes, InsureParamsBean.Response.class);
-            if (insureResponse.code != 200) {
-                return json(BaseResponseBean.CODE_FAILURE, "投保接口请求失败", response);
-            }
-            InsureParamsBean.ResponseData responseData = new InsureParamsBean.ResponseData();
-            InusrePayBean.Requset inusrePayRequest = new InusrePayBean.Requset();
-            //TODO 保单记录表添加/更新
-            WarrantyRecord warrantyRecord = new WarrantyRecord();
-            long date = new Date().getTime();
-            long custId = doCustId(request);
-            if (custId == 0) {
-                return json(BaseResponseBean.CODE_FAILURE, "获取用户信息失败", response);
-            }
-            warrantyRecord.cust_id = custId;
-            warrantyRecord.warranty_uuid = responseData.warrantyUuid;
-            warrantyRecord.warranty_status = responseData.status;
-            warrantyRecord.warranty_status_text = responseData.statusTxt;
-            warrantyRecord.pay_no = responseData.payNo;
-            warrantyRecord.pay_type = responseData.payType;
-            warrantyRecord.pay_url = responseData.payUrl;
-            warrantyRecord.created_at = date;
-            warrantyRecord.updated_at = date;
-            String addWarrantyRecordRes = doAddWarrantyRecord(warrantyRecord);
-            if (addWarrantyRecordRes == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "添加投保记录失败", response);
-            }
-            //TODO 支付参数
-            inusrePayRequest.payNo = insureResponse.data.payNo;
-            inusrePayRequest.payWay = insureResponse.data.payType;
-            //TODO 投保成功,调用支付
-            String payRes = doInsurePay(request, inusrePayRequest);
-            if (payRes == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "支付接口调用失败", response);
-            }
-            InusrePayBean.Response payResponse = JsonKit.json2Bean(payRes, InusrePayBean.Response.class);
-            if (payResponse == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "支付接口调用失败", response);
-            }
-            if (payResponse.code != 200) {
-                return json(BaseResponseBean.CODE_FAILURE, "支付接口调用失败", response);
-            }
-            warrantyRecord.warranty_status = payResponse.data.status;
-            warrantyRecord.warranty_status_text = payResponse.data.statusTxt;
-            warrantyRecord.updated_at = new Date().getTime();
-            String updateWarrantyRecordRes = doUpdateWarrantyRecord(warrantyRecord);
-            if (updateWarrantyRecordRes == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "更新投保记录失败", response);
-            }
-            String statusText = payResponse.data.statusTxt;//支付返回文案
-            return json(BaseResponseBean.CODE_SUCCESS, statusText, response);
-        } catch (IOException e) {
-            return json(BaseResponseBean.CODE_FAILURE, "投保接口请求失败", response);
+        //TODO 调用投保接口
+        InsureParamsBean.Response insureResponse = doInsured(insuredRequest);
+        InsureParamsBean.ResponseData responseData = new InsureParamsBean.ResponseData();
+        InusrePayBean.Requset inusrePayRequest = new InusrePayBean.Requset();
+        //TODO 保单记录表添加/更新
+        WarrantyRecord warrantyRecord = new WarrantyRecord();
+        long date = new Date().getTime();
+        long custId = doCustId(request);
+        if (custId == 0) {
+            return json(BaseResponseBean.CODE_FAILURE, "获取用户信息失败", response);
         }
+        warrantyRecord.cust_id = custId;
+        warrantyRecord.warranty_uuid = responseData.warrantyUuid;
+        warrantyRecord.warranty_status = responseData.status;
+        warrantyRecord.warranty_status_text = responseData.statusTxt;
+        warrantyRecord.pay_no = responseData.payNo;
+        warrantyRecord.pay_type = responseData.payType;
+        warrantyRecord.pay_url = responseData.payUrl;
+        warrantyRecord.created_at = date;
+        warrantyRecord.updated_at = date;
+        String addWarrantyRecordRes = doAddWarrantyRecord(warrantyRecord);
+        if (addWarrantyRecordRes == null) {
+            return json(BaseResponseBean.CODE_FAILURE, "添加投保记录失败", response);
+        }
+        //TODO 支付参数
+        inusrePayRequest.payNo = insureResponse.data.payNo;
+        inusrePayRequest.payWay = insureResponse.data.payType;
+        //TODO 投保成功,调用支付
+        InusrePayBean.Response payRes = doInsurePay(request, inusrePayRequest);
+        if (payRes == null) {
+            return json(BaseResponseBean.CODE_FAILURE, "支付接口调用失败", response);
+        }
+        if (payRes.code != 200) {
+            return json(BaseResponseBean.CODE_FAILURE, "支付接口调用失败", response);
+        }
+        warrantyRecord.warranty_status = payRes.data.status;
+        warrantyRecord.warranty_status_text = payRes.data.statusTxt;
+        warrantyRecord.updated_at = new Date().getTime();
+        String updateWarrantyRecordRes = doUpdateWarrantyRecord(warrantyRecord);
+        if (updateWarrantyRecordRes == null) {
+            return json(BaseResponseBean.CODE_FAILURE, "更新投保记录失败", response);
+        }
+        String statusText = payRes.data.statusTxt;//支付返回文案
+        return json(BaseResponseBean.CODE_SUCCESS, statusText, response);
+    }
+
+
+    /**
+     * 投保操作 todo bean
+     *
+     * @return
+     */
+    private  InsureParamsBean.Response doInsured(InsureParamsBean.Requset insuredRequest ) {
+        String interName = "交易服务-投保接口";
+        String result = commonAction.httpRequest(toInsured, JsonKit.bean2Json(insuredRequest), interName);
+        InsureParamsBean.Response insureResponse = JsonKit.json2Bean(result, InsureParamsBean.Response.class);
+        return insureResponse;
     }
 
     /**
-     * 投保支付操作
+     * 投保支付操作 todo bean
      *
      * @param inusrePayRequest
      * @return
      */
-    private String doInsurePay(JointLoginBean.Requset jointLoginRequest, InusrePayBean.Requset inusrePayRequest) {
-        BaseResponseBean response = new BaseResponseBean();
+    private InusrePayBean.Response doInsurePay(JointLoginBean.Requset jointLoginRequest, InusrePayBean.Requset inusrePayRequest) {
+        InusrePayBean.Response response = new InusrePayBean.Response();
         InusrePayBean.Requset insurePayRequest = new InusrePayBean.Requset();
         insurePayRequest.payNo = inusrePayRequest.payNo;
         insurePayRequest.payWay = insurePayRequest.payWay;
         if (insurePayRequest.payWay == "1") {//支付方式 1 银联 2 支付宝 3 微信 4现金  必填
             //TODO http 请求 支付银行卡服务
-            String bankRes = doPayBank(jointLoginRequest);
-            if (bankRes == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "银行卡服务调用失败", response);
-            }
-            JointLoginBean.BankResponse bankResponse = JsonKit.json2Bean(bankRes, JointLoginBean.BankResponse.class);
-            if (bankResponse == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "银行卡服务调用失败", response);
-            }
-            if (bankResponse.code != 200) {
-                return json(BaseResponseBean.CODE_FAILURE, "银行卡服务调用失败", response);
-            }
+            InusrePayBean.payBankResponse bankResponse = doPayBank(jointLoginRequest);
             //TODO 获取支付银行卡
-            //insurePayRequest.bankData = bankResponse.data;
+            insurePayRequest.bankData = bankResponse.data;
         }
-        try {
-            //TODO 请求http
-            String payRes = HttpClientKit.post(toPay, JsonKit.bean2Json(insurePayRequest));
-            if (payRes == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "支付接口请求失败", response);
-            }
-            BaseResponseBean payResponse = JsonKit.json2Bean(payRes, BaseResponseBean.class);
-            if (payResponse.code != 200) {
-                return json(BaseResponseBean.CODE_FAILURE, "支付接口请求失败", response);
-            }
-            response.data = payResponse;
-            return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
-        } catch (IOException e) {
-            return json(BaseResponseBean.CODE_FAILURE, "支付接口请求失败", response);
-        }
+        String interName = "交易服务-支付接口";
+        String result = commonAction.httpRequest(toPay, JsonKit.bean2Json(insurePayRequest), interName);
+        InusrePayBean.Response insureResponse = JsonKit.json2Bean(result, InusrePayBean.Response.class);
+        return insureResponse;
     }
 
     /**
-     * 获取支付银行卡信息
+     * 获取支付银行卡信息 todo bean
      *
      * @param request
      * @return
      */
-    private String doPayBank(JointLoginBean.Requset request) {
-        BaseResponseBean response = new BaseResponseBean();
-        try {
-            String bankRes = HttpClientKit.post(toPayBank, JsonKit.bean2Json(request));
-            if (bankRes == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "银行卡服务接口请求失败", response);
-            }
-            JointLoginBean.Response bankResponse = JsonKit.json2Bean(bankRes, JointLoginBean.Response.class);
-            if (bankResponse.code != 200) {
-                return json(BaseResponseBean.CODE_FAILURE, "银行卡服务接口请求失败", response);
-            }
-            response.data = bankResponse;
-            return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
-        } catch (IOException e) {
-            return json(BaseResponseBean.CODE_FAILURE, "银行卡服务接口请求失败", response);
-        }
+    private InusrePayBean.payBankResponse doPayBank(JointLoginBean.Requset request) {
+        String interName = "交易服务-银行卡服务";
+        String result = commonAction.httpRequest(toPayBank, JsonKit.bean2Json(request), interName);
+        InusrePayBean.payBankResponse bankResponse = JsonKit.json2Bean(result, InusrePayBean.payBankResponse.class);
+        return bankResponse;
     }
 
     /**

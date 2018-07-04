@@ -25,5 +25,15 @@ public class InusrePayBean {
         public String bankPhone;
         public String bankCode;
     }
+
+    public static class payBankRequest{
+        public String insured_name;
+        public String insured_code;
+        public String insured_phone;
+    }
+
+    public static class payBankResponse{
+        public List<BankData> data;
+    }
 }
 
