@@ -3,9 +3,9 @@ package com.inschos.yunda.access.http.controller.action;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.inschos.yunda.access.http.controller.bean.*;
 import com.inschos.yunda.assist.kit.Base64Kit;
-import com.inschos.yunda.assist.kit.HttpClientKit;
 import com.inschos.yunda.assist.kit.HttpKit;
 import com.inschos.yunda.assist.kit.JsonKit;
+import com.inschos.yunda.assist.kit.TimeKit;
 import com.inschos.yunda.data.dao.JointLoginDao;
 import com.inschos.yunda.data.dao.StaffPersonDao;
 import com.inschos.yunda.data.dao.WarrantyRecordDao;
@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -43,18 +42,16 @@ public class IntersAction extends BaseAction {
     private CommonAction commonAction;
 
     /**
-     * 联合登录 todo
+     * 联合登录
+     * TODO 韵达触发联合登录，获取报文信息,请求账号服务(登录/注册)，获取account_id,,user_id,login_token
      *
      * @return json
      * @params actionBean
      * @access public
-     * <p>
-     * 韵达触发联合登录，获取报文信息请求账号服务(登录/注册)，获取account_id,manager_id,user_id,token
      */
     public String jointLogin(HttpServletRequest httpServletRequest) {
         JointLoginBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), JointLoginBean.Requset.class);
         BaseResponseBean response = new BaseResponseBean();
-        //判空
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "请检查报文格式是否正确", response);
         }
@@ -63,22 +60,19 @@ public class IntersAction extends BaseAction {
         }
         //TODO 联合登录表插入数据,先判断今天有没有插入,再插入登录记录.每天只有一个记录
         long date = new Date().getTime();
-        Calendar calendar = Calendar.getInstance();
-        long date_start = calendar.getTimeInMillis();
         JointLogin jointLogin = new JointLogin();
         jointLogin.login_start = date;
         jointLogin.phone = request.insured_phone;
-        jointLogin.day_start = date_start;
-        jointLogin.day_end = date_start + 24 * 60 * 60 * 1000;
+        jointLogin.day_start = TimeKit.currentTimeMillis();//获取当前时间戳(毫秒值)
+        jointLogin.day_end = TimeKit.getDayEndTime();//获取当天结束时间戳(毫秒值)
         long repeatRes = jointLoginDao.findLoginRecord(jointLogin);
         if (repeatRes == 0) {
             long login_id = jointLoginDao.addLoginRecord(jointLogin);
         }
-        //TODO 触发联合登录,同步操作 http 请求 账号服务
+        //TODO 联合登录触发账号服务
         JointLoginBean.AccountResponse loginResponse = doAccount(request);
         response.data = loginResponse.data;
-        //return json(BaseResponseBean.CODE_SUCCESS, "操作成功", response);
-        //TODO 触发联合登录,异步操作 http 请求 投保服务
+        //TODO 联合登录触发投保服务
         String insureRes = doInsuredPay(request);
         if (insureRes == null) {
             return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
@@ -90,16 +84,18 @@ public class IntersAction extends BaseAction {
         if (insureResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
         }
+        response.data = insureResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, "投保成功", response);
     }
 
     /**
      * 授权查询
+     * TODO 银行卡授权查询和微信免密查询返回参数还没定,授权状态组合判断没做
+     * TODO 授权查询同样需要触发账号服务(根据用户信息获取token)
      *
      * @return json
      * @params actionBean
      * @access public
-     * 授权查询同样需要触发联合登录
      */
     public String authorizationQuery(HttpServletRequest httpServletRequest) {
         JointLoginBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), JointLoginBean.Requset.class);
@@ -112,30 +108,32 @@ public class IntersAction extends BaseAction {
         if (request.insured_name == null || request.insured_code == null || request.insured_phone == null) {
             return json(BaseResponseBean.CODE_FAILURE, "姓名,证件号,手机号不能为空", response);
         }
-        //TODO 触发联合登录,同步操作 http 请求 账号服务
-        String loginRes = doAccount(request);
-        if (loginRes == null) {
+        //TODO 联合登录触发账号服务
+        JointLoginBean.AccountResponse accountResponse = doAccount(request);
+        if (accountResponse == null) {
             return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
         }
-        JointLoginBean.Response loginResponse = JsonKit.json2Bean(loginRes, JointLoginBean.Response.class);
-        if (loginResponse == null) {
+        if (accountResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
         }
-        if (loginResponse.code != 200) {
-            return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
-        }
-        //TODO 查询授权详情
-        String authorizeRes = doAuthorizeRes(request);
-        if (authorizeRes == null) {
+        //TODO 查询银行卡授权详情
+        CommonBean.findBankAuthorizeResponse bankAuthorizeResponse = doBankAuthorizeRes(request);
+        if (bankAuthorizeResponse == null) {
             return json(BaseResponseBean.CODE_FAILURE, "授权查询接口调用失败", response);
         }
-        AuthorizeQueryBean.Response authorizeResponse = JsonKit.json2Bean(authorizeRes, AuthorizeQueryBean.Response.class);
-        if (authorizeResponse == null) {
+        if (bankAuthorizeResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, "授权查询接口调用失败", response);
         }
-        if (authorizeResponse.code != 200) {
+        //TODO 查询微信签约详情
+        CommonBean.findWecahtContractResponse wecahtContractResponse = doWechatContractRes(request);
+        if (bankAuthorizeResponse == null) {
             return json(BaseResponseBean.CODE_FAILURE, "授权查询接口调用失败", response);
         }
+        if (bankAuthorizeResponse.code != 200) {
+            return json(BaseResponseBean.CODE_FAILURE, "授权查询接口调用失败", response);
+        }
+        //TODO 判断银行卡授权和微信签约情况
+
         //TODO 返回参数
         authorizeQueryResponseData.status = "";
         authorizeQueryResponseData.url = "";
@@ -153,6 +151,7 @@ public class IntersAction extends BaseAction {
 
     /**
      * 预投保
+     * TODO 预投保接口跟其他接口的返回格式不同,接口返回参数还没确定
      *
      * @return
      * @params account_id
@@ -193,24 +192,24 @@ public class IntersAction extends BaseAction {
             jointLoginRequest.bank_address = insureRequest.channel_bank_address;
             jointLoginRequest.channel_order_code = "";
             //TODO  http 请求 投保服务
-            String insureRes = doInsured(jointLoginRequest);
+            String insureRes = doInsuredPay(jointLoginRequest);
             if (insureRes == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
+                return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
             }
             InsureParamsBean.Response insureResponse = JsonKit.json2Bean(insureRes, InsureParamsBean.Response.class);
             if (insureResponse == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
+                return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
             }
             if (insureResponse.code != 200) {
-                return json(BaseResponseBean.CODE_FAILURE, "投保接口调用失败", response);
+                return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
             }
         }
         //TODO 预投保接口跟其他接口的返回格式不同
-        return json(BaseResponseBean.CODE_SUCCESS, "操作成功", response);
+        return json(BaseResponseBean.CODE_SUCCESS, "投保成功", response);
     }
 
     /**
-     * 保险推送接口,做异步处理 todo
+     * 保险推送接口
      *
      * @param httpServletRequest
      * @return
@@ -232,17 +231,17 @@ public class IntersAction extends BaseAction {
         callbackYundaRequest.status = request.status;
         callbackYundaRequest.ordersName = request.ordersName;
         callbackYundaRequest.companyName = request.companyName;
-        String interName = "投保推送韵达";
+        String interName = "投保信息推送韵达";
         String result = commonAction.httpRequest(toCallBackYunda, JsonKit.bean2Json(callbackYundaRequest), interName);
         return result;
     }
 
     /**
-     * 获取银行卡授权详情 todo
+     * 获取银行卡授权详情
      *
      * @return
      */
-    private String doBankAuthorizeRes(JointLoginBean.Requset request) {
+    private CommonBean.findBankAuthorizeResponse doBankAuthorizeRes(JointLoginBean.Requset request) {
         BaseResponseBean response = new BaseResponseBean();
         JointLoginBean.Requset jointLoginRequest = new JointLoginBean.Requset();
         jointLoginRequest.insured_name = request.insured_name;
@@ -250,15 +249,16 @@ public class IntersAction extends BaseAction {
         jointLoginRequest.insured_phone = request.insured_phone;
         String interName = "银行卡授权查询";
         String result = commonAction.httpRequest(toAuthorizeQueryBank, JsonKit.bean2Json(jointLoginRequest), interName);
-        return result;
+        CommonBean.findBankAuthorizeResponse bankAuthorizeResponse = JsonKit.json2Bean(result, CommonBean.findBankAuthorizeResponse.class);
+        return bankAuthorizeResponse;
     }
 
     /**
-     * 获取微信签约详情 todo
+     * 获取微信签约详情
      *
      * @return
      */
-    private String doWechatContractRes(JointLoginBean.Requset request) {
+    private CommonBean.findWecahtContractResponse doWechatContractRes(JointLoginBean.Requset request) {
         BaseResponseBean response = new BaseResponseBean();
         JointLoginBean.Requset jointLoginRequest = new JointLoginBean.Requset();
         jointLoginRequest.insured_name = request.insured_name;
@@ -266,11 +266,12 @@ public class IntersAction extends BaseAction {
         jointLoginRequest.insured_phone = request.insured_phone;
         String interName = "微信签约查询";
         String result = commonAction.httpRequest(toAuthorizeQueryWechat, JsonKit.bean2Json(jointLoginRequest), interName);
-        return result;
+        CommonBean.findWecahtContractResponse wecahtContractResponse = JsonKit.json2Bean(result, CommonBean.findWecahtContractResponse.class);
+        return wecahtContractResponse;
     }
 
     /**
-     * 调用账号服务 todo  bean
+     * 调用账号服务
      *
      * @param request
      * @return
@@ -299,7 +300,9 @@ public class IntersAction extends BaseAction {
     }
 
     /**
-     * 投保操作，先走英大投保，再进行泰康投保 todo
+     * 投保服务
+     * todo 先判断当天有没有投过保，没有的话进行投保操作(先走英大投保，再进行泰康投保 )
+     * todo 已经投过,返回投保结果和保单状态
      *
      * @return
      */
@@ -394,13 +397,12 @@ public class IntersAction extends BaseAction {
         return json(BaseResponseBean.CODE_SUCCESS, statusText, response);
     }
 
-
     /**
-     * 投保操作 todo bean
+     * 投保操作
      *
      * @return
      */
-    private  InsureParamsBean.Response doInsured(InsureParamsBean.Requset insuredRequest ) {
+    private InsureParamsBean.Response doInsured(InsureParamsBean.Requset insuredRequest) {
         String interName = "交易服务-投保接口";
         String result = commonAction.httpRequest(toInsured, JsonKit.bean2Json(insuredRequest), interName);
         InsureParamsBean.Response insureResponse = JsonKit.json2Bean(result, InsureParamsBean.Response.class);
@@ -408,7 +410,7 @@ public class IntersAction extends BaseAction {
     }
 
     /**
-     * 投保支付操作 todo bean
+     * 支付操作
      *
      * @param inusrePayRequest
      * @return
@@ -431,7 +433,7 @@ public class IntersAction extends BaseAction {
     }
 
     /**
-     * 获取支付银行卡信息 todo bean
+     * 获取支付银行卡信息
      *
      * @param request
      * @return
@@ -441,55 +443,6 @@ public class IntersAction extends BaseAction {
         String result = commonAction.httpRequest(toPayBank, JsonKit.bean2Json(request), interName);
         InusrePayBean.payBankResponse bankResponse = JsonKit.json2Bean(result, InusrePayBean.payBankResponse.class);
         return bankResponse;
-    }
-
-    /**
-     * 调用微信签约
-     *
-     * @param jointLoginRequest
-     * @param wechatContractRequest
-     * @return
-     */
-    private String doWechatContract(JointLoginBean.Requset jointLoginRequest, WechatContractBean.Requset wechatContractRequest) {
-        BaseResponseBean response = new BaseResponseBean();
-        //先判断前一天是否进行预投保
-        long custId = doCustId(jointLoginRequest);
-        if (custId == 0) {
-            return json(BaseResponseBean.CODE_FAILURE, "获取用户信息失败", response);
-        }
-        WarrantyRecord warrantyRecord = new WarrantyRecord();
-        warrantyRecord.cust_id = custId;
-        Calendar calendar = Calendar.getInstance();
-        long day_start = calendar.getTimeInMillis();
-        warrantyRecord.day_start = day_start;
-        warrantyRecord.day_end = day_start + 24 * 60 * 60 * 1000;
-        WarrantyRecord warrantyRecoedRes = warrantyRecordDao.findLastDayWarrantyRecord(warrantyRecord);
-        if (warrantyRecoedRes == null || warrantyRecoedRes.warranty_uuid == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "您没有进行预投保，不能进行微信签约", response);
-        }
-        WechatContractBean.Requset wechatContractRequests = new WechatContractBean.Requset();
-        wechatContractRequests.warrantyUuid = "";
-        wechatContractRequests.warrantyCode = "";
-        wechatContractRequests.payNo = "";
-        wechatContractRequests.clientIp = "";
-        wechatContractRequests.insuredName = "";
-        wechatContractRequests.insuredCode = "";
-        wechatContractRequests.insuredPhone = "";
-        try {
-            //TODO 请求http
-            String wechatContractRes = HttpClientKit.post(toWechatContract, JsonKit.bean2Json(wechatContractRequests));
-            if (wechatContractRes == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "微信签约接口请求失败", response);
-            }
-            WechatContractBean.Response wechatContractResponse = JsonKit.json2Bean(wechatContractRes, WechatContractBean.Response.class);
-            if (wechatContractResponse.code != 200) {
-                return json(BaseResponseBean.CODE_FAILURE, "微信签约接口请求失败", response);
-            }
-            response.data = wechatContractResponse;
-            return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
-        } catch (IOException e) {
-            return json(BaseResponseBean.CODE_FAILURE, "微信签约接口请求失败", response);
-        }
     }
 
     /**
@@ -527,7 +480,6 @@ public class IntersAction extends BaseAction {
         return json(BaseResponseBean.CODE_SUCCESS, "更新投保记录成功", response);
     }
 
-
     /**
      * 获取cust_id
      *
@@ -543,29 +495,64 @@ public class IntersAction extends BaseAction {
         long date = new Date().getTime();
         if (cust_id == 0) {
             //TODO 触发联合登录,同步操作 http 请求 账号服务
-            String loginRes = doAccount(jointLoginRequest);
-            if (loginRes == null) {
+            JointLoginBean.AccountResponse accountResponse = doAccount(jointLoginRequest);
+            if (accountResponse == null) {
                 return 0;
             }
-            JointLoginBean.AccountResponse loginResponse = JsonKit.json2Bean(loginRes, JointLoginBean.AccountResponse.class);
-            if (loginResponse == null) {
+            if (accountResponse.code != 200) {
                 return 0;
             }
-            if (loginResponse.code != 200) {
-                return 0;
-            }
-            staffPerson.cust_id = loginResponse.data.custId;
-            staffPerson.account_uuid = loginResponse.data.accountUuid;
-            staffPerson.login_token = loginResponse.data.loginToken;
+            staffPerson.cust_id = accountResponse.data.custId;
+            staffPerson.account_uuid = accountResponse.data.accountUuid;
+            staffPerson.login_token = accountResponse.data.loginToken;
             staffPerson.created_at = date;
             staffPerson.updated_at = date;
             long addRes = staffPersonDao.addStaffPerson(staffPerson);
             if (addRes != 0) {
-                cust_id = loginResponse.data.custId;
+                cust_id = accountResponse.data.custId;
             } else {
                 return 0;
             }
         }
         return cust_id;
+    }
+
+    /**
+     * 调用微信签约
+     *
+     * @param jointLoginRequest
+     * @param wechatContractRequest
+     * @return
+     */
+    private String doWechatContract(JointLoginBean.Requset jointLoginRequest, WechatContractBean.Requset wechatContractRequest) {
+        BaseResponseBean response = new BaseResponseBean();
+        //先判断前一天是否进行预投保
+        long custId = doCustId(jointLoginRequest);
+        if (custId == 0) {
+            return json(BaseResponseBean.CODE_FAILURE, "获取用户信息失败", response);
+        }
+        WarrantyRecord warrantyRecord = new WarrantyRecord();
+        warrantyRecord.cust_id = custId;
+        Calendar calendar = Calendar.getInstance();
+        long day_start = calendar.getTimeInMillis();
+        warrantyRecord.day_start = day_start;
+        warrantyRecord.day_end = day_start + 24 * 60 * 60 * 1000;
+        WarrantyRecord warrantyRecoedRes = warrantyRecordDao.findLastDayWarrantyRecord(warrantyRecord);
+        if (warrantyRecoedRes == null || warrantyRecoedRes.warranty_uuid == null) {
+            return json(BaseResponseBean.CODE_FAILURE, "您没有进行预投保，不能进行微信签约", response);
+        }
+        WechatContractBean.Requset wechatContractRequests = new WechatContractBean.Requset();
+        wechatContractRequests.warrantyUuid = "";
+        wechatContractRequests.warrantyCode = "";
+        wechatContractRequests.payNo = "";
+        wechatContractRequests.clientIp = "";
+        wechatContractRequests.insuredName = "";
+        wechatContractRequests.insuredCode = "";
+        wechatContractRequests.insuredPhone = "";
+        String interName = "交易服务-微信签约";
+        String result = commonAction.httpRequest(toWechatContract, JsonKit.bean2Json(wechatContractRequests), interName);
+        WechatContractBean.Response wechatContractResponse = JsonKit.json2Bean(result, WechatContractBean.Response.class);
+        response.data = wechatContractResponse;
+        return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
     }
 }
