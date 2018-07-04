@@ -7,6 +7,12 @@
         insert into warranty_record(`cust_id`,`warranty_uuid`,`warranty_status`,`warranty_status_text`,`created_at`,`updated_at`) values(#{cust_id},#{warranty_uuid},#{warranty_status},#{warranty_status_text},#{created_at},#{updated_at})
     </insert>
 
+    <update id="updateWarrantyRecord" parameterType="WarrantyRecord">
+     update warranty_record set
+              `warranty_status`=#{warranty_status} AND `warranty_status_text`=#{warranty_status_text} AND `updated_at`=#{updated_at}
+            where `id`=#{id}
+    </update>
+
     <select id="findLastDayWarrantyRecord" parameterType="WarrantyRecord" resultType="WarrantyRecord">
         select `cust_id`,`warranty_uuid`,`warranty_status`,`warranty_status_text`,`created_at`,`updated_at`
         from warranty_record
@@ -15,11 +21,14 @@
         </where>
     </select>
 
-    <update id="updateWarrantyRecord" parameterType="WarrantyRecord">
-     update warranty_record set
-              `warranty_status`=#{warranty_status} AND `warranty_status_text`=#{warranty_status_text} AND `updated_at`=#{updated_at}
-            where `id`=#{id}
-    </update>
+    <!--todo 获取保单状态为待支付、待生效、保障中的保单数量 -->
+    <select id="findInsureWarrantyRes" parameterType="WarrantyRecord" resultType="long">
+        select COUNT (id)
+        from warranty_record
+        <where>
+            cust_id =#{cust_id} AND warranty_status in (2,3,4)
+        </where>
+    </select>
 
     <select id="findInsureResult" parameterType="WarrantyRecord" resultType="WarrantyRecord">
         select `cust_id`,`warranty_uuid`,`warranty_status`,`warranty_status_text`,`created_at`,`updated_at`

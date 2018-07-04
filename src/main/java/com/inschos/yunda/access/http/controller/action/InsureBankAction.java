@@ -34,7 +34,6 @@ public class InsureBankAction extends BaseAction {
     public String addBank(ActionBean actionBean) {
         InsureBankBean.bankRequest request = JsonKit.json2Bean(actionBean.body, InsureBankBean.bankRequest.class);
         BaseResponseBean response = new BaseResponseBean();
-        //判空
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
@@ -61,21 +60,11 @@ public class InsureBankAction extends BaseAction {
         if (!verifyBankSmsResponse.data.verifyStatus) {
             return json(BaseResponseBean.CODE_FAILURE, "短信验证码校验失败", response);
         }
-        try {
-            //请求http
-            String addBankRes = HttpClientKit.post(toAddBank, JsonKit.bean2Json(addBankRequest));
-            if (addBankRes == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "添加银行卡接口请求失败", response);
-            }
-            InsureBankBean.addBankResponse addBankResponse = JsonKit.json2Bean(addBankRes, InsureBankBean.addBankResponse.class);
-            if (addBankResponse.code == 500) {
-                return json(BaseResponseBean.CODE_FAILURE, "添加银行卡接口请求失败", response);
-            }
-            response.data = addBankResponse.data;
-            return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
-        } catch (IOException e) {
-            return json(BaseResponseBean.CODE_FAILURE, "添加银行卡接口请求失败", response);
-        }
+        String interName = "添加银行卡";
+        String result = commonAction.httpRequest(toAddBank, JsonKit.bean2Json(addBankRequest), interName);
+        InsureBankBean.addBankResponse addBankResponse = JsonKit.json2Bean(result, InsureBankBean.addBankResponse.class);
+        response.data = addBankResponse.data;
+        return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
     }
 
     /**
@@ -89,21 +78,11 @@ public class InsureBankAction extends BaseAction {
         InsureBankBean.bankListRequest bankListRequest = new InsureBankBean.bankListRequest();
         bankListRequest.custId = Long.valueOf(actionBean.userId);
         bankListRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
-        try {
-            //TODO 请求http
-            String bankListRes = HttpClientKit.post(toBankList, JsonKit.bean2Json(bankListRequest));
-            if (bankListRes == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "获取银行卡列表接口请求失败", response);
-            }
-            InsureBankBean.bankListResponse bankListResponse = JsonKit.json2Bean(bankListRes, InsureBankBean.bankListResponse.class);
-            if (bankListResponse.code == 500) {
-                return json(BaseResponseBean.CODE_FAILURE, "获取银行卡列表接口请求失败", response);
-            }
-            response.data = bankListResponse.data;
-            return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
-        } catch (IOException e) {
-            return json(BaseResponseBean.CODE_FAILURE, "获取银行卡列表接口请求失败", response);
-        }
+        String interName = "获取银行卡列表";
+        String result = commonAction.httpRequest(toBankList, JsonKit.bean2Json(bankListRequest), interName);
+        InsureBankBean.bankListResponse bankListResponse = JsonKit.json2Bean(result, InsureBankBean.bankListResponse.class);
+        response.data = bankListResponse.data;
+        return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
     }
 
     /**
@@ -115,7 +94,6 @@ public class InsureBankAction extends BaseAction {
     public String findBankInfo(ActionBean actionBean) {
         InsureBankBean.bankRequest request = JsonKit.json2Bean(actionBean.body, InsureBankBean.bankRequest.class);
         BaseResponseBean response = new BaseResponseBean();
-        //判空
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
@@ -123,21 +101,11 @@ public class InsureBankAction extends BaseAction {
         bankInfoRequest.bankId = request.bankId;
         bankInfoRequest.custId = Long.valueOf(actionBean.userId);
         bankInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
-        try {
-            //TODO 请求http
-            String bankInfoRes = HttpClientKit.post(toBankInfo, JsonKit.bean2Json(bankInfoRequest));
-            if (bankInfoRes == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "获取银行卡详情接口请求失败", response);
-            }
-            InsureBankBean.bankInfoResponse bankInfoResponse = JsonKit.json2Bean(bankInfoRes, InsureBankBean.bankInfoResponse.class);
-            if (bankInfoResponse.code == 500) {
-                return json(BaseResponseBean.CODE_FAILURE, "获取银行卡详情接口请求失败", response);
-            }
-            response.data = bankInfoResponse.data;
-            return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
-        } catch (IOException e) {
-            return json(BaseResponseBean.CODE_FAILURE, "获取银行卡详情接口请求失败", response);
-        }
+        String interName = "获取银行卡详情";
+        String result = commonAction.httpRequest(toBankInfo, JsonKit.bean2Json(bankInfoRequest), interName);
+        InsureBankBean.bankInfoResponse bankInfoResponse = JsonKit.json2Bean(result, InsureBankBean.bankInfoResponse.class);
+        response.data = bankInfoResponse.data;
+        return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
     }
 
     /**
@@ -157,7 +125,6 @@ public class InsureBankAction extends BaseAction {
         bankListRequest.custId = Long.valueOf(actionBean.userId);
         bankListRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
         try {
-            //TODO 请求http
             String bankListRes = HttpClientKit.post(toBankList, JsonKit.bean2Json(bankListRequest));
             if (bankListRes == null) {
                 return -1;
@@ -227,21 +194,11 @@ public class InsureBankAction extends BaseAction {
         InsureBankBean.updateBankStatusRequest updateBankStatusRequest = new InsureBankBean.updateBankStatusRequest();
         updateBankStatusRequest.custId = Long.valueOf(actionBean.userId);
         updateBankStatusRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
-        try {
-            //请求http
-            String updateBankRes = HttpClientKit.post(toUpdateBank, JsonKit.bean2Json(updateBankStatusRequest));
-            if (updateBankRes == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "更新银行卡状态接口请求失败", response);
-            }
-            InsureBankBean.updateBankStatusResponse bankStatusResponse = JsonKit.json2Bean(updateBankRes, InsureBankBean.updateBankStatusResponse.class);
-            if (bankStatusResponse.code == 500) {
-                return json(BaseResponseBean.CODE_FAILURE, "更新银行卡状态接口请求失败", response);
-            }
-            response.data = bankStatusResponse.data;
-            return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
-        } catch (IOException e) {
-            return json(BaseResponseBean.CODE_FAILURE, "更新银行卡状态接口请求失败", response);
-        }
+        String interName = "更新银行卡状态";
+        String result = commonAction.httpRequest(toUpdateBank, JsonKit.bean2Json(updateBankStatusRequest), interName);
+        InsureBankBean.updateBankStatusResponse bankStatusResponse = JsonKit.json2Bean(result, InsureBankBean.updateBankStatusResponse.class);
+        response.data = bankStatusResponse.data;
+        return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
     }
 }
 

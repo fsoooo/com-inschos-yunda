@@ -44,7 +44,7 @@ public class CommonAction extends BaseAction {
                 return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
             }
             BaseResponseBean baseResponse = JsonKit.json2Bean(result, BaseResponseBean.class);
-            if (baseResponse.code != 200) {
+            if (baseResponse.code != 200 || baseResponse.code == 500) {
                 return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
             }
             response.data = baseResponse.data;
@@ -129,7 +129,7 @@ public class CommonAction extends BaseAction {
      * @param request
      * @return
      */
-    public CommonBean.findUserInfoResponse  findUserInfoById(CommonBean.findUserInfoRequset request) {
+    public CommonBean.findUserInfoResponse findUserInfoById(CommonBean.findUserInfoRequset request) {
         CommonBean.findUserInfoRequset findUserInfoRequset = new CommonBean.findUserInfoRequset();
         findUserInfoRequset.userId = request.userId;
         findUserInfoRequset.accountUuid = request.accountUuid;
@@ -143,7 +143,7 @@ public class CommonAction extends BaseAction {
      * @param request
      * @return
      */
-    public CommonBean.findUserInfoResponse  findUserInfoInter(CommonBean.findUserInfoRequset request) {
+    public CommonBean.findUserInfoResponse findUserInfoInter(CommonBean.findUserInfoRequset request) {
         StaffPerson staffPerson = new StaffPerson();
         staffPerson.cust_id = Long.valueOf(request.userId);
         staffPerson.account_uuid = Long.valueOf(request.accountUuid);
@@ -214,7 +214,7 @@ public class CommonAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, "银行卡号和手机号不能为空", response);
         }
         InsureBankBean.bankSmsRequest bankSmsRequest = new InsureBankBean.bankSmsRequest();
-        CommonBean.findUserInfoRequset findUserInfoRequset = new  CommonBean.findUserInfoRequset();
+        CommonBean.findUserInfoRequset findUserInfoRequset = new CommonBean.findUserInfoRequset();
         findUserInfoRequset.userId = actionBean.userId;
         findUserInfoRequset.accountUuid = actionBean.accountUuid;
         //获取用户基本信息
@@ -306,7 +306,7 @@ public class CommonAction extends BaseAction {
         if (bankVerifyRes != null) {
             //避免重复请求接口
             if (bankVerifyRes.verify_status == "2") {
-                verifyResponse.data.verifyStatus =  true;
+                verifyResponse.data.verifyStatus = true;
                 return verifyResponse;
             }
         }

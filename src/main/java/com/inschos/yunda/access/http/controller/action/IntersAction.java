@@ -308,55 +308,35 @@ public class IntersAction extends BaseAction {
      */
     private String doInsuredPay(JointLoginBean.Requset request) {
         BaseResponseBean response = new BaseResponseBean();
-        //投保人基础信息
-        InsureParamsBean.PolicyHolder policyHolder = new InsureParamsBean.PolicyHolder();
-        policyHolder.name = request.insured_name;
-        policyHolder.cardType = "1";
-        policyHolder.cardCode = request.insured_code;
-        policyHolder.phone = request.insured_phone;
-        policyHolder.relationName = "本人";
-        //以下数据 按业务选填
-        policyHolder.occupation = "";//职业
-        policyHolder.birthday = "";//生日 时间戳
-        policyHolder.sex = "";//性别 1 男 2 女
-        policyHolder.age = "";//年龄
-        policyHolder.email = "";//邮箱
-        policyHolder.nationality = "";//国籍
-        policyHolder.annualIncome = "";//年收入
-        policyHolder.height = "";//身高
-        policyHolder.weight = "";//体重
-        policyHolder.area = "";//地区
-        policyHolder.address = "";//详细地址
-        policyHolder.courier_state = "";//站点地址
-        policyHolder.courier_start_time = "";//分拣开始时间
-        policyHolder.province = "";//省
-        policyHolder.city = "";//市
-        policyHolder.county = "";//县
-        policyHolder.bank_code = "";//银行卡号
-        policyHolder.bank_name = "";//银行卡名字
-        policyHolder.bank_phone = "";//银行卡绑定手机
-        policyHolder.insure_days = "";//购保天数
-        policyHolder.price = "";//价格
-        //TODO 投保人被保人和受益人是本人
-        List<InsureParamsBean.PolicyHolder> recognizees = new ArrayList<>();
-        recognizees.add(policyHolder);
-        InsureParamsBean.Requset insuredRequest = new InsureParamsBean.Requset();
-        insuredRequest.productId = 90;//产品id:英大90,泰康91
-        insuredRequest.startTime = "";
-        insuredRequest.endTime = "";
-        insuredRequest.count = "";
-        insuredRequest.businessNo = "";
-        insuredRequest.payCategoryId = "";
-        insuredRequest.businessNo = "";
-        insuredRequest.policyholder = policyHolder;
-        insuredRequest.recognizees = recognizees;
-        insuredRequest.beneficiary = policyHolder;
+        //TODO 判断用户是否已经投保
+        WarrantyRecord warrantyRecord = new WarrantyRecord();
+        warrantyRecord.cust_id = doCustId(request);
+        long insuredCount = warrantyRecordDao.findInsureWarrantyRes(warrantyRecord);
+        if(insuredCount>0){
+            //TODO 获取保单状态
+            warrantyRecord.day_start = TimeKit.currentTimeMillis();//获取当前时间戳(毫秒值)
+            warrantyRecord.day_end = TimeKit.getDayEndTime();//获取当天结束时间戳(毫秒值)
+            WarrantyRecord insureResult = warrantyRecordDao.findInsureResult(warrantyRecord);
+            if (insureResult == null) {
+                return json(BaseResponseBean.CODE_SUCCESS, "获取保单状态失败", response);
+            } else {
+                InsureResultBean insureResultBean = new InsureResultBean();
+                insureResultBean.id = insureResult.id;
+                insureResultBean.custId = insureResult.cust_id;
+                insureResultBean.warrantyUuid = insureResult.warranty_uuid;
+                insureResultBean.warrantyStatus = insureResult.warranty_status;
+                insureResultBean.warrantyStatusText = insureResult.warranty_status_text;
+                insureResultBean.createdAt = insureResult.created_at;
+                insureResultBean.updatedAt = insureResult.updated_at;
+                response.data = insureResultBean;
+                return json(BaseResponseBean.CODE_SUCCESS, "获取保单状态成功", response);
+            }
+        }
         //TODO 调用投保接口
-        InsureParamsBean.Response insureResponse = doInsured(insuredRequest);
+        InsureParamsBean.Response insureResponse = doInsured(request);
         InsureParamsBean.ResponseData responseData = new InsureParamsBean.ResponseData();
         InusrePayBean.Requset inusrePayRequest = new InusrePayBean.Requset();
         //TODO 保单记录表添加/更新
-        WarrantyRecord warrantyRecord = new WarrantyRecord();
         long date = new Date().getTime();
         long custId = doCustId(request);
         if (custId == 0) {
@@ -402,7 +382,50 @@ public class IntersAction extends BaseAction {
      *
      * @return
      */
-    private InsureParamsBean.Response doInsured(InsureParamsBean.Requset insuredRequest) {
+    private InsureParamsBean.Response doInsured(JointLoginBean.Requset request) {
+        //投保人基础信息
+        InsureParamsBean.PolicyHolder policyHolder = new InsureParamsBean.PolicyHolder();
+        policyHolder.name = request.insured_name;
+        policyHolder.cardType = "1";
+        policyHolder.cardCode = request.insured_code;
+        policyHolder.phone = request.insured_phone;
+        policyHolder.relationName = "本人";
+        //以下数据 按业务选填
+        policyHolder.occupation = "";//职业
+        policyHolder.birthday = "";//生日 时间戳
+        policyHolder.sex = "";//性别 1 男 2 女
+        policyHolder.age = "";//年龄
+        policyHolder.email = "";//邮箱
+        policyHolder.nationality = "";//国籍
+        policyHolder.annualIncome = "";//年收入
+        policyHolder.height = "";//身高
+        policyHolder.weight = "";//体重
+        policyHolder.area = "";//地区
+        policyHolder.address = "";//详细地址
+        policyHolder.courier_state = "";//站点地址
+        policyHolder.courier_start_time = "";//分拣开始时间
+        policyHolder.province = "";//省
+        policyHolder.city = "";//市
+        policyHolder.county = "";//县
+        policyHolder.bank_code = "";//银行卡号
+        policyHolder.bank_name = "";//银行卡名字
+        policyHolder.bank_phone = "";//银行卡绑定手机
+        policyHolder.insure_days = "";//购保天数
+        policyHolder.price = "";//价格
+        //TODO 投保人被保人和受益人是本人
+        List<InsureParamsBean.PolicyHolder> recognizees = new ArrayList<>();
+        recognizees.add(policyHolder);
+        InsureParamsBean.Requset insuredRequest = new InsureParamsBean.Requset();
+        insuredRequest.productId = 90;//产品id:英大90,泰康91
+        insuredRequest.startTime = "";
+        insuredRequest.endTime = "";
+        insuredRequest.count = "";
+        insuredRequest.businessNo = "";
+        insuredRequest.payCategoryId = "";
+        insuredRequest.businessNo = "";
+        insuredRequest.policyholder = policyHolder;
+        insuredRequest.recognizees = recognizees;
+        insuredRequest.beneficiary = policyHolder;
         String interName = "交易服务-投保接口";
         String result = commonAction.httpRequest(toInsured, JsonKit.bean2Json(insuredRequest), interName);
         InsureParamsBean.Response insureResponse = JsonKit.json2Bean(result, InsureParamsBean.Response.class);
