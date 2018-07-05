@@ -25,7 +25,7 @@ public class InsureWarrantyAction extends BaseAction {
 
     /**
      * 获取保单列表(不同状态的)
-     * TODO 从远程接口取数据
+     * 从远程接口取数据
      *
      * @param actionBean
      * @return
@@ -52,7 +52,7 @@ public class InsureWarrantyAction extends BaseAction {
 
     /**
      * 获取保单详情
-     * TODO 根据warranty_uuid,从远程接口取数据
+     * 根据warranty_uuid,从远程接口取数据
      *
      * @param actionBean
      * @return
@@ -73,7 +73,7 @@ public class InsureWarrantyAction extends BaseAction {
 
     /**
      * 获取保单详情
-     * TODO 根据warranty_uuid,从远程接口取数据
+     * 根据warranty_uuid,从远程接口取数据
      *
      * @param request
      * @return
@@ -95,7 +95,7 @@ public class InsureWarrantyAction extends BaseAction {
 
     /**
      * 获取购保结果
-     * TODO 从远程接口取数据,本地数据做备用
+     * 从远程接口取数据,本地数据做备用
      *
      * @param actionBean
      * @return

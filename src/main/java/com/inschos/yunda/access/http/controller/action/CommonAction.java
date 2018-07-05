@@ -271,12 +271,12 @@ public class CommonAction extends BaseAction {
 
     /**
      * 校验银行卡短信验证码
-     * <p>
-     * TODO 新增银行验证码记录表,逻辑如下
-     * TODO 1.每次发送验证码之前查询是否已发过或者是还在有效期内 findBankVerifyRepeat
-     * TODO 2.验证码获取成功,添加记录,并返回给端上记录表id addBankVerify
-     * TODO 3.校验验证码需要查询记录表获取verifyId findBankVerifyid
-     * TODO 4.验证码校验成功,更新记录表 updateBankVerify
+     *
+     * 新增银行验证码记录表,逻辑如下
+     * 1.每次发送验证码之前查询是否已发过或者是还在有效期内 findBankVerifyRepeat
+     * 2.验证码获取成功,添加记录,并返回给端上记录表id addBankVerify
+     * 3.校验验证码需要查询记录表获取verifyId findBankVerifyid
+     * 4.验证码校验成功,更新记录表 updateBankVerify
      *
      * @param request
      * @return String

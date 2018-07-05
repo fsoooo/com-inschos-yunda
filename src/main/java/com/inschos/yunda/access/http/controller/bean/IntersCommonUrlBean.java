@@ -78,7 +78,4 @@ public class IntersCommonUrlBean {
     //6.投保推送韵达
     public static final String toCallBackYunda = IntersCommonUrlBean.getServerHostCallBackYunda() + "/";
 
-    //TODO 测试http请求接口
-    public static final String toHttpTest = IntersCommonUrlBean.getServerHostTest() + "/joint_login?bank_code=6217001210078544622 &bank_address=11&channel_code=YD&insured_province=320000&insured_county=320982&insured_code=342225199504065369&insured_phone=15856218334&insured_city=320900&insured_name=曹桥桥&insured_address=11&bank_phone=111&bank_name=11&insured_email=111&channel_order_code=1111";
-
 }

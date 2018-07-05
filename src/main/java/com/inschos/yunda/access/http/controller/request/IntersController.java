@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Controller
 @RequestMapping("/webapi")
-//TODO 路由统一也用小驼峰命名规则
 public class IntersController {
 
     private static final Logger logger = Logger.getLogger(IntersController.class);

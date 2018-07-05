@@ -144,7 +144,6 @@ public class InsureClaimYdAction extends BaseAction {
 
     /**
      * 提交理赔申请资料
-     * TODO 逻辑：
      * 端上通过上一个接口获取需要上传资料的描述然后调用文件服务上传文件，上传文件成功后把文件服务返回的键值给服务端，入库存储
      *
      * @param actionBean
@@ -213,19 +212,19 @@ public class InsureClaimYdAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, "获取理赔审核页面信息失败", response);
         }
         InsureClaimBean.claimVerifyResponse claimVerifyResponse = new InsureClaimBean.claimVerifyResponse();
-        //TODO 获取出险人信息
+        //获取出险人信息
         claimVerifyResponse.name = claimVerifyRes.name;
         claimVerifyResponse.IdCard = claimVerifyRes.idcard;
         claimVerifyResponse.phone = claimVerifyRes.phone;
         claimVerifyResponse.email = claimVerifyRes.email;
         claimVerifyResponse.address = claimVerifyRes.address;
-        //TODO 获取出险信息
+        //获取出险信息
         claimVerifyResponse.claimId = claimVerifyRes.id;
         claimVerifyResponse.claimType = claimVerifyRes.claim_type;
         claimVerifyResponse.claimStart = claimVerifyRes.claim_start;
         claimVerifyResponse.claimArea = claimVerifyRes.claim_area;
         claimVerifyResponse.claimDescription = claimVerifyRes.claim_desc;
-        //TODO 获取保单信息
+        //获取保单信息
         InsureWarrantyBean.warrantyInfoRequest warrantyInfoRequest = new InsureWarrantyBean.warrantyInfoRequest();
         warrantyInfoRequest.custId = Long.valueOf(actionBean.userId);
         warrantyInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
@@ -240,7 +239,7 @@ public class InsureClaimYdAction extends BaseAction {
         claimVerifyResponse.insureEnd = warrantyInfoResponse.data.toString();
         claimVerifyResponse.warrantyCode = warrantyInfoResponse.data.toString();
         claimVerifyResponse.insurePrice = warrantyInfoResponse.data.toString();
-        //TODO 获取理赔资料
+        //获取理赔资料
         claimVerifyResponse.claimApplication = claimVerifyRes.claimInfo.claim_application;
         claimVerifyResponse.medicalInformation = claimVerifyRes.claimInfo.medical_information;
         claimVerifyResponse.medicalInvoice = claimVerifyRes.claimInfo.medical_invoice;

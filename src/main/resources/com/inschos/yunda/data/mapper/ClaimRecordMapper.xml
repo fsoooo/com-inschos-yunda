@@ -72,7 +72,7 @@
         </where>
     </select>
 
-    <!--TODO 两表联查-->
+    <!--两表联查-->
     <select id="findClaimVerify" parameterType="ClaimRecord" resultMap="findClaimInfo">
         select
         `claim_record_yingda`.`id`,  `claim_record_yingda`.`cust_id`,  `claim_record_yingda`.`account_uuid`,  `claim_record_yingda`.`warranty_uuid`,  `claim_record_yingda`.`name`,  `claim_record_yingda`.`idcard`,  `claim_record_yingda`.`phone`,  `claim_record_yingda`.`email`,  `claim_record_yingda`.`address`,  `claim_record_yingda`.`claim_type`,  `claim_record_yingda`.`claim_start`,  `claim_record_yingda`.`claim_area`,  `claim_record_yingda`.`claim_desc`,  `claim_record_yingda`.`status`,  `claim_record_yingda`.`created_at`,  `claim_record_yingda`.`updated_at`,`claim_info_yingda`.`id`,`claim_info_yingda`.`claim_id`,`claim_info_yingda`.`claim_application`,`claim_info_yingda`.`medical_information`,`claim_info_yingda`.`medical_invoice`,`claim_info_yingda`.`fees_list`,`claim_info_yingda`.`idcard_copy`,`claim_info_yingda`.`bank_account`,`claim_info_yingda`.`traffic_accident_certification`,`claim_info_yingda`.`third_material`,`claim_info_yingda`.`disability_report`,`claim_info_yingda`.`death_certificate`,`claim_info_yingda`.`beneficiary_material`,`claim_info_yingda`.`status`,`claim_info_yingda`.`remarks`,`claim_info_yingda`.`created_at`,`claim_info_yingda`.`updated_at`
@@ -84,7 +84,7 @@
         <!--主表的主键id-->
         <id column="id" property="id"/>
         <association property="claimInfo" javaType="ClaimInfo">
-            <!--todo 附表的主键id-->
+            <!--附表的主键id-->
             <id column="id" property="id"/>
             <result column="claim_id" property="claim_id"/>
             <result column="claim_application" property="claim_application"/>

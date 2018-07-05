@@ -34,7 +34,7 @@ public class InsureSetupAction extends BaseAction {
         InsureSetup insureAutoRes = insureSetupDao.findInsureAutoInfo(insureSetup);
         InsureSetupBean.findInsureAutoResponseData insureAutoResponseData = new InsureSetupBean.findInsureAutoResponseData();
         if (insureAutoRes == null) {
-            //TODO 添加投保设置记录
+            //添加投保设置记录
             long date = new Date().getTime();
             insureSetup.authorize_bank = "";
             insureSetup.authorize_status = 1;//银行卡授权设置,未授权1/已授权2

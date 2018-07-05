@@ -142,11 +142,11 @@ public class InsureBankAction extends BaseAction {
 
     /**
      * 更改银行卡状态
-     * TODO 逻辑如下：
-     * TODO 1.银行卡有两种状态:默认使用状态(bankUseStatus:默认是1没有使用/使用中2)和授权状态(bankAuthorizeStatus:默认是1正常/2删除)
-     * TODO 2.当只剩下一张银行卡时,不能取消授权
-     * TODO 3.当所有银行卡都取消授权,本地库要更改银行卡授权状态
-     * TODO 4.当改变默认使用银行卡时,要做银行卡短信验证,然后变更本地库
+     * 逻辑如下：
+     * 1.银行卡有两种状态:默认使用状态(bankUseStatus:默认是1没有使用/使用中2)和授权状态(bankAuthorizeStatus:默认是1正常/2删除)
+     * 2.当只剩下一张银行卡时,不能取消授权
+     * 3.当所有银行卡都取消授权,本地库要更改银行卡授权状态
+     * 4.当改变默认使用银行卡时,要做银行卡短信验证,然后变更本地库
      *
      * @return
      * @params actionBean
@@ -162,7 +162,7 @@ public class InsureBankAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, "获取银行卡信息失败", response);
         }
         if (bankCount == 0) {
-            //TODO 修改本地库的银行卡授权状态??
+            //TODO 修改本地库的银行卡授权状态
             InsureSetup insureSetup = new InsureSetup();
             insureSetup.authorize_status = 1;
             insureSetup.cust_id = Long.valueOf(actionBean.userId);
@@ -173,8 +173,7 @@ public class InsureBankAction extends BaseAction {
             if (request.bankAuthorizeStatus == 2) {
                 return json(BaseResponseBean.CODE_FAILURE, "您还剩最后一张可使用银行卡", response);
             }
-            if (request.bankUseStatus == 2) {
-                //TODO 做银行卡短信检验
+            if (request.bankUseStatus == 2) {//TODO 做银行卡短信检验
                 //获取verifyId
                 InsureBankBean.bankVerifyIdRequest bankVerifyIdRequest = new InsureBankBean.bankVerifyIdRequest();
                 bankVerifyIdRequest.cust_id = Long.valueOf(actionBean.userId);

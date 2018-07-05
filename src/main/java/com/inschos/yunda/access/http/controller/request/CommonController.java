@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 @RequestMapping("/webapi")
-//TODO 路由统一也用小驼峰命名规则
 public class CommonController {
 
     private static final Logger logger = Logger.getLogger(CommonController.class);
