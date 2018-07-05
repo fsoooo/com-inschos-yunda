@@ -124,7 +124,7 @@ public class InsureClaimBean {
     public static class doClaimVerifyRequest {//理赔审核提交
         public long claimId;//理赔id
         public int verifyStatus;//审核状态:1审核通过/2需要重新提交资料/3驳回
-        public String verifyContent = "";//审核备注
+        public String verifyContent;//审核备注
     }
 
     public static class claimProgressListRequest {//获取理赔进度列表
