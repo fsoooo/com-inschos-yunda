@@ -1,8 +1,5 @@
 package com.inschos.yunda.access.http.controller.bean;
 
-/**
- * Created by IceAnt on 2017/6/19.
- */
 public class BaseRequestBean {
     public final static String FILEID_BUILDCODE = "buildCode";
     public final static String FILEID_PLATFORM = "platform";

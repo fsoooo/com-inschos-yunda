@@ -117,21 +117,13 @@ public class IntersAction extends BaseAction {
         if (accountResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
         }
-        //TODO 查询银行卡授权详情
-        CommonBean.findBankAuthorizeResponse bankAuthorizeResponse = doBankAuthorizeRes(request);
-        if (bankAuthorizeResponse == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "授权查询接口调用失败", response);
+        //TODO 查询授权/签约详情
+        CommonBean.findAuthorizeResponse authorizeResponse = doAuthorizeRes(request);
+        if (authorizeResponse == null) {
+            return json(BaseResponseBean.CODE_FAILURE, "授权/签约查询接口调用失败", response);
         }
-        if (bankAuthorizeResponse.code != 200) {
-            return json(BaseResponseBean.CODE_FAILURE, "授权查询接口调用失败", response);
-        }
-        //TODO 查询微信签约详情
-        CommonBean.findWecahtContractResponse wecahtContractResponse = doWechatContractRes(request);
-        if (bankAuthorizeResponse == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "授权查询接口调用失败", response);
-        }
-        if (bankAuthorizeResponse.code != 200) {
-            return json(BaseResponseBean.CODE_FAILURE, "授权查询接口调用失败", response);
+        if (authorizeResponse.code != 200) {
+            return json(BaseResponseBean.CODE_FAILURE, "授权/签约查询接口调用失败", response);
         }
         //TODO 判断银行卡授权和微信签约情况
 
@@ -238,37 +230,20 @@ public class IntersAction extends BaseAction {
     }
 
     /**
-     * 获取银行卡授权详情
+     * 获取授权/签约详情
      *
      * @return
      */
-    private CommonBean.findBankAuthorizeResponse doBankAuthorizeRes(JointLoginBean.Requset request) {
+    private CommonBean.findAuthorizeResponse doAuthorizeRes(JointLoginBean.Requset request) {
         BaseResponseBean response = new BaseResponseBean();
         JointLoginBean.Requset jointLoginRequest = new JointLoginBean.Requset();
         jointLoginRequest.insured_name = request.insured_name;
         jointLoginRequest.insured_code = request.insured_code;
         jointLoginRequest.insured_phone = request.insured_phone;
-        String interName = "银行卡授权查询";
-        String result = commonAction.httpRequest(toAuthorizeQueryBank, JsonKit.bean2Json(jointLoginRequest), interName);
-        CommonBean.findBankAuthorizeResponse bankAuthorizeResponse = JsonKit.json2Bean(result, CommonBean.findBankAuthorizeResponse.class);
-        return bankAuthorizeResponse;
-    }
-
-    /**
-     * 获取微信签约详情
-     *
-     * @return
-     */
-    private CommonBean.findWecahtContractResponse doWechatContractRes(JointLoginBean.Requset request) {
-        BaseResponseBean response = new BaseResponseBean();
-        JointLoginBean.Requset jointLoginRequest = new JointLoginBean.Requset();
-        jointLoginRequest.insured_name = request.insured_name;
-        jointLoginRequest.insured_code = request.insured_code;
-        jointLoginRequest.insured_phone = request.insured_phone;
-        String interName = "微信签约查询";
-        String result = commonAction.httpRequest(toAuthorizeQueryWechat, JsonKit.bean2Json(jointLoginRequest), interName);
-        CommonBean.findWecahtContractResponse wecahtContractResponse = JsonKit.json2Bean(result, CommonBean.findWecahtContractResponse.class);
-        return wecahtContractResponse;
+        String interName = "授权/签约查询";
+        String result = commonAction.httpRequest(toAuthorizeQuery, JsonKit.bean2Json(jointLoginRequest), interName);
+        CommonBean.findAuthorizeResponse authorizeResponse = JsonKit.json2Bean(result, CommonBean.findAuthorizeResponse.class);
+        return authorizeResponse;
     }
 
     /**
@@ -313,7 +288,7 @@ public class IntersAction extends BaseAction {
         WarrantyRecord warrantyRecord = new WarrantyRecord();
         warrantyRecord.cust_id = doCustId(request);
         long insuredCount = warrantyRecordDao.findInsureWarrantyRes(warrantyRecord);
-        if(insuredCount>0){
+        if (insuredCount > 0) {
             //TODO 获取保单状态
             warrantyRecord.day_start = TimeKit.currentTimeMillis();//获取当前时间戳(毫秒值)
             warrantyRecord.day_end = TimeKit.getDayEndTime();//获取当天结束时间戳(毫秒值)

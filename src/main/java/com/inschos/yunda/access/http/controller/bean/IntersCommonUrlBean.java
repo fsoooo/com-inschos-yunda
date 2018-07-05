@@ -42,14 +42,12 @@ public class IntersCommonUrlBean {
     public static final String toPay = IntersCommonUrlBean.getServerHostInsure() + "/pay";
 
     //3.交易服务-授权签约接口
-    //授权查询(银行卡)
-    public static final String toAuthorizeQueryBank = IntersCommonUrlBean.getServerHostInsure() + "/";
+    //授权查询(银行卡+微信)
+    public static final String toAuthorizeQuery = IntersCommonUrlBean.getServerHostInsure() + "/";
     //获取支付银行卡信息
     public static final String toPayBank = IntersCommonUrlBean.getServerHostInsure() + "/";
     //执行银行卡授权
     public static final String toDoAuthorize = IntersCommonUrlBean.getServerHostInsure() + "/";
-    //授权查询(微信免密签约)
-    public static final String toAuthorizeQueryWechat = IntersCommonUrlBean.getServerHostInsure() + "/";
     //微信签约
     public static final String toWechatContract = IntersCommonUrlBean.getServerHostInsure() + "/";
 

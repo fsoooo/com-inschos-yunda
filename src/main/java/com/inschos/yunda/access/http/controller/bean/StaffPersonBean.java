@@ -12,7 +12,6 @@ public class StaffPersonBean {
     public long createdAt;
     public long updatedAt;
 
-
     public static class userInfoResponse extends BaseResponseBean {
         public userInfoResponseData data;
     }

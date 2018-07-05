@@ -2,12 +2,6 @@ package com.inschos.yunda.access.http.controller.bean;
 
 import java.util.List;
 
-/**
- * User: wangsl
- * Date: 2018/07/02
- * Time: 14:12
- * 韵达项目-理赔-参数Bean
- */
 public class InsureClaimBean {
     public static String getListStatus(int listStatus) {
         String result = "--";
