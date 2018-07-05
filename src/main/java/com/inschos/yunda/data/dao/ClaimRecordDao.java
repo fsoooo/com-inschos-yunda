@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class ClaimRecordDao {
+public class ClaimRecordDao extends BaseDao {
     @Autowired
     private ClaimRecordMapper claimRecordMapper;
 
@@ -37,7 +37,14 @@ public class ClaimRecordDao {
         return claimRecordMapper.findClaimVerify(claimRecord);
     }
 
-    public long updateClaimInfo(ClaimInfo claimInfo){
-        return claimRecordMapper.updateClaimInfo(claimInfo);
+    public long updateClaimVerify(ClaimInfo claimInfo) {
+        long updateRecordRes = claimRecordMapper.updateClaimRecord(claimInfo);
+        long updateInfoRes = claimRecordMapper.updateClaimInfo(claimInfo);
+        if (updateRecordRes == 1 && updateInfoRes == 1) {
+            return 1;
+        } else {
+            rollBack();
+            return 0;
+        }
     }
 }

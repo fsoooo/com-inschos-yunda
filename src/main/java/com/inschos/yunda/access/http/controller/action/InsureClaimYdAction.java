@@ -271,11 +271,13 @@ public class InsureClaimYdAction extends BaseAction {
         if (request.claimId == 0 || request.verifyStatus == 0) {
             return json(BaseResponseBean.CODE_FAILURE, "必要参数为空", response);
         }
+        long date = new Date().getTime();
         ClaimInfo claimInfo = new ClaimInfo();
         claimInfo.claim_id = request.claimId;
         claimInfo.status = request.verifyStatus;
         claimInfo.remarks = request.verifyContent;
-        long updateRes = claimRecordDao.updateClaimInfo(claimInfo);
+        claimInfo.updated_at = date;
+        long updateRes = claimRecordDao.updateClaimVerify(claimInfo);
         if (updateRes == 0) {
             return json(BaseResponseBean.CODE_FAILURE, "理赔审核页面提交失败", response);
         } else {

@@ -42,7 +42,8 @@
                     id&lt;#{page.lastId}
                 </when>
                 <when test="page.start>0">
-                    id&lt;=(select id from claim_record_yingda where cust_id =#{cust_id} AND account_uuid =#{account_uuid} order by id desc limit #{page.start},1)
+                    id&lt;=(select id from claim_record_yingda where cust_id =#{cust_id} AND account_uuid
+                    =#{account_uuid} order by id desc limit #{page.start},1)
                 </when>
                 <otherwise>
                     1=1
@@ -84,7 +85,7 @@
         <id column="id" property="id"/>
         <association property="claimInfo" javaType="ClaimInfo">
             <!--todo 附表的主键id-->
-            <id column="id" property="id" />
+            <id column="id" property="id"/>
             <result column="claim_id" property="claim_id"/>
             <result column="claim_application" property="claim_application"/>
             <result column="medical_information" property="medical_information"/>
@@ -103,4 +104,16 @@
             <result column="updated_at" property="updated_at"/>
         </association>
     </resultMap>
+
+    <update id="updateClaimRecord" parameterType="ClaimInfo">
+        update claim_record_yingda set
+        `status`=#{status} AND `updated_at`=#{updated_at}
+        where id =#{claim_id}
+    </update>
+
+    <update id="updateClaimInfo" parameterType="ClaimInfo">
+        update claim_info_yingda set
+        `status`=#{status} AND `remarks`=#{remarks} AND `updated_at`=#{updated_at}
+        where claim_id =#{claim_id}
+    </update>
 </mapper>

@@ -18,6 +18,8 @@ public interface ClaimRecordMapper {
 
     ClaimRecord findClaimVerify(ClaimRecord claimRecord);
 
+    long updateClaimRecord(ClaimInfo claimInfo);
+
     long updateClaimInfo(ClaimInfo claimInfo);
 
 }
