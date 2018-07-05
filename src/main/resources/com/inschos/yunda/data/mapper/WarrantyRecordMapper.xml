@@ -4,13 +4,14 @@
 <mapper namespace="com.inschos.yunda.data.mapper.WarrantyRecordMapper">
 
     <insert id="addWarrantyRecord" parameterType="WarrantyRecord" useGeneratedKeys="true" keyProperty="id">
-        insert into warranty_record(`cust_id`,`warranty_uuid`,`warranty_status`,`warranty_status_text`,`created_at`,`updated_at`) values(#{cust_id},#{warranty_uuid},#{warranty_status},#{warranty_status_text},#{created_at},#{updated_at})
+        insert into warranty_record(`cust_id`,`warranty_uuid`,`warranty_status`,`warranty_status_text`,`created_at`,`updated_at`)
+        values(#{cust_id},#{warranty_uuid},#{warranty_status},#{warranty_status_text},#{created_at},#{updated_at})
     </insert>
 
     <update id="updateWarrantyRecord" parameterType="WarrantyRecord">
-     update warranty_record set
+        update warranty_record set
               `warranty_status`=#{warranty_status} AND `warranty_status_text`=#{warranty_status_text} AND `updated_at`=#{updated_at}
-            where `id`=#{id}
+        where `id`=#{id}
     </update>
 
     <select id="findLastDayWarrantyRecord" parameterType="WarrantyRecord" resultType="WarrantyRecord">

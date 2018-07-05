@@ -10,10 +10,6 @@ public class BankVerifyDao {
     @Autowired
     private BankVerifyMapper bankVerifyMapper;
 
-    public BankVerify findBankVerify(BankVerify bankVerify) {
-        return bankVerifyMapper.findBankVerify(bankVerify);
-    }
-
     public long addBankVerify(BankVerify bankVerify) {
         return bankVerifyMapper.addBankVerify(bankVerify);
     }
@@ -22,8 +18,8 @@ public class BankVerifyDao {
         return bankVerifyMapper.updateBankVerify(bankVerify);
     }
 
-    public BankVerify findBankVerifyRepeat(BankVerify bankVerify) {
-        return bankVerifyMapper.findBankVerifyRepeat(bankVerify);
+    public BankVerify findBankVerify(BankVerify bankVerify) {
+        return bankVerifyMapper.findBankVerify(bankVerify);
     }
 
     public BankVerify findBankVerifyId(BankVerify bankVerify) {

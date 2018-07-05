@@ -218,7 +218,7 @@ public class CommonAction extends BaseAction {
         bankVerify.cust_id = Long.valueOf(actionBean.userId);
         bankVerify.bank_code = request.bankCode;
         bankVerify.bank_phone = request.bankCode;
-        BankVerify bankVerifyRepeat = bankVerifyDao.findBankVerifyRepeat(bankVerify);
+        BankVerify bankVerifyRepeat = bankVerifyDao.findBankVerify(bankVerify);
         if (bankVerifyRepeat != null) {
             //判断验证码是否已经过期,过期时间5分钟(暂定五分钟)
             if (bankVerifyRepeat.verify_time + 60 * 5 * 1000 > date) {

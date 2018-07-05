@@ -17,15 +17,6 @@
         </where>
     </select>
 
-    <select id="findBankVerifyRepeat" parameterType="BankVerify" resultType="BankVerify">
-        select
-        `id`,`bank_code`,`bank_phone`,`verify_id`,`verify_code`,`verify_time`,`verify_status`,`created_at`,`updated_at`
-        from bank_verify
-        <where>
-            cust_id =#{cust_id} AND bank_code =#{bank_code} AND bank_phone =#{bank_phone}
-        </where>
-    </select>
-
     <select id="findBankVerifyId" parameterType="BankVerify" resultType="BankVerify">
         select
         `id`,`bank_code`,`bank_phone`,`verify_id`,`verify_code`,`verify_time`,`verify_status`,`created_at`,`updated_at`
