@@ -34,7 +34,7 @@ public class ClaimRecordDao {
     }
 
     public ClaimRecord findClaimVerify(ClaimRecord claimRecord) {
-        return claimRecordMapper.findClaimRecord(claimRecord);
+        return claimRecordMapper.findClaimVerify(claimRecord);
     }
 
     public long updateClaimInfo(ClaimInfo claimInfo){

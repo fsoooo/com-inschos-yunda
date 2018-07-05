@@ -41,7 +41,7 @@ public class InsureClaimBean {
         public List<claimType> claimTypes;//出险类型
         public long claimStart;//出险时间
         public String claimArea;//出险地区
-        public String ClaimDescription;//出险经过描述
+        public String claimDescription;//出险经过描述
     }
 
     public static class claimType {

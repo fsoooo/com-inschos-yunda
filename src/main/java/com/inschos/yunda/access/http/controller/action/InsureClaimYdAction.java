@@ -60,7 +60,7 @@ public class InsureClaimYdAction extends BaseAction {
         }
         claimRecord.claim_start = request.claimStart;
         claimRecord.claim_area = request.claimArea;
-        claimRecord.claim_desc = request.ClaimDescription;
+        claimRecord.claim_desc = request.claimDescription;
         claimRecord.status = 1;//进度状态: 1申请理赔 2提交资料 3等待审核 4审核通过 -1 审核失败',
         claimRecord.created_at = date;
         claimRecord.updated_at = date;
@@ -68,7 +68,9 @@ public class InsureClaimYdAction extends BaseAction {
         if (addRes == 0) {
             return json(BaseResponseBean.CODE_FAILURE, "理赔申请提交失败", response);
         } else {
-            response.data = addRes;
+            InsureClaimBean.claimVerifyRequest claimId = new InsureClaimBean.claimVerifyRequest();
+            claimId.claimId = claimRecord.id;
+            response.data = claimId;
             return json(BaseResponseBean.CODE_SUCCESS, "理赔申请提交成功", response);
         }
     }
@@ -224,20 +226,20 @@ public class InsureClaimYdAction extends BaseAction {
         claimVerifyResponse.claimArea = claimVerifyRes.claim_area;
         claimVerifyResponse.claimDescription = claimVerifyRes.claim_desc;
         //TODO 获取保单信息
-        InsureWarrantyBean.warrantyInfoRequest warrantyInfoRequest = new InsureWarrantyBean.warrantyInfoRequest();
-        warrantyInfoRequest.custId = Long.valueOf(actionBean.userId);
-        warrantyInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
-        warrantyInfoRequest.warrantyUuid = claimVerifyRes.warranty_uuid;
-        String warrantyRecordRes = insureWarrantyAction.findInsureWarrantyInfoById(warrantyInfoRequest);
-        if (warrantyRecordRes == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "获取理赔申请页信息-保单信息失败", response);
-        }
-        InsureWarrantyBean.warrantyInfoResponse warrantyInfoResponse = JsonKit.json2Bean(warrantyRecordRes, InsureWarrantyBean.warrantyInfoResponse.class);
-        claimVerifyResponse.productName = "英大快递保";
-        claimVerifyResponse.insureStart = warrantyInfoResponse.data.toString();
-        claimVerifyResponse.insureEnd = warrantyInfoResponse.data.toString();
-        claimVerifyResponse.warrantyCode = warrantyInfoResponse.data.toString();
-        claimVerifyResponse.insurePrice = warrantyInfoResponse.data.toString();
+//        InsureWarrantyBean.warrantyInfoRequest warrantyInfoRequest = new InsureWarrantyBean.warrantyInfoRequest();
+//        warrantyInfoRequest.custId = Long.valueOf(actionBean.userId);
+//        warrantyInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
+//        warrantyInfoRequest.warrantyUuid = claimVerifyRes.warranty_uuid;
+//        String warrantyRecordRes = insureWarrantyAction.findInsureWarrantyInfoById(warrantyInfoRequest);
+//        if (warrantyRecordRes == null) {
+//            return json(BaseResponseBean.CODE_FAILURE, "获取理赔申请页信息-保单信息失败", response);
+//        }
+//        InsureWarrantyBean.warrantyInfoResponse warrantyInfoResponse = JsonKit.json2Bean(warrantyRecordRes, InsureWarrantyBean.warrantyInfoResponse.class);
+//        claimVerifyResponse.productName = "英大快递保";
+//        claimVerifyResponse.insureStart = warrantyInfoResponse.data.toString();
+//        claimVerifyResponse.insureEnd = warrantyInfoResponse.data.toString();
+//        claimVerifyResponse.warrantyCode = warrantyInfoResponse.data.toString();
+//        claimVerifyResponse.insurePrice = warrantyInfoResponse.data.toString();
         //TODO 获取理赔资料
         claimVerifyResponse.claimApplication = claimVerifyRes.claimInfo.claim_application;
         claimVerifyResponse.medicalInformation = claimVerifyRes.claimInfo.medical_information;

@@ -14,11 +14,13 @@
     </sql>
 
     <insert id="addClaimRecord" parameterType="ClaimRecord" useGeneratedKeys="true" keyProperty="id">
-        insert into claim_record_yingda(`cust_id`,`warranty_uuid`,`warranty_status`,`warranty_status_text`,`created_at`,`updated_at`) values(#{cust_id},#{warranty_uuid},#{warranty_status},#{warranty_status_text},#{created_at},#{updated_at})
+        insert into claim_record_yingda(`cust_id`,`account_uuid`,`warranty_uuid`,`name`,`idcard`,`phone`,`email`,`address`,`claim_type`,`claim_start`,`claim_area`,`claim_desc`,`status`,`created_at`,`updated_at`)
+        values(#{cust_id},#{account_uuid},#{warranty_uuid},#{name},#{idcard},#{phone},#{email},#{address},#{claim_type},#{claim_start},#{claim_area},#{claim_desc},#{status},#{created_at},#{updated_at})
     </insert>
 
     <insert id="addClaimInfo" parameterType="ClaimInfo" useGeneratedKeys="true" keyProperty="id">
-        insert into claim_info_yingda(`cust_id`,`warranty_uuid`,`warranty_status`,`warranty_status_text`,`created_at`,`updated_at`) values(#{cust_id},#{warranty_uuid},#{warranty_status},#{warranty_status_text},#{created_at},#{updated_at})
+        insert into claim_info_yingda(`claim_id`,`claim_application`,`medical_information`,`medical_invoice`,`fees_list`,`idcard_copy`,`bank_account`,`traffic_accident_certification`,`third_material`,`disability_report`,`death_certificate`,`beneficiary_material`,`status`,`remarks`,`created_at`,`updated_at`)
+        values(#{claim_id},#{claim_application},#{medical_information},#{medical_invoice},#{fees_list},#{idcard_copy},#{bank_account},#{traffic_accident_certification},#{third_material},#{disability_report},#{death_certificate},#{beneficiary_material},#{status},#{remarks},#{created_at},#{updated_at})
     </insert>
 
     <select id="findClaimRecordList" parameterType="ClaimRecord" resultType="ClaimRecord">
@@ -28,12 +30,13 @@
         <where>
             <choose>
                 <when test="status==1">
-                    `type` in (1,2,3)
+                    `status` in (1,2,3)
                 </when>
                 <when test="status==2">
-                    `type` in (-1,4)
+                    `status` in (-1,4)
                 </when>
             </choose>
+            AND
             <choose>
                 <when test="page.lastId>0">
                     id&lt;#{page.lastId}
@@ -71,17 +74,17 @@
     <!--TODO 两表联查-->
     <select id="findClaimVerify" parameterType="ClaimRecord" resultMap="findClaimInfo">
         select
-        `a`.`id`,  `a`.`cust_id`,  `a`.`account_uuid`,  `a`.`warranty_uuid`,  `a`.`name`,  `a`.`idcard`,  `a`.`phone`,  `a`.`email`,  `a`.`address`,  `a`.`claim_type`,  `a`.`claim_start`,  `a`.`claim_area`,  `a`.`claim_desc`,  `a`.`status`,  `a`.`created_at`,  `a`.`updated_at`
-        from  claim_record_yingda as a LEFT JOIN claim_info_yingda as b ON a.id = b.claim_id
-        where `a`.`id`=#{id} AND  `a`.`cust_id` =#{manager_uuid} AND `a`.`account_uuid` =#{account_uuid}
+        `claim_record_yingda`.`id`,  `claim_record_yingda`.`cust_id`,  `claim_record_yingda`.`account_uuid`,  `claim_record_yingda`.`warranty_uuid`,  `claim_record_yingda`.`name`,  `claim_record_yingda`.`idcard`,  `claim_record_yingda`.`phone`,  `claim_record_yingda`.`email`,  `claim_record_yingda`.`address`,  `claim_record_yingda`.`claim_type`,  `claim_record_yingda`.`claim_start`,  `claim_record_yingda`.`claim_area`,  `claim_record_yingda`.`claim_desc`,  `claim_record_yingda`.`status`,  `claim_record_yingda`.`created_at`,  `claim_record_yingda`.`updated_at`
+        from  claim_record_yingda LEFT JOIN claim_info_yingda ON claim_record_yingda.id = claim_info_yingda.claim_id
+        where `claim_record_yingda`.`id`=#{id}
     </select>
     <!--联查映射-->
-    <resultMap id="findClaimInfo" type="ClaimInfo" autoMapping="true">
+    <resultMap id="findClaimInfo" type="ClaimRecord" autoMapping="true">
         <!--主表的主键id-->
         <id column="id" property="id"/>
-        <association property="ClaimRecord" javaType="ClaimRecord">
+        <association property="claimInfo" javaType="ClaimInfo">
             <!--todo 附表的主键id-->
-            <id column="id" property="id" />
+            <!--<id column="id" property="id" />-->
             <result column="claim_id" property="claim_id"/>
             <result column="claim_application" property="claim_application"/>
             <result column="medical_information" property="medical_information"/>
