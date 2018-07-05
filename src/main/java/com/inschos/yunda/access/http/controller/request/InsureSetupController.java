@@ -1,7 +1,6 @@
 package com.inschos.yunda.access.http.controller.request;
 
 import com.inschos.yunda.access.http.controller.action.InsureSetupAction;
-import com.inschos.yunda.access.http.controller.action.IntersAction;
 import com.inschos.yunda.access.http.controller.bean.ActionBean;
 import com.inschos.yunda.annotation.GetActionBeanAnnotation;
 import org.apache.log4j.Logger;
@@ -9,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * User: wangsl
@@ -56,17 +53,17 @@ public class InsureSetupController {
     }
 
     /**
-     * 获取签约状态
+     * 获取授权/签约状态
      *
      * @return json
      * @params actionBean
      * @access public
      */
     @GetActionBeanAnnotation
-    @RequestMapping("/findWhetContractStatus/**")
+    @RequestMapping("/findAuthorizeStatus/**")
     @ResponseBody
-    public String findWhetContractStatus(ActionBean actionBean) {
-        return insureSetupAction.findWehatContractStatus(actionBean);
+    public String findAuthorizeStatus(ActionBean actionBean) {
+        return insureSetupAction.findAuthorizeStatus(actionBean);
     }
 
     /**
@@ -95,19 +92,6 @@ public class InsureSetupController {
     @ResponseBody
     public String findWhetContractInfo(ActionBean actionBean) {
         return insureSetupAction.findWhetContractInfo(actionBean);
-    }
-
-    /**
-     * 获取银行卡授权状态
-     *
-     * @return
-     * @params actionBean
-     */
-    @GetActionBeanAnnotation
-    @RequestMapping("/findBankAuthorizeStatus/**")
-    @ResponseBody
-    public String findBankAuthorizeStatus(ActionBean actionBean) {
-        return insureSetupAction.findBankAuthorizeStatus(actionBean);
     }
 
     /**

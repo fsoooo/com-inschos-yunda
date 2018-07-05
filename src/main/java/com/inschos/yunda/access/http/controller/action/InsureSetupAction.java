@@ -94,23 +94,23 @@ public class InsureSetupAction extends BaseAction {
     }
 
     /**
-     * 获取签约状态
+     * 获取授权/签约状态
      *
      * @param actionBean
      * @return
      */
-    public String findWehatContractStatus(ActionBean actionBean) {
+    public String findAuthorizeStatus(ActionBean actionBean) {
         InsureSetupBean request = JsonKit.json2Bean(actionBean.body, InsureSetupBean.class);
         BaseResponseBean response = new BaseResponseBean();
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
-        CommonBean.findWecahtContractRequset wecahtContractRequset = new CommonBean.findWecahtContractRequset();
+        CommonBean.findAuthorizeRequset wecahtContractRequset = new CommonBean.findAuthorizeRequset();
         wecahtContractRequset.userId = actionBean.userId;
         wecahtContractRequset.accountUuid = actionBean.accountUuid;
-        CommonBean.findWecahtContractResponse wecahtContractResponse = commonAction.findWechatContractStatus(wecahtContractRequset);
-        response.data = wecahtContractResponse.data;
-        return json(BaseResponseBean.CODE_SUCCESS, "获取签约状态成功", response);
+        CommonBean.findAuthorizeResponse authorizeResponse = commonAction.findWechatContractStatus(wecahtContractRequset);
+        response.data = authorizeResponse.data;
+        return json(BaseResponseBean.CODE_SUCCESS, "获取授权/签约状态成功", response);
     }
 
     /**
@@ -159,27 +159,6 @@ public class InsureSetupAction extends BaseAction {
         CommonBean.findUserInfoResponse findUserInfoResponse = commonAction.findUserInfoById(findUserInfoRequset);
         response.data = findUserInfoResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, "获取微信免密授权书详情成功", response);
-    }
-
-
-    /**
-     * 获取银行卡状态
-     *
-     * @return
-     * @params actionBean
-     */
-    public String findBankAuthorizeStatus(ActionBean actionBean) {
-        InsureSetupBean request = JsonKit.json2Bean(actionBean.body, InsureSetupBean.class);
-        BaseResponseBean response = new BaseResponseBean();
-        if (request == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
-        }
-        CommonBean.findBankAuthorizeRequset bankAuthorizeRequset = new CommonBean.findBankAuthorizeRequset();
-        bankAuthorizeRequset.userId = actionBean.userId;
-        bankAuthorizeRequset.accountUuid = actionBean.accountUuid;
-        CommonBean.findBankAuthorizeResponse bankAuthorizeResponse = commonAction.findBankAuthorizeStatus(bankAuthorizeRequset);
-        response.data = bankAuthorizeResponse.data;
-        return json(BaseResponseBean.CODE_SUCCESS, "获取银行卡状态成功", response);
     }
 
     /**

@@ -55,16 +55,16 @@ public class CommonAction extends BaseAction {
     }
 
     /**
-     * 获取微信签约状态
+     * 获取授权/签约状态
      *
      * @param request
      * @return
      */
-    public CommonBean.findWecahtContractResponse findWechatContractStatus(CommonBean.findWecahtContractRequset request) {
-        String interName = "获取微信签约状态";
-        String result = httpRequest(toAuthorizeQueryWechat, JsonKit.bean2Json(request), interName);
-        CommonBean.findWecahtContractResponse wecahtContractResponse = JsonKit.json2Bean(result, CommonBean.findWecahtContractResponse.class);
-        return wecahtContractResponse;
+    public CommonBean.findAuthorizeResponse findWechatContractStatus(CommonBean.findAuthorizeRequset request) {
+        String interName = "获取授权/签约状态";
+        String result = httpRequest(toAuthorizeQuery, JsonKit.bean2Json(request), interName);
+        CommonBean.findAuthorizeResponse authorizeResponse = JsonKit.json2Bean(result, CommonBean.findAuthorizeResponse.class);
+        return authorizeResponse;
     }
 
     /**
@@ -75,21 +75,8 @@ public class CommonAction extends BaseAction {
      */
     public CommonBean.doWecahtContractResponse doWechatContract(CommonBean.doWecahtContractRequset request) {
         String interName = "执行微信签约操作";
-        String result = httpRequest(toAuthorizeQueryWechat, JsonKit.bean2Json(request), interName);
+        String result = httpRequest(toWechatContract, JsonKit.bean2Json(request), interName);
         CommonBean.doWecahtContractResponse response = JsonKit.json2Bean(result, CommonBean.doWecahtContractResponse.class);
-        return response;
-    }
-
-    /**
-     * 获取银行卡授权状态
-     *
-     * @param request
-     * @return
-     */
-    public CommonBean.findBankAuthorizeResponse findBankAuthorizeStatus(CommonBean.findBankAuthorizeRequset request) {
-        String interName = "获取银行卡授权状态";
-        String result = httpRequest(toAuthorizeQueryWechat, JsonKit.bean2Json(request), interName);
-        CommonBean.findBankAuthorizeResponse response = JsonKit.json2Bean(result, CommonBean.findBankAuthorizeResponse.class);
         return response;
     }
 
@@ -101,7 +88,7 @@ public class CommonAction extends BaseAction {
      */
     public CommonBean.doBankAuthorizeResponse doBankAuthorize(CommonBean.doBankAuthorizeRequset request) {
         String interName = "执行银行卡授权";
-        String result = httpRequest(toAuthorizeQueryWechat, JsonKit.bean2Json(request), interName);
+        String result = httpRequest(toBankAuthorize, JsonKit.bean2Json(request), interName);
         CommonBean.doBankAuthorizeResponse response = JsonKit.json2Bean(result, CommonBean.doBankAuthorizeResponse.class);
         return response;
     }

@@ -47,7 +47,7 @@ public class IntersCommonUrlBean {
     //获取支付银行卡信息
     public static final String toPayBank = IntersCommonUrlBean.getServerHostInsure() + "/";
     //执行银行卡授权
-    public static final String toDoAuthorize = IntersCommonUrlBean.getServerHostInsure() + "/";
+    public static final String toBankAuthorize = IntersCommonUrlBean.getServerHostInsure() + "/";
     //微信签约
     public static final String toWechatContract = IntersCommonUrlBean.getServerHostInsure() + "/";
 
