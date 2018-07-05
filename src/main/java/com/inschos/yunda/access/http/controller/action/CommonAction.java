@@ -43,9 +43,12 @@ public class CommonAction extends BaseAction {
             if (result == null) {
                 return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
             }
+            if (!isJSONValid(result)) {
+                return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
+            }
             BaseResponseBean baseResponse = JsonKit.json2Bean(result, BaseResponseBean.class);
             if (baseResponse.code != 200 || baseResponse.code == 500) {
-                return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
+                return json(BaseResponseBean.CODE_FAILURE, interName + "接口服务请求失败", response);
             }
             response.data = baseResponse.data;
             return json(BaseResponseBean.CODE_SUCCESS, interName + "接口请求成功", response);
@@ -142,7 +145,6 @@ public class CommonAction extends BaseAction {
             InsureSetupBean.accountInfoRequest accountInfoRequest = new InsureSetupBean.accountInfoRequest();
             accountInfoRequest.custId = Long.valueOf(request.userId);
             accountInfoRequest.accountUuid = Long.valueOf(request.accountUuid);
-
             String result = httpRequest(toAccountInfo, JsonKit.bean2Json(accountInfoRequest), interName);
             InsureSetupBean.accountInfoResponse accountInfoResponse = JsonKit.json2Bean(result, InsureSetupBean.accountInfoResponse.class);
             //获取数据成功,数据入库

@@ -1,5 +1,6 @@
 package com.inschos.yunda.access.http.controller.action;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inschos.yunda.access.http.controller.bean.BaseResponseBean;
 import com.inschos.yunda.access.http.controller.bean.PageBean;
 import com.inschos.yunda.annotation.CheckParamsKit;
@@ -7,10 +8,21 @@ import com.inschos.yunda.assist.kit.JsonKit;
 import com.inschos.yunda.assist.kit.StringKit;
 import com.inschos.yunda.model.Page;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BaseAction {
+    protected final static boolean isJSONValid(String jsonInString) {
+        try {
+            final ObjectMapper mapper = new ObjectMapper();
+            mapper.readTree(jsonInString);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
     public <T> T requst2Bean(String body, Class<T> clazz) {
         T bean = JsonKit.json2Bean(body, clazz);
         if (bean == null) {
