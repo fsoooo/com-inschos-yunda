@@ -226,20 +226,20 @@ public class InsureClaimYdAction extends BaseAction {
         claimVerifyResponse.claimArea = claimVerifyRes.claim_area;
         claimVerifyResponse.claimDescription = claimVerifyRes.claim_desc;
         //TODO 获取保单信息
-//        InsureWarrantyBean.warrantyInfoRequest warrantyInfoRequest = new InsureWarrantyBean.warrantyInfoRequest();
-//        warrantyInfoRequest.custId = Long.valueOf(actionBean.userId);
-//        warrantyInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
-//        warrantyInfoRequest.warrantyUuid = claimVerifyRes.warranty_uuid;
-//        String warrantyRecordRes = insureWarrantyAction.findInsureWarrantyInfoById(warrantyInfoRequest);
-//        if (warrantyRecordRes == null) {
-//            return json(BaseResponseBean.CODE_FAILURE, "获取理赔申请页信息-保单信息失败", response);
-//        }
-//        InsureWarrantyBean.warrantyInfoResponse warrantyInfoResponse = JsonKit.json2Bean(warrantyRecordRes, InsureWarrantyBean.warrantyInfoResponse.class);
-//        claimVerifyResponse.productName = "英大快递保";
-//        claimVerifyResponse.insureStart = warrantyInfoResponse.data.toString();
-//        claimVerifyResponse.insureEnd = warrantyInfoResponse.data.toString();
-//        claimVerifyResponse.warrantyCode = warrantyInfoResponse.data.toString();
-//        claimVerifyResponse.insurePrice = warrantyInfoResponse.data.toString();
+        InsureWarrantyBean.warrantyInfoRequest warrantyInfoRequest = new InsureWarrantyBean.warrantyInfoRequest();
+        warrantyInfoRequest.custId = Long.valueOf(actionBean.userId);
+        warrantyInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
+        warrantyInfoRequest.warrantyUuid = claimVerifyRes.warranty_uuid;
+        String warrantyRecordRes = insureWarrantyAction.findInsureWarrantyInfoById(warrantyInfoRequest);
+        if (warrantyRecordRes == null) {
+            return json(BaseResponseBean.CODE_FAILURE, "获取理赔申请页信息-保单信息失败", response);
+        }
+        InsureWarrantyBean.warrantyInfoResponse warrantyInfoResponse = JsonKit.json2Bean(warrantyRecordRes, InsureWarrantyBean.warrantyInfoResponse.class);
+        claimVerifyResponse.productName = "英大快递保";
+        claimVerifyResponse.insureStart = warrantyInfoResponse.data.toString();
+        claimVerifyResponse.insureEnd = warrantyInfoResponse.data.toString();
+        claimVerifyResponse.warrantyCode = warrantyInfoResponse.data.toString();
+        claimVerifyResponse.insurePrice = warrantyInfoResponse.data.toString();
         //TODO 获取理赔资料
         claimVerifyResponse.claimApplication = claimVerifyRes.claimInfo.claim_application;
         claimVerifyResponse.medicalInformation = claimVerifyRes.claimInfo.medical_information;
