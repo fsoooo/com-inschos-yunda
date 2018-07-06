@@ -2,13 +2,19 @@ package com.inschos.yunda.access.http.controller.action;
 
 import com.inschos.yunda.access.http.controller.bean.*;
 import com.inschos.yunda.assist.kit.JsonKit;
+import com.inschos.yunda.assist.kit.TimeKit;
 import com.inschos.yunda.data.dao.InsureSetupDao;
+import com.inschos.yunda.data.dao.WarrantyRecordDao;
 import com.inschos.yunda.model.InsureSetup;
+import com.inschos.yunda.model.WarrantyRecord;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Calendar;
 import java.util.Date;
+
+import static com.inschos.yunda.access.http.controller.bean.IntersCommonUrlBean.toWechatContract;
 
 @Component
 public class InsureSetupAction extends BaseAction {
@@ -17,6 +23,9 @@ public class InsureSetupAction extends BaseAction {
 
     @Autowired
     private InsureSetupDao insureSetupDao;
+
+    @Autowired
+    private WarrantyRecordDao warrantyRecordDao;
 
     @Autowired
     private CommonAction commonAction;
@@ -100,42 +109,49 @@ public class InsureSetupAction extends BaseAction {
      * @return
      */
     public String findAuthorizeStatus(ActionBean actionBean) {
-        InsureSetupBean request = JsonKit.json2Bean(actionBean.body, InsureSetupBean.class);
         BaseResponseBean response = new BaseResponseBean();
-        if (request == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
-        }
-        CommonBean.findAuthorizeRequset wecahtContractRequset = new CommonBean.findAuthorizeRequset();
-        wecahtContractRequset.userId = actionBean.userId;
-        wecahtContractRequset.accountUuid = actionBean.accountUuid;
-        CommonBean.findAuthorizeResponse authorizeResponse = commonAction.findWechatContractStatus(wecahtContractRequset);
+        CommonBean.findAuthorizeRequset authorizeRequset = new CommonBean.findAuthorizeRequset();
+        authorizeRequset.userId = actionBean.userId;
+        authorizeRequset.accountUuid = actionBean.accountUuid;
+        CommonBean.findAuthorizeResponse authorizeResponse = commonAction.findWechatContractStatus(authorizeRequset);
         response.data = authorizeResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, "获取授权/签约状态成功", response);
     }
 
     /**
      * 获取签约信息(url)
-     * TODO 签约参数还没凑齐
      *
      * @param actionBean
      * @return
      */
     public String findWhetContractUrl(ActionBean actionBean) {
-        InsureSetupBean request = JsonKit.json2Bean(actionBean.body, InsureSetupBean.class);
+        InsureSetupBean.doWechatContractRequset request = JsonKit.json2Bean(actionBean.body, InsureSetupBean.doWechatContractRequset.class);
         BaseResponseBean response = new BaseResponseBean();
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
+        WarrantyRecord warrantyRecord = new WarrantyRecord();
+        warrantyRecord.cust_id = Long.valueOf(actionBean.userId);
+        //前一天的保单信息
+        warrantyRecord.day_start = TimeKit.getDayStartTime()-24*60*60*1000;
+        warrantyRecord.day_end = TimeKit.getDayEndTime()-24*60*60*1000;
+        WarrantyRecord warrantyRecoedRes = warrantyRecordDao.findLastDayWarrantyRecord(warrantyRecord);
+        if (warrantyRecoedRes == null || warrantyRecoedRes.warranty_uuid == null) {
+            return json(BaseResponseBean.CODE_FAILURE, "您没有进行预投保，不能进行微信签约", response);
+        }
         CommonBean.doWecahtContractRequset doWecahtContractRequset = new CommonBean.doWecahtContractRequset();
-        //TODO 签约参数还没凑齐
-        doWecahtContractRequset.warrantyUuid = actionBean.userId;
-        doWecahtContractRequset.warrantyCode = actionBean.accountUuid;
-        doWecahtContractRequset.payNo = actionBean.accountUuid;
-        doWecahtContractRequset.wechatAccount = actionBean.accountUuid;
-        doWecahtContractRequset.clientIp = actionBean.accountUuid;
-        doWecahtContractRequset.insuredName = actionBean.accountUuid;
-        doWecahtContractRequset.insuredCode = actionBean.accountUuid;
-        doWecahtContractRequset.insuredPhone = actionBean.accountUuid;
+        //签约参数待定
+        doWecahtContractRequset.warrantyUuid = warrantyRecoedRes.warranty_uuid;
+        doWecahtContractRequset.payNo = warrantyRecoedRes.pay_no;
+        doWecahtContractRequset.clientIp = request.clientIp;
+        CommonBean.findUserInfoRequset userInfoRequset = new CommonBean.findUserInfoRequset();
+        userInfoRequset.userId = actionBean.userId;
+        userInfoRequset.accountUuid = actionBean.accountUuid;
+        CommonBean.findUserInfoResponse userInfoResponse = commonAction.findUserInfoById(userInfoRequset);
+        doWecahtContractRequset.wechatAccount = userInfoResponse.data.phone;
+        doWecahtContractRequset.insuredName = userInfoResponse.data.name;
+        doWecahtContractRequset.insuredCode = userInfoResponse.data.papersCode;
+        doWecahtContractRequset.insuredPhone = userInfoResponse.data.phone;
         CommonBean.doWecahtContractResponse doWecahtContractResponse = commonAction.doWechatContract(doWecahtContractRequset);
         response.data = doWecahtContractResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, "获取签约信息成功", response);
@@ -148,11 +164,7 @@ public class InsureSetupAction extends BaseAction {
      * @return
      */
     public String findWhetContractInfo(ActionBean actionBean) {
-        InsureSetupBean request = JsonKit.json2Bean(actionBean.body, InsureSetupBean.class);
         BaseResponseBean response = new BaseResponseBean();
-        if (request == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
-        }
         CommonBean.findUserInfoRequset findUserInfoRequset = new CommonBean.findUserInfoRequset();
         findUserInfoRequset.userId = actionBean.userId;
         findUserInfoRequset.accountUuid = actionBean.accountUuid;
@@ -168,11 +180,7 @@ public class InsureSetupAction extends BaseAction {
      * @params actionBean
      */
     public String findBankAuthorizeInfo(ActionBean actionBean) {
-        InsureSetupBean request = JsonKit.json2Bean(actionBean.body, InsureSetupBean.class);
         BaseResponseBean response = new BaseResponseBean();
-        if (request == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
-        }
         CommonBean.findUserInfoRequset findUserInfoRequset = new CommonBean.findUserInfoRequset();
         findUserInfoRequset.userId = actionBean.userId;
         findUserInfoRequset.accountUuid = actionBean.accountUuid;

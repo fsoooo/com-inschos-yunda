@@ -55,4 +55,12 @@ public class InsureSetupBean {
     public static class doBankAuthorizeResponse extends BaseResponseBean {
         public Object data;
     }
+
+    public static class doWechatContractRequset {
+        public String clientIp;
+    }
+
+    public static class doWechatContractResponse extends BaseResponseBean {
+        public Object data;
+    }
 }

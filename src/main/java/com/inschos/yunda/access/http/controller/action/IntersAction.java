@@ -515,43 +515,4 @@ public class IntersAction extends BaseAction {
         }
         return cust_id;
     }
-
-    /**
-     * 调用微信签约
-     *
-     * @param jointLoginRequest
-     * @param wechatContractRequest
-     * @return
-     */
-    private String doWechatContract(JointLoginBean.Requset jointLoginRequest, WechatContractBean.Requset wechatContractRequest) {
-        BaseResponseBean response = new BaseResponseBean();
-        //先判断前一天是否进行预投保
-        long custId = doCustId(jointLoginRequest);
-        if (custId == 0) {
-            return json(BaseResponseBean.CODE_FAILURE, "获取用户信息失败", response);
-        }
-        WarrantyRecord warrantyRecord = new WarrantyRecord();
-        warrantyRecord.cust_id = custId;
-        Calendar calendar = Calendar.getInstance();
-        long day_start = calendar.getTimeInMillis();
-        warrantyRecord.day_start = day_start;
-        warrantyRecord.day_end = day_start + 24 * 60 * 60 * 1000;
-        WarrantyRecord warrantyRecoedRes = warrantyRecordDao.findLastDayWarrantyRecord(warrantyRecord);
-        if (warrantyRecoedRes == null || warrantyRecoedRes.warranty_uuid == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "您没有进行预投保，不能进行微信签约", response);
-        }
-        WechatContractBean.Requset wechatContractRequests = new WechatContractBean.Requset();
-        wechatContractRequests.warrantyUuid = "";
-        wechatContractRequests.warrantyCode = "";
-        wechatContractRequests.payNo = "";
-        wechatContractRequests.clientIp = "";
-        wechatContractRequests.insuredName = "";
-        wechatContractRequests.insuredCode = "";
-        wechatContractRequests.insuredPhone = "";
-        String interName = "交易服务-微信签约";
-        String result = commonAction.httpRequest(toWechatContract, JsonKit.bean2Json(wechatContractRequests), interName);
-        WechatContractBean.Response wechatContractResponse = JsonKit.json2Bean(result, WechatContractBean.Response.class);
-        response.data = wechatContractResponse;
-        return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
-    }
 }

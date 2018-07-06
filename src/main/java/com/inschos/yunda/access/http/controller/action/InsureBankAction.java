@@ -206,7 +206,7 @@ public class InsureBankAction extends BaseAction {
         String result = commonAction.httpRequest(toUpdateBank, JsonKit.bean2Json(updateBankStatusRequest), interName);
         InsureBankBean.updateBankStatusResponse bankStatusResponse = JsonKit.json2Bean(result, InsureBankBean.updateBankStatusResponse.class);
         //根据接口返回状态,修改本地库的银行卡授权状态
-       if(updateBankStatusRequest.bankUseStatus==2){
+        if (updateBankStatusRequest.bankUseStatus == 2) {
             insureSetup.cust_id = Long.valueOf(actionBean.userId);
             insureSetup.authorize_status = 2;//授权
             insureSetup.authorize_bank = updateBankStatusRequest.bankCode;

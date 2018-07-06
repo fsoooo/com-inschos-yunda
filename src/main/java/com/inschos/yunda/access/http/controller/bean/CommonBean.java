@@ -27,7 +27,6 @@ public class CommonBean {
 
     public static class doWecahtContractRequset {
         public String warrantyUuid;
-        public String warrantyCode;
         public String payNo;
         public String wechatAccount;
         public String clientIp;
