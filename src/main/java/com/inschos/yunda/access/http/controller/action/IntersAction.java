@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -43,7 +42,11 @@ public class IntersAction extends BaseAction {
 
     /**
      * 联合登录
-     * TODO 韵达触发联合登录，获取报文信息,请求账号服务(登录/注册)，获取account_id,,user_id,login_token
+     * TODO 韵达触发联合登录:
+     * TODO 1.账号服务(登录/注册)，获取account_id,,user_id,login_token
+     * TODO 2.授权查询,已授权往下执行,未授权返回结果,结束
+     * TODO 3.购保结果,查询当天有没有购保,为购保往下执行,已购保返回购保结果(保单状态),结束
+     * TODO 4.购保操作,投保操作,投保成功,执行支付操作
      *
      * @return json
      * @params actionBean
@@ -58,7 +61,7 @@ public class IntersAction extends BaseAction {
         if (request.insured_name == null || request.insured_code == null || request.insured_phone == null) {
             return json(BaseResponseBean.CODE_FAILURE, "姓名,证件号,手机号不能为空", response);
         }
-        //TODO 联合登录表插入数据,先判断今天有没有插入,再插入登录记录.每天只有一个记录
+        //TODO 联合登录表插入数据,先判断今天有没有插入,再插入登录记录.每天只有一个最早的记录(上工时间)
         long date = new Date().getTime();
         JointLogin jointLogin = new JointLogin();
         jointLogin.login_start = date;
@@ -74,6 +77,14 @@ public class IntersAction extends BaseAction {
         //TODO 联合登录触发账号服务
         JointLoginBean.AccountResponse loginResponse = doAccount(request);
         response.data = loginResponse.data;
+        //TODO 查询授权/签约详情
+        CommonBean.findAuthorizeResponse authorizeResponse = doAuthorizeRes(request);
+        if (authorizeResponse == null) {
+            return json(BaseResponseBean.CODE_FAILURE, "授权/签约查询接口调用失败", response);
+        }
+        if (authorizeResponse.code != 200) {
+            return json(BaseResponseBean.CODE_FAILURE, "授权/签约查询接口调用失败", response);
+        }
         //TODO 联合登录触发投保服务
         String insureRes = doInsuredPay(request);
         if (insureRes == null) {
@@ -92,8 +103,9 @@ public class IntersAction extends BaseAction {
 
     /**
      * 授权查询
-     * TODO 银行卡授权查询和微信免密查询返回参数还没定,授权状态组合判断没做
-     * TODO 授权查询同样需要触发账号服务(根据用户信息获取token)
+     * TODO 韵达触发授权查询:
+     * TODO 1.账号服务(登录/注册)，获取account_id,,user_id,login_token
+     * TODO 2.授权查询,根据银行卡授权和微信签约的状态返回查询结果,结束
      *
      * @return json
      * @params actionBean
@@ -125,7 +137,7 @@ public class IntersAction extends BaseAction {
         if (authorizeResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, "授权/签约查询接口调用失败", response);
         }
-        //TODO 判断银行卡授权和微信签约情况
+        //TODO 判断授权/签约状态
 
         //TODO 返回参数
         authorizeQueryResponseData.status = "";
@@ -145,6 +157,7 @@ public class IntersAction extends BaseAction {
     /**
      * 预投保
      * TODO 预投保接口跟其他接口的返回格式不同,接口返回参数还没确定
+     * TODO 还没确定这个接口是用来投保还是用来获取用户信息
      *
      * @return
      * @params account_id
@@ -203,6 +216,7 @@ public class IntersAction extends BaseAction {
 
     /**
      * 保险推送接口
+     * TODO 核心服务投保成功后触发此接口,将购保结果推送至韵达
      *
      * @param httpServletRequest
      * @return
