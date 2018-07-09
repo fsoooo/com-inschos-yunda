@@ -65,7 +65,7 @@ public class IntersAction extends BaseAction {
         //TODO 联合登录触发账号服务
         JointLoginBean.AccountResponse accountResponse = doAccount(request);
         if (accountResponse.code != 200) {
-            return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败", response);
+            //return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败", response);
         }
         //TODO 成功获取联合登录信息
         String loginToken = accountResponse.data.loginToken;
@@ -300,6 +300,9 @@ public class IntersAction extends BaseAction {
         String interName = "账号服务";
         String result = commonAction.httpRequest(toJointLogin, JsonKit.bean2Json(jointLoginRequest), interName);
         accountResponse = JsonKit.json2Bean(result, JointLoginBean.AccountResponse.class);
+        if(accountResponse.code!=200){
+            return accountResponse;
+        }
         //TODO 获取数据成功,数据入库
         long date = new Date().getTime();
         staffPerson.cust_id = Long.valueOf(accountResponse.data.custId);

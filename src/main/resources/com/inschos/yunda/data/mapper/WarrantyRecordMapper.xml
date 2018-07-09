@@ -24,7 +24,7 @@
 
     <!--获取保单状态为待支付、待生效、保障中的保单数量 -->
     <select id="findInsureWarrantyRes" parameterType="WarrantyRecord" resultType="long">
-        select COUNT (id)
+        select COUNT(id)
         from warranty_record
         <where>
             cust_id =#{cust_id} AND warranty_status in (2,3,4)

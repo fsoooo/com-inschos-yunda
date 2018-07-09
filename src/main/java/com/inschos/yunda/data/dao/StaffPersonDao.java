@@ -15,7 +15,11 @@ public class StaffPersonDao {
     }
 
     public long findStaffPersonId(StaffPerson staffPerson) {
-        return staffPersonMapper.findStaffPersonId(staffPerson);
+        if (staffPersonMapper.findStaffPersonId(staffPerson) != null) {
+            return staffPersonMapper.findStaffPersonId(staffPerson).longValue();
+        } else {
+            return 0;
+        }
     }
 
     public StaffPerson findStaffPersonInfoById(StaffPerson staffPerson) {

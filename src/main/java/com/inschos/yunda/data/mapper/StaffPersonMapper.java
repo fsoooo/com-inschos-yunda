@@ -5,7 +5,7 @@ import com.inschos.yunda.model.StaffPerson;
 public interface StaffPersonMapper {
     long addStaffPerson(StaffPerson staffPerson);
 
-    long findStaffPersonId(StaffPerson staffPerson);
+    java.lang.Long findStaffPersonId(StaffPerson staffPerson);
 
     StaffPerson findStaffPersonInfoById(StaffPerson staffPerson);
 
