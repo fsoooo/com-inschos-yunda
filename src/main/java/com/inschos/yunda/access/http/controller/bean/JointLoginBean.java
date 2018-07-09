@@ -32,6 +32,15 @@ public class JointLoginBean {
         public String local_url;//我的保险地址
     }
 
+    public static class AuthorizeQueryResponse extends BaseResponseBean {
+        public AuthorizeQueryResponseData data;
+    }
+
+    public static class AuthorizeQueryResponseData {
+        public String status;//授权状态:01未授权/02已授权
+        public String url;//授权页面地址
+    }
+
     public static class AccountResponse extends BaseResponseBean {
         public AccountResponseData data;
     }

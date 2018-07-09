@@ -126,7 +126,7 @@ public class IntersAction extends BaseAction {
     public String authorizationQuery(HttpServletRequest httpServletRequest) {
         JointLoginBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), JointLoginBean.Requset.class);
         BaseResponseBean response = new BaseResponseBean();
-        AuthorizeQueryBean.ResponseData authorizeQueryResponseData = new AuthorizeQueryBean.ResponseData();
+        JointLoginBean.AuthorizeQueryResponseData authorizeQueryResponseData = new JointLoginBean.AuthorizeQueryResponseData();
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "请检查报文格式是否正确", response);
         }
@@ -135,35 +135,25 @@ public class IntersAction extends BaseAction {
         }
         //TODO 联合登录触发账号服务
         JointLoginBean.AccountResponse accountResponse = doAccount(request);
-        if (accountResponse == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
-        }
         if (accountResponse.code != 200) {
-            return json(BaseResponseBean.CODE_FAILURE, "账号服务调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败", response);
         }
         //TODO 查询授权/签约详情
         CommonBean.findAuthorizeResponse authorizeResponse = doAuthorizeRes(request);
-        if (authorizeResponse == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "授权/签约查询接口调用失败", response);
-        }
         if (authorizeResponse.code != 200) {
-            return json(BaseResponseBean.CODE_FAILURE, "授权/签约查询接口调用失败", response);
+            return json(BaseResponseBean.CODE_FAILURE, "查询授权/签约接口请求失败,查询授权/签约详情失败", response);
         }
         //TODO 判断授权/签约状态
-
-        //TODO 返回参数
-        authorizeQueryResponseData.status = "";
-        authorizeQueryResponseData.url = "";
-        response.data = authorizeQueryResponseData;
-        if (authorizeQueryResponseData.status == "01") {
+        if (authorizeResponse.data.toString() == "未授权") {
+            //TODO 返回参数
+            authorizeQueryResponseData.status = "";
+            authorizeQueryResponseData.url = "";
+            response.data = authorizeQueryResponseData;
             String responseText = "未授权";
             return json(BaseResponseBean.CODE_FAILURE, responseText, response);
-        } else if (authorizeQueryResponseData.status == "02") {
-            String responseText = "已授权";
-            return json(BaseResponseBean.CODE_FAILURE, responseText, response);
-        } else {
-            return json(BaseResponseBean.CODE_FAILURE, "", response);
         }
+        String responseText = "已授权";
+        return json(BaseResponseBean.CODE_FAILURE, responseText, response);
     }
 
     /**
@@ -210,7 +200,7 @@ public class IntersAction extends BaseAction {
             jointLoginRequest.bank_address = insureRequest.channel_bank_address;
             jointLoginRequest.channel_order_code = "";
             //TODO  http 请求 投保服务
-            String insureRes = doInsuredPayYd(jointLoginRequest);
+            String insureRes = doInsuredPayTk(jointLoginRequest);
             InsureParamsBean.Response insureResponse = JsonKit.json2Bean(insureRes, InsureParamsBean.Response.class);
             if (insureResponse == null) {
                 return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
@@ -279,6 +269,19 @@ public class IntersAction extends BaseAction {
      */
     private JointLoginBean.AccountResponse doAccount(JointLoginBean.Requset request) {
         BaseResponseBean response = new BaseResponseBean();
+        JointLoginBean.AccountResponse accountResponse = new JointLoginBean.AccountResponse();
+        //TODO 先判断本地数据库里有没有此用户信息
+        StaffPerson staffPerson = new StaffPerson();
+        staffPerson.name = request.insured_name;
+        staffPerson.papers_code = request.insured_code;
+        staffPerson.phone = request.insured_phone;
+        StaffPerson staffPersonInfo = staffPersonDao.findStaffPersonInfoByCode(staffPerson);
+        if (staffPersonInfo != null) {
+            accountResponse.data.custId = staffPersonInfo.cust_id + "";
+            accountResponse.data.accountUuid = staffPersonInfo.account_uuid + "";
+            accountResponse.data.loginToken = staffPersonInfo.login_token;
+            return accountResponse;
+        }
         JointLoginBean.Requset jointLoginRequest = new JointLoginBean.Requset();
         jointLoginRequest.channel_code = request.channel_code;
         jointLoginRequest.insured_name = request.insured_name;
@@ -296,7 +299,18 @@ public class IntersAction extends BaseAction {
         jointLoginRequest.channel_order_code = request.channel_order_code;
         String interName = "账号服务";
         String result = commonAction.httpRequest(toJointLogin, JsonKit.bean2Json(jointLoginRequest), interName);
-        JointLoginBean.AccountResponse accountResponse = JsonKit.json2Bean(result, JointLoginBean.AccountResponse.class);
+        accountResponse = JsonKit.json2Bean(result, JointLoginBean.AccountResponse.class);
+        //TODO 获取数据成功,数据入库
+        long date = new Date().getTime();
+        staffPerson.cust_id = Long.valueOf(accountResponse.data.custId);
+        staffPerson.account_uuid = Long.valueOf(accountResponse.data.accountUuid);
+        staffPerson.login_token = accountResponse.data.loginToken;
+        staffPerson.name = request.insured_name;
+        staffPerson.papers_code = request.insured_code;
+        staffPerson.phone = request.insured_phone;
+        staffPerson.created_at = date;
+        staffPerson.updated_at = date;
+        long addRes = staffPersonDao.addStaffPerson(staffPerson);
         return accountResponse;
     }
 
@@ -308,7 +322,7 @@ public class IntersAction extends BaseAction {
      */
     private String doInsuredPayYd(JointLoginBean.Requset request) {
         String p_code = "90";
-        String insureResult =  doInsuredPay(request,p_code);
+        String insureResult = doInsuredPay(request, p_code);
         return insureResult;
     }
 
@@ -328,16 +342,17 @@ public class IntersAction extends BaseAction {
      * 投保服务(根据产品id区分不同公司产品)
      * todo 先判断当天有没有投过保，没有的话进行投保操作
      * todo 已经投过,返回投保结果和保单状态
+     *
      * @param request
      * @param p_code
      * @return
      */
-    private String doInsuredPay(JointLoginBean.Requset request,String p_code) {
+    private String doInsuredPay(JointLoginBean.Requset request, String p_code) {
         BaseResponseBean response = new BaseResponseBean();
         BaseResponseBean insuredCount = insuredCount(request);
-        if(insuredCount.code!=600){
+        if (insuredCount.code != 600) {
             //TODO 有投保记录
-            return  json(insuredCount);
+            return json(insuredCount);
         }
         WarrantyRecord warrantyRecord = new WarrantyRecord();
         //TODO 调用投保接口
@@ -402,7 +417,7 @@ public class IntersAction extends BaseAction {
             warrantyRecord.day_end = TimeKit.getDayEndTime();//获取当天结束时间戳(毫秒值)
             WarrantyRecord insureResult = warrantyRecordDao.findInsureResult(warrantyRecord);
             if (insureResult == null) {
-                return JsonKit.json2Bean(json(BaseResponseBean.CODE_FAILURE, "获取保单状态失败", response),BaseResponseBean.class);
+                return JsonKit.json2Bean(json(BaseResponseBean.CODE_FAILURE, "获取保单状态失败", response), BaseResponseBean.class);
             } else {
                 InsureResultBean insureResultBean = new InsureResultBean();
                 insureResultBean.id = insureResult.id;
@@ -413,10 +428,10 @@ public class IntersAction extends BaseAction {
                 insureResultBean.createdAt = insureResult.created_at;
                 insureResultBean.updatedAt = insureResult.updated_at;
                 response.data = insureResultBean;
-                return JsonKit.json2Bean(json(BaseResponseBean.CODE_SUCCESS, "获取保单状态成功", response),BaseResponseBean.class);
+                return JsonKit.json2Bean(json(BaseResponseBean.CODE_SUCCESS, "获取保单状态成功", response), BaseResponseBean.class);
             }
-        }else{
-            return JsonKit.json2Bean(json(BaseResponseBean.CODE_VERIFY_CODE, "没有投保记录", response),BaseResponseBean.class);
+        } else {
+            return JsonKit.json2Bean(json(BaseResponseBean.CODE_VERIFY_CODE, "没有投保记录", response), BaseResponseBean.class);
         }
     }
 
