@@ -38,26 +38,4 @@ public class CommonBean {
     public static class doWecahtContractResponse extends BaseResponseBean {
         public Object data;
     }
-
-    public static class findUserInfoRequset {
-        public String userId;
-        public String accountUuid;
-    }
-
-    public static class findUserInfoResponse extends BaseResponseBean {
-        public findUserInfoResponseData data;
-    }
-
-    public static class findUserInfoResponseData{
-        public long id;
-        public long custId;
-        public long accountUuid;
-        public String loginToken;
-        public String name;
-        public long papersType = 1;
-        public String papersCode;
-        public String phone;
-        public long createdAt;
-        public long updatedAt;
-    }
 }
