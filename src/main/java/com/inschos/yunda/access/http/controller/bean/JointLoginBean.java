@@ -37,8 +37,8 @@ public class JointLoginBean {
     }
 
     public static class AccountResponseData {
-        public long custId;
-        public long accountUuid;
+        public String custId;
+        public String accountUuid;
         public String loginToken;
     }
 

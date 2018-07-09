@@ -67,11 +67,22 @@ public class IntersAction extends BaseAction {
         if (accountResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败", response);
         }
-        //TODO 成功获取联合登录信息:token user_id accout_id
-        //TODO 查询授权/签约详情
+        //TODO 成功获取联合登录信息
+        String loginToken = accountResponse.data.loginToken;
+        String custId = accountResponse.data.custId;
+        String accountUuid = accountResponse.data.accountUuid;
+        //TODO 查询授权/签约详情(此接口还需判断用户是否有可用银行卡)
         CommonBean.findAuthorizeResponse authorizeResponse = doAuthorizeRes(request);
         if (authorizeResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, "查询授权/签约接口请求失败,查询授权/签约详情失败", response);
+        }
+        //TODO 判断授权情况,返回相应参数(URL+token)
+        if (authorizeResponse.data.toString() == "未授权") {
+            returnResponse.data.status = "";
+            returnResponse.data.content = "";
+            returnResponse.data.target_url = "";
+            returnResponse.data.local_url = "";
+            return JsonKit.bean2Json(returnResponse);
         }
         //TODO 联合登录表插入数据,先判断今天有没有插入,再插入登录记录.每天只有一个最早的记录(上工时间)
         long date = new Date().getTime();
@@ -86,17 +97,17 @@ public class IntersAction extends BaseAction {
         if (repeatRes == 0) {
             long login_id = jointLoginDao.addLoginRecord(jointLogin);
         }
-        //TODO 联合登录触发投保服务
-        String insureRes = doInsuredPay(request);
-        if (insureRes == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
-        }
-        InsureParamsBean.Response insureResponse = JsonKit.json2Bean(insureRes, InsureParamsBean.Response.class);
-        if (insureResponse == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
-        }
-        if (insureResponse.code != 200) {
-            return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
+        //TODO 联合登录触发投保服务(先走英大,再走泰康流程)
+        InsureParamsBean.Response insureResponse = new InsureParamsBean.Response();
+        String insureResYd = doInsuredPayYd(request);
+        insureResponse = JsonKit.json2Bean(insureResYd, InsureParamsBean.Response.class);
+        if (insureResponse == null || insureResponse.code != 200) {
+            //TODO 泰康流程
+            String insureResTk = doInsuredPayTk(request);
+            insureResponse = JsonKit.json2Bean(insureResTk, InsureParamsBean.Response.class);
+            if (insureResponse == null || insureResponse.code != 200) {
+                return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
+            }
         }
         response.data = insureResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, "投保成功", response);
@@ -199,10 +210,7 @@ public class IntersAction extends BaseAction {
             jointLoginRequest.bank_address = insureRequest.channel_bank_address;
             jointLoginRequest.channel_order_code = "";
             //TODO  http 请求 投保服务
-            String insureRes = doInsuredPay(jointLoginRequest);
-            if (insureRes == null) {
-                return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
-            }
+            String insureRes = doInsuredPayYd(jointLoginRequest);
             InsureParamsBean.Response insureResponse = JsonKit.json2Bean(insureRes, InsureParamsBean.Response.class);
             if (insureResponse == null) {
                 return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
@@ -293,38 +301,45 @@ public class IntersAction extends BaseAction {
     }
 
     /**
-     * 投保服务
-     * todo 先判断当天有没有投过保，没有的话进行投保操作(先走英大投保，再进行泰康投保 )
-     * todo 已经投过,返回投保结果和保单状态
+     * 英大投保服务
      *
+     * @param request
      * @return
      */
-    private String doInsuredPay(JointLoginBean.Requset request) {
+    private String doInsuredPayYd(JointLoginBean.Requset request) {
+        String p_code = "90";
+        String insureResult =  doInsuredPay(request,p_code);
+        return insureResult;
+    }
+
+    /**
+     * 泰康投保服务
+     *
+     * @param request
+     * @return
+     */
+    private String doInsuredPayTk(JointLoginBean.Requset request) {
+        String p_code = "91";
+        String insureResult = doInsuredPay(request, p_code);
+        return insureResult;
+    }
+
+    /**
+     * 投保服务(根据产品id区分不同公司产品)
+     * todo 先判断当天有没有投过保，没有的话进行投保操作
+     * todo 已经投过,返回投保结果和保单状态
+     * @param request
+     * @param p_code
+     * @return
+     */
+    private String doInsuredPay(JointLoginBean.Requset request,String p_code) {
         BaseResponseBean response = new BaseResponseBean();
-        //TODO 判断用户是否已经投保
-        WarrantyRecord warrantyRecord = new WarrantyRecord();
-        warrantyRecord.cust_id = doCustId(request);
-        long insuredCount = warrantyRecordDao.findInsureWarrantyRes(warrantyRecord);
-        if (insuredCount > 0) {
-            //TODO 获取保单状态
-            warrantyRecord.day_start = TimeKit.currentTimeMillis();//获取当前时间戳(毫秒值)
-            warrantyRecord.day_end = TimeKit.getDayEndTime();//获取当天结束时间戳(毫秒值)
-            WarrantyRecord insureResult = warrantyRecordDao.findInsureResult(warrantyRecord);
-            if (insureResult == null) {
-                return json(BaseResponseBean.CODE_SUCCESS, "获取保单状态失败", response);
-            } else {
-                InsureResultBean insureResultBean = new InsureResultBean();
-                insureResultBean.id = insureResult.id;
-                insureResultBean.custId = insureResult.cust_id;
-                insureResultBean.warrantyUuid = insureResult.warranty_uuid;
-                insureResultBean.warrantyStatus = insureResult.warranty_status;
-                insureResultBean.warrantyStatusText = insureResult.warranty_status_text;
-                insureResultBean.createdAt = insureResult.created_at;
-                insureResultBean.updatedAt = insureResult.updated_at;
-                response.data = insureResultBean;
-                return json(BaseResponseBean.CODE_SUCCESS, "获取保单状态成功", response);
-            }
+        BaseResponseBean insuredCount = insuredCount(request);
+        if(insuredCount.code!=600){
+            //TODO 有投保记录
+            return  json(insuredCount);
         }
+        WarrantyRecord warrantyRecord = new WarrantyRecord();
         //TODO 调用投保接口
         InsureParamsBean.Response insureResponse = doInsured(request);
         InsureParamsBean.ResponseData responseData = new InsureParamsBean.ResponseData();
@@ -368,6 +383,41 @@ public class IntersAction extends BaseAction {
         }
         String statusText = payRes.data.statusTxt;//支付返回文案
         return json(BaseResponseBean.CODE_SUCCESS, statusText, response);
+    }
+
+    /**
+     * 判断用户是否已经投保
+     *
+     * @param request
+     * @return
+     */
+    private BaseResponseBean insuredCount(JointLoginBean.Requset request) {
+        BaseResponseBean response = new BaseResponseBean();
+        WarrantyRecord warrantyRecord = new WarrantyRecord();
+        warrantyRecord.cust_id = doCustId(request);
+        long insuredCount = warrantyRecordDao.findInsureWarrantyRes(warrantyRecord);
+        if (insuredCount > 0) {
+            //TODO 获取保单状态
+            warrantyRecord.day_start = TimeKit.currentTimeMillis();//获取当前时间戳(毫秒值)
+            warrantyRecord.day_end = TimeKit.getDayEndTime();//获取当天结束时间戳(毫秒值)
+            WarrantyRecord insureResult = warrantyRecordDao.findInsureResult(warrantyRecord);
+            if (insureResult == null) {
+                return JsonKit.json2Bean(json(BaseResponseBean.CODE_FAILURE, "获取保单状态失败", response),BaseResponseBean.class);
+            } else {
+                InsureResultBean insureResultBean = new InsureResultBean();
+                insureResultBean.id = insureResult.id;
+                insureResultBean.custId = insureResult.cust_id;
+                insureResultBean.warrantyUuid = insureResult.warranty_uuid;
+                insureResultBean.warrantyStatus = insureResult.warranty_status;
+                insureResultBean.warrantyStatusText = insureResult.warranty_status_text;
+                insureResultBean.createdAt = insureResult.created_at;
+                insureResultBean.updatedAt = insureResult.updated_at;
+                response.data = insureResultBean;
+                return JsonKit.json2Bean(json(BaseResponseBean.CODE_SUCCESS, "获取保单状态成功", response),BaseResponseBean.class);
+            }
+        }else{
+            return JsonKit.json2Bean(json(BaseResponseBean.CODE_VERIFY_CODE, "没有投保记录", response),BaseResponseBean.class);
+        }
     }
 
     /**
@@ -518,14 +568,14 @@ public class IntersAction extends BaseAction {
             if (accountResponse.code != 200) {
                 return 0;
             }
-            staffPerson.cust_id = accountResponse.data.custId;
-            staffPerson.account_uuid = accountResponse.data.accountUuid;
+            staffPerson.cust_id = Long.valueOf(accountResponse.data.custId);
+            staffPerson.account_uuid = Long.valueOf(accountResponse.data.accountUuid);
             staffPerson.login_token = accountResponse.data.loginToken;
             staffPerson.created_at = date;
             staffPerson.updated_at = date;
             long addRes = staffPersonDao.addStaffPerson(staffPerson);
             if (addRes != 0) {
-                cust_id = accountResponse.data.custId;
+                cust_id = Long.valueOf(accountResponse.data.custId);
             } else {
                 return 0;
             }
