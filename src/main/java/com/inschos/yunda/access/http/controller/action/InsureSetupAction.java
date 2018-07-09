@@ -11,10 +11,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Calendar;
 import java.util.Date;
-
-import static com.inschos.yunda.access.http.controller.bean.IntersCommonUrlBean.toWechatContract;
 
 @Component
 public class InsureSetupAction extends BaseAction {
@@ -139,8 +136,8 @@ public class InsureSetupAction extends BaseAction {
         WarrantyRecord warrantyRecord = new WarrantyRecord();
         warrantyRecord.cust_id = Long.valueOf(actionBean.userId);
         //前一天的保单信息
-        warrantyRecord.day_start = TimeKit.getDayStartTime()-24*60*60*1000;
-        warrantyRecord.day_end = TimeKit.getDayEndTime()-24*60*60*1000;
+        warrantyRecord.day_start = TimeKit.getDayStartTime() - 24 * 60 * 60 * 1000;
+        warrantyRecord.day_end = TimeKit.getDayEndTime() - 24 * 60 * 60 * 1000;
         WarrantyRecord warrantyRecoedRes = warrantyRecordDao.findLastDayWarrantyRecord(warrantyRecord);
         if (warrantyRecoedRes == null || warrantyRecoedRes.warranty_uuid == null) {
             return json(BaseResponseBean.CODE_FAILURE, "您没有进行预投保，不能进行微信签约", response);

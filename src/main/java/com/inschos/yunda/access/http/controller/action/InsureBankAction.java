@@ -1,11 +1,13 @@
 package com.inschos.yunda.access.http.controller.action;
 
-import com.inschos.yunda.access.http.controller.bean.*;
+import com.inschos.yunda.access.http.controller.bean.ActionBean;
+import com.inschos.yunda.access.http.controller.bean.BaseResponseBean;
+import com.inschos.yunda.access.http.controller.bean.InsureBankBean;
+import com.inschos.yunda.access.http.controller.bean.InsureUserBean;
 import com.inschos.yunda.assist.kit.HttpClientKit;
 import com.inschos.yunda.assist.kit.JsonKit;
 import com.inschos.yunda.data.dao.BankVerifyDao;
 import com.inschos.yunda.data.dao.InsureSetupDao;
-import com.inschos.yunda.data.dao.StaffPersonDao;
 import com.inschos.yunda.model.BankVerify;
 import com.inschos.yunda.model.InsureSetup;
 import org.apache.log4j.Logger;
@@ -310,7 +312,7 @@ public class InsureBankAction extends BaseAction {
 
     /**
      * 校验银行卡短信验证码
-     *
+     * <p>
      * 新增银行验证码记录表,逻辑如下
      * 1.每次发送验证码之前查询是否已发过或者是还在有效期内 findBankVerifyRepeat
      * 2.验证码获取成功,添加记录,并返回给端上记录表id addBankVerify

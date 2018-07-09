@@ -1,18 +1,16 @@
 package com.inschos.yunda.access.http.controller.action;
 
-import com.inschos.yunda.access.http.controller.bean.*;
+import com.inschos.yunda.access.http.controller.bean.BaseResponseBean;
+import com.inschos.yunda.access.http.controller.bean.CommonBean;
 import com.inschos.yunda.assist.kit.HttpClientKit;
 import com.inschos.yunda.assist.kit.JsonKit;
 import com.inschos.yunda.data.dao.BankVerifyDao;
 import com.inschos.yunda.data.dao.StaffPersonDao;
-import com.inschos.yunda.model.BankVerify;
-import com.inschos.yunda.model.StaffPerson;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Date;
 
 import static com.inschos.yunda.access.http.controller.bean.IntersCommonUrlBean.*;
 

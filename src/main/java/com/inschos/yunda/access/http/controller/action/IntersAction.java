@@ -64,13 +64,13 @@ public class IntersAction extends BaseAction {
         JointLoginBean.Response returnResponse = new JointLoginBean.Response();
         //TODO 联合登录触发账号服务
         JointLoginBean.AccountResponse accountResponse = doAccount(request);
-        if(accountResponse.code!=200){
+        if (accountResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败", response);
         }
         //TODO 成功获取联合登录信息:token user_id accout_id
         //TODO 查询授权/签约详情
         CommonBean.findAuthorizeResponse authorizeResponse = doAuthorizeRes(request);
-        if(authorizeResponse.code!=200){
+        if (authorizeResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, "查询授权/签约接口请求失败,查询授权/签约详情失败", response);
         }
         //TODO 联合登录表插入数据,先判断今天有没有插入,再插入登录记录.每天只有一个最早的记录(上工时间)
