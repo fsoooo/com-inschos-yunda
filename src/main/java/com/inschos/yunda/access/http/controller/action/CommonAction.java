@@ -27,6 +27,7 @@ public class CommonAction extends BaseAction {
 
     /**
      * http请求公共函数
+     * TODO 接口返回的code,服务请求方自行判断
      *
      * @param url       请求地址
      * @param json      请求报文,格式是json
@@ -46,11 +47,10 @@ public class CommonAction extends BaseAction {
             if (!isJSONValid(result)) {
                 return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
             }
-            BaseResponseBean baseResponse = JsonKit.json2Bean(result, BaseResponseBean.class);
-            if (baseResponse.code != 200 || baseResponse.code == 500) {
-                return json(BaseResponseBean.CODE_FAILURE, interName + "接口服务请求失败", response);
-            }
-            response.data = baseResponse.data;
+            response = JsonKit.json2Bean(result, BaseResponseBean.class);
+//            if (response.code != 200 || response.code == 500) {
+//                return json(BaseResponseBean.CODE_FAILURE, interName + "接口服务请求失败", response);
+//            }
             return json(BaseResponseBean.CODE_SUCCESS, interName + "接口请求成功", response);
         } catch (IOException e) {
             return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);

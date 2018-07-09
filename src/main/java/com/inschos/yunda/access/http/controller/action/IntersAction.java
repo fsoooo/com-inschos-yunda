@@ -61,6 +61,18 @@ public class IntersAction extends BaseAction {
         if (request.insured_name == null || request.insured_code == null || request.insured_phone == null) {
             return json(BaseResponseBean.CODE_FAILURE, "姓名,证件号,手机号不能为空", response);
         }
+        JointLoginBean.Response returnResponse = new JointLoginBean.Response();
+        //TODO 联合登录触发账号服务
+        JointLoginBean.AccountResponse accountResponse = doAccount(request);
+        if(accountResponse.code!=200){
+            return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败", response);
+        }
+        //TODO 成功获取联合登录信息:token user_id accout_id
+        //TODO 查询授权/签约详情
+        CommonBean.findAuthorizeResponse authorizeResponse = doAuthorizeRes(request);
+        if(authorizeResponse.code!=200){
+            return json(BaseResponseBean.CODE_FAILURE, "查询授权/签约接口请求失败,查询授权/签约详情失败", response);
+        }
         //TODO 联合登录表插入数据,先判断今天有没有插入,再插入登录记录.每天只有一个最早的记录(上工时间)
         long date = new Date().getTime();
         JointLogin jointLogin = new JointLogin();
@@ -73,17 +85,6 @@ public class IntersAction extends BaseAction {
         long repeatRes = jointLoginDao.findLoginRecord(jointLogin);
         if (repeatRes == 0) {
             long login_id = jointLoginDao.addLoginRecord(jointLogin);
-        }
-        //TODO 联合登录触发账号服务
-        JointLoginBean.AccountResponse loginResponse = doAccount(request);
-        response.data = loginResponse.data;
-        //TODO 查询授权/签约详情
-        CommonBean.findAuthorizeResponse authorizeResponse = doAuthorizeRes(request);
-        if (authorizeResponse == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "授权/签约查询接口调用失败", response);
-        }
-        if (authorizeResponse.code != 200) {
-            return json(BaseResponseBean.CODE_FAILURE, "授权/签约查询接口调用失败", response);
         }
         //TODO 联合登录触发投保服务
         String insureRes = doInsuredPay(request);
@@ -250,6 +251,8 @@ public class IntersAction extends BaseAction {
      */
     private CommonBean.findAuthorizeResponse doAuthorizeRes(JointLoginBean.Requset request) {
         BaseResponseBean response = new BaseResponseBean();
+        //TODO 先判断本地库里有没有用户信息
+
         JointLoginBean.Requset jointLoginRequest = new JointLoginBean.Requset();
         jointLoginRequest.insured_name = request.insured_name;
         jointLoginRequest.insured_code = request.insured_code;
