@@ -15,7 +15,15 @@
         </where>
     </select>
 
-    <select id="findStaffPersonInfo" parameterType="StaffPerson" resultType="StaffPerson">
+    <select id="findStaffPersonInfoById" parameterType="StaffPerson" resultType="StaffPerson">
+        select `cust_id`,`account_uuid`,`name`,`papers_type`,`papers_code`,`phone`,`created_at`,`updated_at`
+        from staff_person
+        <where>
+            cust_id =#{cust_id} AND account_uuid =#{account_uuid}
+        </where>
+    </select>
+
+    <select id="findStaffPersonInfoByCode" parameterType="StaffPerson" resultType="StaffPerson">
         select `cust_id`,`account_uuid`,`name`,`papers_type`,`papers_code`,`phone`,`created_at`,`updated_at`
         from staff_person
         <where>

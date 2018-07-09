@@ -30,6 +30,12 @@ public class InsureSetupAction extends BaseAction {
     @Autowired
     private CommonAction commonAction;
 
+    @Autowired
+    private InsureUserAction insureUserAction;
+
+    @Autowired
+    private InsureBankAction insureBankAction;
+
     /**
      * 获取投保设置详情,第一次查询时，先插入投保设置记录
      *
@@ -144,10 +150,10 @@ public class InsureSetupAction extends BaseAction {
         doWecahtContractRequset.warrantyUuid = warrantyRecoedRes.warranty_uuid;
         doWecahtContractRequset.payNo = warrantyRecoedRes.pay_no;
         doWecahtContractRequset.clientIp = request.clientIp;
-        CommonBean.findUserInfoRequset userInfoRequset = new CommonBean.findUserInfoRequset();
-        userInfoRequset.userId = actionBean.userId;
-        userInfoRequset.accountUuid = actionBean.accountUuid;
-        CommonBean.findUserInfoResponse userInfoResponse = commonAction.findUserInfoById(userInfoRequset);
+        InsureUserBean.userInfoRequest userInfoRequest = new InsureUserBean.userInfoRequest();
+        userInfoRequest.custId = Long.valueOf(actionBean.userId);
+        userInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
+        InsureUserBean.userInfoResponse userInfoResponse = insureUserAction.findUserInfoById(userInfoRequest);
         doWecahtContractRequset.wechatAccount = userInfoResponse.data.phone;
         doWecahtContractRequset.insuredName = userInfoResponse.data.name;
         doWecahtContractRequset.insuredCode = userInfoResponse.data.papersCode;
@@ -165,11 +171,11 @@ public class InsureSetupAction extends BaseAction {
      */
     public String findWhetContractInfo(ActionBean actionBean) {
         BaseResponseBean response = new BaseResponseBean();
-        CommonBean.findUserInfoRequset findUserInfoRequset = new CommonBean.findUserInfoRequset();
-        findUserInfoRequset.userId = actionBean.userId;
-        findUserInfoRequset.accountUuid = actionBean.accountUuid;
-        CommonBean.findUserInfoResponse findUserInfoResponse = commonAction.findUserInfoById(findUserInfoRequset);
-        response.data = findUserInfoResponse.data;
+        InsureUserBean.userInfoRequest userInfoRequest = new InsureUserBean.userInfoRequest();
+        userInfoRequest.custId = Long.valueOf(actionBean.userId);
+        userInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
+        InsureUserBean.userInfoResponse userInfoResponse = insureUserAction.findUserInfoById(userInfoRequest);
+        response.data = userInfoResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, "获取微信免密授权书详情成功", response);
     }
 
@@ -181,11 +187,11 @@ public class InsureSetupAction extends BaseAction {
      */
     public String findBankAuthorizeInfo(ActionBean actionBean) {
         BaseResponseBean response = new BaseResponseBean();
-        CommonBean.findUserInfoRequset findUserInfoRequset = new CommonBean.findUserInfoRequset();
-        findUserInfoRequset.userId = actionBean.userId;
-        findUserInfoRequset.accountUuid = actionBean.accountUuid;
-        CommonBean.findUserInfoResponse findUserInfoResponse = commonAction.findUserInfoById(findUserInfoRequset);
-        response.data = findUserInfoResponse.data;
+        InsureUserBean.userInfoRequest userInfoRequest = new InsureUserBean.userInfoRequest();
+        userInfoRequest.custId = Long.valueOf(actionBean.userId);
+        userInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
+        InsureUserBean.userInfoResponse userInfoResponse = insureUserAction.findUserInfoById(userInfoRequest);
+        response.data = userInfoResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, "获取银行卡转账授权书详情成功", response);
     }
 
@@ -212,7 +218,7 @@ public class InsureSetupAction extends BaseAction {
             bankVerifyIdRequest.cust_id = Long.valueOf(actionBean.userId);
             bankVerifyIdRequest.bank_code = request.bankCode;
             bankVerifyIdRequest.bank_phone = request.phone;
-            request.verifyId = commonAction.findBankVerifyId(bankVerifyIdRequest);
+            request.verifyId = insureBankAction.findBankVerifyId(bankVerifyIdRequest);
         }
         doBankAuthorizeRequset.requestId = request.verifyId;
         doBankAuthorizeRequset.vdCode = request.verifyCode;
@@ -220,7 +226,7 @@ public class InsureSetupAction extends BaseAction {
         InsureBankBean.bankRequest verifyBankSmsRequest = new InsureBankBean.bankRequest();
         verifyBankSmsRequest.verifyId = request.verifyId;
         verifyBankSmsRequest.verifyCode = request.verifyCode;
-        InsureBankBean.verifyBankSmsResponse verifyBankSmsResponse = commonAction.verifyBankSms(verifyBankSmsRequest);
+        InsureBankBean.verifyBankSmsResponse verifyBankSmsResponse = insureBankAction.verifyBankSms(verifyBankSmsRequest);
         if (!verifyBankSmsResponse.data.verifyStatus) {
             return json(BaseResponseBean.CODE_FAILURE, "短信验证码校验失败", response);
         }

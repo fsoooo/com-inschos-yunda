@@ -1,11 +1,12 @@
 package com.inschos.yunda.access.http.controller.action;
 
-import com.inschos.yunda.access.http.controller.bean.ActionBean;
-import com.inschos.yunda.access.http.controller.bean.BaseResponseBean;
-import com.inschos.yunda.access.http.controller.bean.InsureBankBean;
+import com.inschos.yunda.access.http.controller.bean.*;
 import com.inschos.yunda.assist.kit.HttpClientKit;
 import com.inschos.yunda.assist.kit.JsonKit;
+import com.inschos.yunda.data.dao.BankVerifyDao;
 import com.inschos.yunda.data.dao.InsureSetupDao;
+import com.inschos.yunda.data.dao.StaffPersonDao;
+import com.inschos.yunda.model.BankVerify;
 import com.inschos.yunda.model.InsureSetup;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +23,16 @@ public class InsureBankAction extends BaseAction {
     private static final Logger logger = Logger.getLogger(InsureBankAction.class);
 
     @Autowired
+    private InsureSetupDao insureSetupDao;
+
+    @Autowired
+    private BankVerifyDao bankVerifyDao;
+
+    @Autowired
     private CommonAction commonAction;
 
     @Autowired
-    private InsureSetupDao insureSetupDao;
+    private InsureUserAction insureUserAction;
 
     /**
      * 添加银行卡,要做英大短信验证
@@ -52,12 +59,12 @@ public class InsureBankAction extends BaseAction {
         bankVerifyIdRequest.cust_id = Long.valueOf(actionBean.userId);
         bankVerifyIdRequest.bank_code = request.bankCode;
         bankVerifyIdRequest.bank_phone = request.phone;
-        String verifyId = commonAction.findBankVerifyId(bankVerifyIdRequest);
+        String verifyId = findBankVerifyId(bankVerifyIdRequest);
         //检验短信验证码
         InsureBankBean.bankRequest verifyBankSmsRequest = new InsureBankBean.bankRequest();
         verifyBankSmsRequest.verifyId = verifyId;
         verifyBankSmsRequest.verifyCode = request.verifyCode;
-        InsureBankBean.verifyBankSmsResponse verifyBankSmsResponse = commonAction.verifyBankSms(verifyBankSmsRequest);
+        InsureBankBean.verifyBankSmsResponse verifyBankSmsResponse = verifyBankSms(verifyBankSmsRequest);
         if (!verifyBankSmsResponse.data.verifyStatus) {
             return json(BaseResponseBean.CODE_FAILURE, "短信验证码校验失败", response);
         }
@@ -192,12 +199,12 @@ public class InsureBankAction extends BaseAction {
             bankVerifyIdRequest.cust_id = Long.valueOf(actionBean.userId);
             bankVerifyIdRequest.bank_code = request.bankCode;
             bankVerifyIdRequest.bank_phone = request.phone;
-            String verifyId = commonAction.findBankVerifyId(bankVerifyIdRequest);
+            String verifyId = findBankVerifyId(bankVerifyIdRequest);
             //检验短信验证码
             InsureBankBean.bankRequest verifyBankSmsRequest = new InsureBankBean.bankRequest();
             verifyBankSmsRequest.verifyId = verifyId;
             verifyBankSmsRequest.verifyCode = request.verifyCode;
-            InsureBankBean.verifyBankSmsResponse verifyBankSmsResponse = commonAction.verifyBankSms(verifyBankSmsRequest);
+            InsureBankBean.verifyBankSmsResponse verifyBankSmsResponse = verifyBankSms(verifyBankSmsRequest);
             if (!verifyBankSmsResponse.data.verifyStatus) {
                 return json(BaseResponseBean.CODE_FAILURE, "短信验证码校验失败", response);
             }
@@ -215,6 +222,129 @@ public class InsureBankAction extends BaseAction {
         }
         response.data = bankStatusResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
+    }
+
+    /**
+     * 获取银行卡绑定验证码
+     * 英大接口返回结果的同时会返回一个验证参数,返回给端上同时存在数据库里
+     * 是否获取短信验证码,根据获取验证码的时间来判断,有时间限制,过期失效:verify_time
+     * 获取短信验证码必要参数校验:银行卡号和绑定手机号
+     *
+     * @param actionBean
+     * @return
+     */
+    public String findBankSms(ActionBean actionBean) {
+        InsureBankBean.bankRequest request = JsonKit.json2Bean(actionBean.body, InsureBankBean.bankRequest.class);
+        BaseResponseBean response = new BaseResponseBean();
+        if (request == null) {
+            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
+        }
+        if (request.phone == null || request.bankCode == null) {
+            return json(BaseResponseBean.CODE_FAILURE, "银行卡号和手机号不能为空", response);
+        }
+        InsureBankBean.bankSmsRequest bankSmsRequest = new InsureBankBean.bankSmsRequest();
+        InsureUserBean.userInfoRequest userInfoRequest = new InsureUserBean.userInfoRequest();
+        userInfoRequest.custId = Long.valueOf(actionBean.userId);
+        userInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
+        InsureUserBean.userInfoResponse userInfoResponse = insureUserAction.findUserInfoById(userInfoRequest);
+        bankSmsRequest.phone = request.phone;
+        bankSmsRequest.bankCode = request.bankCode;
+        bankSmsRequest.name = userInfoResponse.data.name;
+        bankSmsRequest.idCard = userInfoResponse.data.papersCode;
+        //判断是否已经发过验证码，避免重复发送
+        BankVerify bankVerify = new BankVerify();
+        long date = new Date().getTime();
+        bankVerify.cust_id = Long.valueOf(actionBean.userId);
+        bankVerify.bank_code = request.bankCode;
+        bankVerify.bank_phone = request.bankCode;
+        BankVerify bankVerifyRepeat = bankVerifyDao.findBankVerify(bankVerify);
+        if (bankVerifyRepeat != null) {
+            //判断验证码是否已经过期,过期时间5分钟(暂定五分钟)
+            if (bankVerifyRepeat.verify_time + 60 * 5 * 1000 > date) {
+                return json(BaseResponseBean.CODE_FAILURE, "您已获取验证码成功,请稍后重试", response);
+            }
+        }
+        String interName = "获取银行卡绑定验证码";
+        String result = commonAction.httpRequest(toBankSms, JsonKit.bean2Json(bankSmsRequest), interName);
+        InsureBankBean.bankSmsResponse bankSmsResponse = JsonKit.json2Bean(result, InsureBankBean.bankSmsResponse.class);
+        //数据库添加记录
+        bankVerify.verify_id = bankSmsResponse.data.requestId;
+        bankVerify.verify_code = "";
+        bankVerify.verify_time = date;
+        bankVerify.verify_status = "1";//验证码验证状态：默认1未验证/2验证成功
+        bankVerify.created_at = date;
+        bankVerify.updated_at = date;
+        long addBankVerifyRes = bankVerifyDao.addBankVerify(bankVerify);
+        response.data = bankSmsResponse.data;
+        return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
+    }
+
+    /**
+     * 获取verifyId
+     *
+     * @param request
+     * @return
+     */
+    public String findBankVerifyId(InsureBankBean.bankVerifyIdRequest request) {
+        if (request == null) {
+            return "";
+        }
+        if (request.cust_id == 0 || request.bank_code == null || request.bank_phone == null) {
+            return "";
+        }
+        long date = new Date().getTime();
+        BankVerify bankVerifyId = new BankVerify();
+        bankVerifyId.cust_id = request.cust_id;
+        bankVerifyId.bank_code = request.bank_code;
+        bankVerifyId.bank_phone = request.bank_phone;
+        bankVerifyId.verify_status = "1";
+        bankVerifyId.verify_time = date - 60 * 5 * 100;
+        BankVerify bankVerify = bankVerifyDao.findBankVerifyId(bankVerifyId);
+        if (bankVerify == null) {
+            return "";
+        } else {
+            String verifyId = bankVerify.verify_id;
+            return verifyId;
+        }
+    }
+
+    /**
+     * 校验银行卡短信验证码
+     *
+     * 新增银行验证码记录表,逻辑如下
+     * 1.每次发送验证码之前查询是否已发过或者是还在有效期内 findBankVerifyRepeat
+     * 2.验证码获取成功,添加记录,并返回给端上记录表id addBankVerify
+     * 3.校验验证码需要查询记录表获取verifyId findBankVerifyid
+     * 4.验证码校验成功,更新记录表 updateBankVerify
+     *
+     * @param request
+     * @return String
+     */
+    public InsureBankBean.verifyBankSmsResponse verifyBankSms(InsureBankBean.bankRequest request) {
+        BaseResponseBean response = new BaseResponseBean();
+        InsureBankBean.verifyBankSmsResponse verifyResponse = new InsureBankBean.verifyBankSmsResponse();
+        String interName = "校验银行卡短信验证码";
+        InsureBankBean.verifyBankSmsRequest verifyBankSmsRequest = new InsureBankBean.verifyBankSmsRequest();
+        verifyBankSmsRequest.requestId = request.verifyId;
+        verifyBankSmsRequest.vdCode = request.verifyCode;
+        BankVerify bankVerify = new BankVerify();
+        bankVerify.verify_id = request.verifyId;
+        bankVerify.verify_code = request.verifyCode;
+        BankVerify bankVerifyRes = bankVerifyDao.findBankVerify(bankVerify);
+        if (bankVerifyRes != null) {
+            //避免重复请求接口
+            if (bankVerifyRes.verify_status == "2") {
+                verifyResponse.data.verifyStatus = true;
+                return verifyResponse;
+            }
+        }
+        String result = commonAction.httpRequest(toVerifyBankSms, JsonKit.bean2Json(verifyBankSmsRequest), interName);
+        InsureBankBean.verifyBankSmsResponse verifyBankSmsResponse = JsonKit.json2Bean(result, InsureBankBean.verifyBankSmsResponse.class);
+        long date = new Date().getTime();
+        bankVerify.verify_status = "2";
+        bankVerify.updated_at = date;
+        long updateRes = bankVerifyDao.updateBankVerify(bankVerify);
+        return verifyResponse;
     }
 }
 

@@ -1,7 +1,9 @@
 package com.inschos.yunda.access.http.controller.request;
 
-import com.inschos.yunda.access.http.controller.bean.*;
-import com.inschos.yunda.access.http.controller.action.*;
+import com.inschos.yunda.access.http.controller.action.CommonAction;
+import com.inschos.yunda.access.http.controller.action.InsureBankAction;
+import com.inschos.yunda.access.http.controller.action.InsureUserAction;
+import com.inschos.yunda.access.http.controller.bean.ActionBean;
 import com.inschos.yunda.annotation.GetActionBeanAnnotation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,10 @@ public class CommonController {
     private static final Logger logger = Logger.getLogger(CommonController.class);
     @Autowired
     private CommonAction commonAction;
+    @Autowired
+    private InsureUserAction insureUserAction;
+    @Autowired
+    private InsureBankAction insureBankAction;
 
     /**
      * 通过token获取用户信息
@@ -33,7 +39,7 @@ public class CommonController {
     @RequestMapping("/findUserInfo/**")
     @ResponseBody
     public String findUserInfo(ActionBean actionBean) {
-        return commonAction.findUserInfo(actionBean);
+        return insureUserAction.findUserInfoByToken(actionBean);
     }
 
     /**
@@ -46,7 +52,7 @@ public class CommonController {
     @RequestMapping("/findBankSms/**")
     @ResponseBody
     public String findBankSms(ActionBean actionBean) {
-        return commonAction.findBankSms(actionBean);
+        return insureBankAction.findBankSms(actionBean);
     }
 
 

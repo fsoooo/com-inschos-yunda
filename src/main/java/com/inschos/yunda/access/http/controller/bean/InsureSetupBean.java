@@ -28,6 +28,9 @@ public class InsureSetupBean {
     }
 
     public static class accountInfoRequest {
+        public String name;
+        public String idCard;
+        public String phone;
         public long custId;//用户id
         public long accountUuid;//用户account_uuid
     }
@@ -37,11 +40,12 @@ public class InsureSetupBean {
     }
 
     public static class accountInfoResponseData {
+        public long custId;//用户id
+        public long accountUuid;//用户account_uuid
         public String name;
         public String idCard;
         public String phone;
         public String loginToken;
-
     }
 
     public static class doBankAuthorizeRequest {
