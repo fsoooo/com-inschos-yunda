@@ -99,4 +99,17 @@
 		<!-- 对切入点和事务的通知，进行适配 -->
 		<aop:advisor advice-ref="txAdvice" pointcut-ref="services" />
 	</aop:config>
+
+	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+	<bean id="testAopConfig" class="com.inschos.yunda.aop.TestAopConfig" />
+	<!-- 定义AOP配置 -->
+	<aop:config>
+		<!-- 扫描 注解的 数据源 -->
+		<aop:aspect id="c" ref="testAopConfig">
+			<!-- 定义一个切入点 -->
+			<aop:pointcut id="tx" expression="execution(* com.inschos.yunda.access.http.controller.request.TestController*.*(..))"/>
+			<!-- 对切入点和事务的通知，进行适配 (目前只有before通知类型)-->
+			<aop:before pointcut-ref="tx" method="before"/>
+		</aop:aspect>
+	</aop:config>
 </beans>
