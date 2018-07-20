@@ -1,8 +1,6 @@
 package com.inschos.yunda.access.http.controller.request;
 
-import com.inschos.yunda.annotation.TestAnnotationAfter;
-import com.inschos.yunda.annotation.TestAnnotationAround;
-import com.inschos.yunda.annotation.TestAnnotationBefore;
+import com.inschos.yunda.annotation.*;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,6 +40,20 @@ public class TestController {
     @RequestMapping("/aop/around/**")
     @ResponseBody
     public String around(HttpServletRequest request) {
+        return "add...........";
+    }
+
+    @TestAnnotationAfterThrowing
+    @RequestMapping("/aop/throw/**")
+    @ResponseBody
+    public String afterThrowing(HttpServletRequest request) {
+        return "add...........";
+    }
+
+    @TestAnnotationAfterReturning
+    @RequestMapping("/aop/return/**")
+    @ResponseBody
+    public String afterReturning(HttpServletRequest request) {
         return "add...........";
     }
 
