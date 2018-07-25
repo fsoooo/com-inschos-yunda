@@ -239,7 +239,12 @@ public class IntersAction extends BaseAction {
         callbackYundaRequest.companyName = request.companyName;
         String interName = "投保信息推送韵达";
         String result = commonAction.httpRequest(toCallBackYunda, JsonKit.bean2Json(callbackYundaRequest), interName);
-        return result;
+        CallbackYundaBean.ResponseData responseData = JsonKit.json2Bean(result,CallbackYundaBean.ResponseData.class);
+        if(responseData.result==true){
+            return json(BaseResponseBean.CODE_SUCCESS, "保险数据推送韵达成功", response);
+        }else{
+            return json(BaseResponseBean.CODE_FAILURE, "保险数据推送韵达失败", response);
+        }
     }
 
     /**

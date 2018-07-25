@@ -9,8 +9,6 @@ public class IntersCommonUrlBean {
 
     private static final String SERVER_HOST_INSURE = "http://122.14.202.146:9200/trading";
 
-    private static final String SERVER_HOST_YUNDA = "http://yunda.com/test";
-
     private static final String SERVER_HOST_TEST = "https://api-yunda.inschos.com/webapi";
 
     public static String getServerHostAccount() {
@@ -19,10 +17,6 @@ public class IntersCommonUrlBean {
 
     public static String getServerHostInsure() {
         return SERVER_HOST_INSURE;
-    }
-
-    public static String getServerHostCallBackYunda() {
-        return SERVER_HOST_YUNDA;
     }
 
     public static String getServerHostTest() {
@@ -76,6 +70,6 @@ public class IntersCommonUrlBean {
     //5.交易服务-理赔服务接口(英大/泰康)
 
     //6.投保推送韵达
-    public static final String toCallBackYunda = IntersCommonUrlBean.getServerHostCallBackYunda() + "/";
+    public static final String toCallBackYunda = "https://apptest.yundasys.com/ywy-insurance/interface/ywy/insurance/pushinsuranceinfo.do";
 
 }
