@@ -1,5 +1,7 @@
 package com.inschos.yunda.access.http.controller.bean;
 
+import java.util.List;
+
 public class InsureBankBean {
     public static class bankRequest {
         public long bankId;
@@ -15,39 +17,18 @@ public class InsureBankBean {
     }
 
     public static class addBankRequest {
-        public long custId;//用户id
-        public long accountUuid;//用户account_uuid
-        public String name;//用户姓名
-        public String bankCode;//用户银行卡号
-        public String phone;//用户手机号
-    }
-
-    public static class addBankResponse extends BaseResponseBean {
-        public addBankResponseData data;
-    }
-
-    public static class addBankResponseData {
-
-    }
-
-    public static class bankListRequest {
-        public long custId;//用户id
-        public long accountUuid;//用户account_uuid
+        public String bankName;//银行卡名称
+        public String bankCode;//银行卡号码
+        public String bankPhone;//银行卡绑定手机
+        public String bankCity;//银行卡开户城市
     }
 
     public static class bankListResponse extends BaseResponseBean {
-        public bankListResponseData data;
-    }
-
-    public static class bankListResponseData {
-        public long bankCount;
-
+        public List<bankInfoResponseData> data;
     }
 
     public static class bankInfoRequest {
-        public long bankId;
-        public long custId;//用户id
-        public long accountUuid;//用户account_uuid
+        public long id;
     }
 
     public static class bankInfoResponse extends BaseResponseBean {
@@ -55,28 +36,33 @@ public class InsureBankBean {
     }
 
     public static class bankInfoResponseData {
-        public long bankId;
+        public long id;
+        public String bankName;//银行卡名称
+        public String bankCode;//银行卡号码
+        public String bankPhone;//银行卡绑定手机
+        public String bankCity;//银行卡开户城市
+        public String bankType;//银行卡类型 1储蓄卡，2借记卡
+        public String status;//审核状态(授权状态):是否通过审核检验，1未审核,2已审核,3审核失败
     }
 
     public static class updateBankStatusRequest {
-        public long custId;//用户id
-        public long accountUuid;//用户account_uuid
-        public String name;//用户姓名
-        public String bankCode;//用户银行卡号
-        public String phone;//用户手机号
-        public long bankUseStatus;//银行卡使用状态
-        public long bankAuthorizeStatus;//银行卡授权状态
+        public long id;//银行卡id
+        public String bankName;//银行卡名称
+        public String bankCode;//银行卡号码
+        public String bankPhone;//银行卡绑定手机
+        public String bankCity;//银行卡开户城市
     }
 
-    public static class updateBankStatusResponse extends BaseResponseBean {
-        public Object data;
+    public static class deleteBankStatusRequest {
+        public long id;//银行卡id
     }
 
     public static class bankSmsRequest {
-        public String name;//用户姓名
-        public String phone;//银行卡绑定手机
-        public String idCard;//用户身份证号
+        public String origin = "YUNDA";//标识
+        public String Name;//用户姓名
         public String bankCode;//用户银行卡号
+        public String bankPhone;//银行卡绑定手机
+        public String idCard;//用户身份证号
     }
 
     public static class bankSmsResponse extends BaseResponseBean {
@@ -94,6 +80,11 @@ public class InsureBankBean {
     }
 
     public static class verifyBankSmsRequest {
+        public String origin = "YUNDA";//标识
+        public String Name;//用户姓名
+        public String bankCode;//用户银行卡号
+        public String bankPhone;//银行卡绑定手机
+        public String idCard;//用户身份证号
         public String requestId;//验证id
         public String vdCode;//验证码
     }
@@ -105,4 +96,5 @@ public class InsureBankBean {
     public static class verifyBankSmsResponseData {
         public boolean verifyStatus;
     }
+
 }

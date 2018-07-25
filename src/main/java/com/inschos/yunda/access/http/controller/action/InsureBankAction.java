@@ -1,5 +1,6 @@
 package com.inschos.yunda.access.http.controller.action;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.inschos.yunda.access.http.controller.bean.ActionBean;
 import com.inschos.yunda.access.http.controller.bean.BaseResponseBean;
 import com.inschos.yunda.access.http.controller.bean.InsureBankBean;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 import static com.inschos.yunda.access.http.controller.bean.IntersCommonUrlBean.*;
 
@@ -51,11 +53,10 @@ public class InsureBankAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, "必填参数为空", response);
         }
         InsureBankBean.addBankRequest addBankRequest = new InsureBankBean.addBankRequest();
-        addBankRequest.custId = Long.valueOf(actionBean.userId);
-        addBankRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
-        addBankRequest.name = request.name;
+        addBankRequest.bankName = request.bankName;
         addBankRequest.bankCode = request.bankCode;
-        addBankRequest.phone = request.phone;
+        addBankRequest.bankPhone = request.phone;
+        addBankRequest.bankCity = request.bankCity;
         //获取verifyId
         InsureBankBean.bankVerifyIdRequest bankVerifyIdRequest = new InsureBankBean.bankVerifyIdRequest();
         bankVerifyIdRequest.cust_id = Long.valueOf(actionBean.userId);
@@ -72,24 +73,22 @@ public class InsureBankAction extends BaseAction {
         }
         String interName = "添加银行卡";
         String result = commonAction.httpRequest(toAddBank, JsonKit.bean2Json(addBankRequest), interName);
-        InsureBankBean.addBankResponse addBankResponse = JsonKit.json2Bean(result, InsureBankBean.addBankResponse.class);
+       BaseResponseBean addBankResponse = JsonKit.json2Bean(result, BaseResponseBean.class);
         response.data = addBankResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
     }
 
     /**
-     * 获取银行卡列表,暂不考虑分页和状态
+     * 获取银行卡列表,暂不考虑分页和状态(token)
+     * TODO 获取token
      *
      * @return
      * @params actionBean
      */
     public String findBankList(ActionBean actionBean) {
         BaseResponseBean response = new BaseResponseBean();
-        InsureBankBean.bankListRequest bankListRequest = new InsureBankBean.bankListRequest();
-        bankListRequest.custId = Long.valueOf(actionBean.userId);
-        bankListRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
         String interName = "获取银行卡列表";
-        String result = commonAction.httpRequest(toBankList, JsonKit.bean2Json(bankListRequest), interName);
+        String result = commonAction.httpRequest(toBankList, "", interName);
         InsureBankBean.bankListResponse bankListResponse = JsonKit.json2Bean(result, InsureBankBean.bankListResponse.class);
         response.data = bankListResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
@@ -108,9 +107,7 @@ public class InsureBankAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
         InsureBankBean.bankInfoRequest bankInfoRequest = new InsureBankBean.bankInfoRequest();
-        bankInfoRequest.bankId = request.bankId;
-        bankInfoRequest.custId = Long.valueOf(actionBean.userId);
-        bankInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
+        bankInfoRequest.id = request.bankId;
         String interName = "获取银行卡详情";
         String result = commonAction.httpRequest(toBankInfo, JsonKit.bean2Json(bankInfoRequest), interName);
         InsureBankBean.bankInfoResponse bankInfoResponse = JsonKit.json2Bean(result, InsureBankBean.bankInfoResponse.class);
@@ -131,11 +128,8 @@ public class InsureBankAction extends BaseAction {
         if (actionBean.accountUuid == null || actionBean.userId == null) {
             return -1;
         }
-        InsureBankBean.bankListRequest bankListRequest = new InsureBankBean.bankListRequest();
-        bankListRequest.custId = Long.valueOf(actionBean.userId);
-        bankListRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
         try {
-            String bankListRes = HttpClientKit.post(toBankList, JsonKit.bean2Json(bankListRequest));
+            String bankListRes = HttpClientKit.post(toBankList,"");
             if (bankListRes == null) {
                 return -1;
             }
@@ -143,7 +137,10 @@ public class InsureBankAction extends BaseAction {
             if (bankListResponse.code == 500) {
                 return -1;
             }
-            long bankCount = bankListResponse.data.bankCount;
+            Object bankList = bankListResponse.data;
+            List<InsureBankBean.bankInfoResponseData> bankLists = JsonKit.json2Bean(JsonKit.bean2Json(bankList),new TypeReference<List<InsureBankBean.bankInfoResponseData>>() {
+            });
+            long bankCount = bankLists.size();
             return bankCount;
         } catch (IOException e) {
             return -1;
@@ -187,15 +184,13 @@ public class InsureBankAction extends BaseAction {
             }
         }
         InsureBankBean.updateBankStatusRequest updateBankStatusRequest = new InsureBankBean.updateBankStatusRequest();
-        updateBankStatusRequest.custId = Long.valueOf(actionBean.userId);
-        updateBankStatusRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
-        updateBankStatusRequest.name = request.name;
+        updateBankStatusRequest.id = request.bankId;
         updateBankStatusRequest.bankCode = request.bankCode;
-        updateBankStatusRequest.phone = request.phone;
-        updateBankStatusRequest.bankUseStatus = request.bankUseStatus;
-        updateBankStatusRequest.bankAuthorizeStatus = request.bankAuthorizeStatus;
+        updateBankStatusRequest.bankName = request.bankName;
+        updateBankStatusRequest.bankPhone = request.phone;
+        updateBankStatusRequest.bankCity = request.bankCity;
         //当更换默认支付银行卡时,要做银行卡短信检验
-        if (updateBankStatusRequest.bankUseStatus == 2) {
+        if (request.bankUseStatus == 2) {
             //获取verifyId
             InsureBankBean.bankVerifyIdRequest bankVerifyIdRequest = new InsureBankBean.bankVerifyIdRequest();
             bankVerifyIdRequest.cust_id = Long.valueOf(actionBean.userId);
@@ -213,9 +208,9 @@ public class InsureBankAction extends BaseAction {
         }
         String interName = "更新银行卡状态";
         String result = commonAction.httpRequest(toUpdateBank, JsonKit.bean2Json(updateBankStatusRequest), interName);
-        InsureBankBean.updateBankStatusResponse bankStatusResponse = JsonKit.json2Bean(result, InsureBankBean.updateBankStatusResponse.class);
+        BaseResponseBean bankStatusResponse = JsonKit.json2Bean(result, BaseResponseBean.class);
         //根据接口返回状态,修改本地库的银行卡授权状态
-        if (updateBankStatusRequest.bankUseStatus == 2) {
+        if (request.bankUseStatus == 2) {
             insureSetup.cust_id = Long.valueOf(actionBean.userId);
             insureSetup.authorize_status = 2;//授权
             insureSetup.authorize_bank = updateBankStatusRequest.bankCode;
@@ -249,9 +244,9 @@ public class InsureBankAction extends BaseAction {
         userInfoRequest.custId = Long.valueOf(actionBean.userId);
         userInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
         InsureUserBean.userInfoResponse userInfoResponse = insureUserAction.findUserInfoById(userInfoRequest);
-        bankSmsRequest.phone = request.phone;
+        bankSmsRequest.bankPhone = request.phone;
         bankSmsRequest.bankCode = request.bankCode;
-        bankSmsRequest.name = userInfoResponse.data.name;
+        bankSmsRequest.Name = userInfoResponse.data.name;
         bankSmsRequest.idCard = userInfoResponse.data.papersCode;
         //判断是否已经发过验证码，避免重复发送
         BankVerify bankVerify = new BankVerify();
