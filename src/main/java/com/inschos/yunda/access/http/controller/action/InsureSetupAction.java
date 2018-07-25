@@ -114,8 +114,7 @@ public class InsureSetupAction extends BaseAction {
     public String findAuthorizeStatus(ActionBean actionBean) {
         BaseResponseBean response = new BaseResponseBean();
         CommonBean.findAuthorizeRequset authorizeRequset = new CommonBean.findAuthorizeRequset();
-        authorizeRequset.userId = actionBean.userId;
-        authorizeRequset.accountUuid = actionBean.accountUuid;
+        authorizeRequset.token = actionBean.token;
         CommonBean.findAuthorizeResponse authorizeResponse = commonAction.findWechatContractStatus(authorizeRequset);
         response.data = authorizeResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, "获取授权/签约状态成功", response);
@@ -148,8 +147,7 @@ public class InsureSetupAction extends BaseAction {
         doWecahtContractRequset.payNo = warrantyRecoedRes.pay_no;
         doWecahtContractRequset.clientIp = request.clientIp;
         InsureUserBean.userInfoRequest userInfoRequest = new InsureUserBean.userInfoRequest();
-        userInfoRequest.custId = Long.valueOf(actionBean.userId);
-        userInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
+        userInfoRequest.token = actionBean.token;
         InsureUserBean.userInfoResponse userInfoResponse = insureUserAction.findUserInfoById(userInfoRequest);
         doWecahtContractRequset.wechatAccount = userInfoResponse.data.phone;
         doWecahtContractRequset.insuredName = userInfoResponse.data.name;
@@ -169,8 +167,7 @@ public class InsureSetupAction extends BaseAction {
     public String findWhetContractInfo(ActionBean actionBean) {
         BaseResponseBean response = new BaseResponseBean();
         InsureUserBean.userInfoRequest userInfoRequest = new InsureUserBean.userInfoRequest();
-        userInfoRequest.custId = Long.valueOf(actionBean.userId);
-        userInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
+        userInfoRequest.token = actionBean.token;
         InsureUserBean.userInfoResponse userInfoResponse = insureUserAction.findUserInfoById(userInfoRequest);
         response.data = userInfoResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, "获取微信免密授权书详情成功", response);
@@ -185,8 +182,7 @@ public class InsureSetupAction extends BaseAction {
     public String findBankAuthorizeInfo(ActionBean actionBean) {
         BaseResponseBean response = new BaseResponseBean();
         InsureUserBean.userInfoRequest userInfoRequest = new InsureUserBean.userInfoRequest();
-        userInfoRequest.custId = Long.valueOf(actionBean.userId);
-        userInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
+        userInfoRequest.token = actionBean.token;
         InsureUserBean.userInfoResponse userInfoResponse = insureUserAction.findUserInfoById(userInfoRequest);
         response.data = userInfoResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, "获取银行卡转账授权书详情成功", response);
@@ -205,8 +201,7 @@ public class InsureSetupAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
         CommonBean.doBankAuthorizeRequset doBankAuthorizeRequset = new CommonBean.doBankAuthorizeRequset();
-        doBankAuthorizeRequset.custId = actionBean.userId;
-        doBankAuthorizeRequset.accountUuid = actionBean.accountUuid;
+        doBankAuthorizeRequset.token = actionBean.token;
         doBankAuthorizeRequset.name = request.name;
         doBankAuthorizeRequset.bankCode = request.bankCode;
         doBankAuthorizeRequset.phone = request.phone;

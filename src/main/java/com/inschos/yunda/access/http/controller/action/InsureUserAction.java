@@ -34,8 +34,7 @@ public class InsureUserAction extends BaseAction {
         BaseResponseBean response = new BaseResponseBean();
         InsureUserBean.userInfoRequest userInfoRequset = new InsureUserBean.userInfoRequest();
         InsureUserBean.userInfoResponse userInfoResponse = new InsureUserBean.userInfoResponse();
-        userInfoRequset.custId = Long.valueOf(actionBean.userId);
-        userInfoRequset.accountUuid = Long.valueOf(actionBean.accountUuid);
+        userInfoRequset.token = actionBean.token;
         userInfoResponse = findUserInfoById(userInfoRequset);
         response.data = userInfoResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
@@ -49,8 +48,7 @@ public class InsureUserAction extends BaseAction {
      */
     public InsureUserBean.userInfoResponse findUserInfoById(InsureUserBean.userInfoRequest request) {
         StaffPerson staffPerson = new StaffPerson();
-        staffPerson.cust_id = request.custId;
-        staffPerson.account_uuid = request.accountUuid;
+        staffPerson.token = request.token;
         InsureUserBean.userInfoResponse userInfoResponse = findUserInfoCommon(staffPerson);
         return userInfoResponse;
     }
@@ -88,13 +86,13 @@ public class InsureUserAction extends BaseAction {
             if (staffPerson.cust_id != 0 && staffPerson.account_uuid != 0) {
                 accountInfoRequest.custId = staffPerson.cust_id;
                 accountInfoRequest.accountUuid = staffPerson.account_uuid;
-                String result = commonAction.httpRequest(toAccountInfo, JsonKit.bean2Json(accountInfoRequest), interName);
+                String result = commonAction.httpRequest(toAccountInfo, JsonKit.bean2Json(accountInfoRequest), interName,staffPerson.token);
                 accountInfoResponse = JsonKit.json2Bean(result, InsureSetupBean.accountInfoResponse.class);
             } else if (staffPerson.name != null && staffPerson.papers_code != null && staffPerson.phone != null) {
                 accountInfoRequest.name = staffPerson.name;
                 accountInfoRequest.idCard = staffPerson.papers_code;
                 accountInfoRequest.phone = staffPerson.phone;
-                String result = commonAction.httpRequest(toAccountInfo, JsonKit.bean2Json(accountInfoRequest), interName);
+                String result = commonAction.httpRequest(toAccountInfo, JsonKit.bean2Json(accountInfoRequest), interName,staffPerson.token);
                 accountInfoResponse = JsonKit.json2Bean(result, InsureSetupBean.accountInfoResponse.class);
             }
             //获取数据成功,数据入库

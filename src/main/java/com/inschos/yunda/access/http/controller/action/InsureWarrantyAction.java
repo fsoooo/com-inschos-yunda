@@ -44,7 +44,7 @@ public class InsureWarrantyAction extends BaseAction {
         }
         warrantyListRequest.warrantyStatus = request.warrantyStatus;
         String interName = "获取保单列表";
-        String result = commonAction.httpRequest(toWarrantyList, JsonKit.bean2Json(warrantyListRequest), interName);
+        String result = commonAction.httpRequest(toWarrantyList, JsonKit.bean2Json(warrantyListRequest), interName,actionBean.token);
         InsureWarrantyBean.warrantyListResponse warrantyListResponse = JsonKit.json2Bean(result, InsureWarrantyBean.warrantyListResponse.class);
         response.data = warrantyListResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
@@ -64,9 +64,8 @@ public class InsureWarrantyAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
         InsureWarrantyBean.warrantyInfoRequest warrantyInfoRequest = new InsureWarrantyBean.warrantyInfoRequest();
-        warrantyInfoRequest.custId = Long.valueOf(actionBean.userId);
-        warrantyInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
         warrantyInfoRequest.warrantyUuid = request.warrantyUuid;
+        warrantyInfoRequest.token = actionBean.token;
         String warrantyInfoRes = findInsureWarrantyInfoById(warrantyInfoRequest);
         return warrantyInfoRes;
     }
@@ -83,11 +82,11 @@ public class InsureWarrantyAction extends BaseAction {
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
-        if (request.warrantyUuid == null || request.custId == 0 || request.accountUuid == 0) {
+        if (request.warrantyUuid == null) {
             return json(BaseResponseBean.CODE_FAILURE, "必要参数为空", response);
         }
         String interName = "获取保单详情";
-        String result = commonAction.httpRequest(toWarrantyInfo, JsonKit.bean2Json(request), interName);
+        String result = commonAction.httpRequest(toWarrantyInfo, JsonKit.bean2Json(request), interName,request.token);
         InsureWarrantyBean.warrantyInfoResponse warrantyInfoResponse = JsonKit.json2Bean(result, InsureWarrantyBean.warrantyInfoResponse.class);
         response.data = warrantyInfoResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
@@ -116,7 +115,7 @@ public class InsureWarrantyAction extends BaseAction {
             insureResultRequest.custId = Long.valueOf(actionBean.userId);
             insureResultRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
             String interName = "获取投保结果";
-            String result = commonAction.httpRequest(toInsureResult, JsonKit.bean2Json(insureResultRequest), interName);
+            String result = commonAction.httpRequest(toInsureResult, JsonKit.bean2Json(insureResultRequest), interName,actionBean.token);
             InsureWarrantyBean.insureResultResponse insureResultResponse = JsonKit.json2Bean(result, InsureWarrantyBean.insureResultResponse.class);
             response.data = insureResultResponse.data;
             return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);

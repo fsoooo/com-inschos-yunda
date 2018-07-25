@@ -15,6 +15,8 @@ import com.inschos.yunda.model.WarrantyRecord;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -54,6 +56,9 @@ public class IntersAction extends BaseAction {
      */
     public String jointLogin(HttpServletRequest httpServletRequest) {
         JointLoginBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), JointLoginBean.Requset.class);
+        HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String token = httpRequest.getParameter("token");
+        request.token = token;
         BaseResponseBean response = new BaseResponseBean();
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "请检查报文格式是否正确", response);
@@ -126,6 +131,9 @@ public class IntersAction extends BaseAction {
     public String authorizationQuery(HttpServletRequest httpServletRequest) {
         JointLoginBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), JointLoginBean.Requset.class);
         BaseResponseBean response = new BaseResponseBean();
+        HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String token = httpRequest.getParameter("token");
+        request.token = token;
         JointLoginBean.AuthorizeQueryResponseData authorizeQueryResponseData = new JointLoginBean.AuthorizeQueryResponseData();
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "请检查报文格式是否正确", response);
@@ -170,6 +178,9 @@ public class IntersAction extends BaseAction {
     public String prepareInusre(HttpServletRequest httpServletRequest) {
         InsurePrepareBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), InsurePrepareBean.Requset.class);
         BaseResponseBean response = new BaseResponseBean();
+        HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String token = httpRequest.getParameter("token");
+        request.token = token;
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
@@ -223,6 +234,9 @@ public class IntersAction extends BaseAction {
     public String CallBackYunda(HttpServletRequest httpServletRequest) {
         CallbackYundaBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), CallbackYundaBean.Requset.class);
         BaseResponseBean response = new BaseResponseBean();
+        HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String token = httpRequest.getParameter("token");
+        request.token = token;
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
@@ -238,7 +252,7 @@ public class IntersAction extends BaseAction {
         callbackYundaRequest.ordersName = request.ordersName;
         callbackYundaRequest.companyName = request.companyName;
         String interName = "投保信息推送韵达";
-        String result = commonAction.httpRequest(toCallBackYunda, JsonKit.bean2Json(callbackYundaRequest), interName);
+        String result = commonAction.httpRequest(toCallBackYunda, JsonKit.bean2Json(callbackYundaRequest), interName,token);
         CallbackYundaBean.ResponseData responseData = JsonKit.json2Bean(result,CallbackYundaBean.ResponseData.class);
         if(responseData.result==true){
             return json(BaseResponseBean.CODE_SUCCESS, "保险数据推送韵达成功", response);
@@ -261,7 +275,7 @@ public class IntersAction extends BaseAction {
         jointLoginRequest.insured_code = request.insured_code;
         jointLoginRequest.insured_phone = request.insured_phone;
         String interName = "授权/签约查询";
-        String result = commonAction.httpRequest(toAuthorizeQuery, JsonKit.bean2Json(jointLoginRequest), interName);
+        String result = commonAction.httpRequest(toAuthorizeQuery, JsonKit.bean2Json(jointLoginRequest), interName,request.token);
         CommonBean.findAuthorizeResponse authorizeResponse = JsonKit.json2Bean(result, CommonBean.findAuthorizeResponse.class);
         return authorizeResponse;
     }
@@ -303,7 +317,7 @@ public class IntersAction extends BaseAction {
         jointLoginRequest.bank_address = request.bank_address;
         jointLoginRequest.channel_order_code = request.channel_order_code;
         String interName = "账号服务";
-        String result = commonAction.httpRequest(toJointLogin, JsonKit.bean2Json(jointLoginRequest), interName);
+        String result = commonAction.httpRequest(toJointLogin, JsonKit.bean2Json(jointLoginRequest), interName,request.token);
         accountResponse = JsonKit.json2Bean(result, JointLoginBean.AccountResponse.class);
         if(accountResponse.code!=200){
             return accountResponse;
@@ -493,7 +507,7 @@ public class IntersAction extends BaseAction {
         insuredRequest.recognizees = recognizees;
         insuredRequest.beneficiary = policyHolder;
         String interName = "交易服务-投保接口";
-        String result = commonAction.httpRequest(toInsured, JsonKit.bean2Json(insuredRequest), interName);
+        String result = commonAction.httpRequest(toInsured, JsonKit.bean2Json(insuredRequest), interName,request.token);
         InsureParamsBean.Response insureResponse = JsonKit.json2Bean(result, InsureParamsBean.Response.class);
         return insureResponse;
     }
@@ -516,7 +530,7 @@ public class IntersAction extends BaseAction {
             insurePayRequest.bankData = bankResponse.data;
         }
         String interName = "交易服务-支付接口";
-        String result = commonAction.httpRequest(toPay, JsonKit.bean2Json(insurePayRequest), interName);
+        String result = commonAction.httpRequest(toPay, JsonKit.bean2Json(insurePayRequest), interName,jointLoginRequest.token);
         InusrePayBean.Response insureResponse = JsonKit.json2Bean(result, InusrePayBean.Response.class);
         return insureResponse;
     }
@@ -529,7 +543,7 @@ public class IntersAction extends BaseAction {
      */
     private InusrePayBean.payBankResponse doPayBank(JointLoginBean.Requset request) {
         String interName = "交易服务-银行卡服务";
-        String result = commonAction.httpRequest(toPayBank, JsonKit.bean2Json(request), interName);
+        String result = commonAction.httpRequest(toPayBank, JsonKit.bean2Json(request), interName,request.token);
         InusrePayBean.payBankResponse bankResponse = JsonKit.json2Bean(result, InusrePayBean.payBankResponse.class);
         return bankResponse;
     }

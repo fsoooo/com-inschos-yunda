@@ -3,6 +3,7 @@ package com.inschos.yunda.access.http.controller.bean;
 public class CallbackYundaBean {
 
     public static class Requset {
+        public String token;
         public String ordersId;//保单号 256
         public String payTime;//支付时间 64
         public String effectiveTime;//生效时段 64

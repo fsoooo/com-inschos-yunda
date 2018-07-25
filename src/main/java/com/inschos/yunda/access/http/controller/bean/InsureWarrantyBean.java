@@ -28,8 +28,7 @@ public class InsureWarrantyBean {
     }
 
     public static class warrantyInfoRequest {
-        public long custId;//用户id
-        public long accountUuid;//用户account_uuid
+        public String token;//用户account_uuid
         public String warrantyUuid;//'warranty_uuid内部保单唯一标识'
     }
 

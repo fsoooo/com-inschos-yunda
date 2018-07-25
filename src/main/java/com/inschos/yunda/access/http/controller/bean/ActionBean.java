@@ -26,6 +26,8 @@ public class ActionBean {
     public long tokenTime;
     public String referer;
 
+    public String token;
+
     public static String getSalt(String salt) {
         if (ConstantKit.IS_PRODUCT) {
             return SALT_VALUE_ONLINE + salt;

@@ -5,6 +5,7 @@ import java.util.List;
 public class InsureBankBean {
     public static class bankRequest {
         public long bankId;
+        public String token;
         public String name;//用户姓名
         public String bankCode;//用户银行卡号
         public String bankName;//银行名称

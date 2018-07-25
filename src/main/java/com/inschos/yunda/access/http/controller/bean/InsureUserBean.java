@@ -3,9 +3,7 @@ package com.inschos.yunda.access.http.controller.bean;
 public class InsureUserBean {
 
     public static class userInfoRequest {
-        public long custId;
-        public long accountUuid;
-        public String loginToken;
+        public String token;
         public String name;
         public long papersType = 1;
         public String papersCode;

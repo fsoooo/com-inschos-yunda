@@ -72,7 +72,7 @@ public class InsureBankAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, "短信验证码校验失败", response);
         }
         String interName = "添加银行卡";
-        String result = commonAction.httpRequest(toAddBank, JsonKit.bean2Json(addBankRequest), interName);
+        String result = commonAction.httpRequest(toAddBank, JsonKit.bean2Json(addBankRequest), interName,actionBean.token);
        BaseResponseBean addBankResponse = JsonKit.json2Bean(result, BaseResponseBean.class);
         response.data = addBankResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
@@ -88,7 +88,7 @@ public class InsureBankAction extends BaseAction {
     public String findBankList(ActionBean actionBean) {
         BaseResponseBean response = new BaseResponseBean();
         String interName = "获取银行卡列表";
-        String result = commonAction.httpRequest(toBankList, "", interName);
+        String result = commonAction.httpRequest(toBankList, "", interName,actionBean.token);
         InsureBankBean.bankListResponse bankListResponse = JsonKit.json2Bean(result, InsureBankBean.bankListResponse.class);
         response.data = bankListResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
@@ -109,7 +109,7 @@ public class InsureBankAction extends BaseAction {
         InsureBankBean.bankInfoRequest bankInfoRequest = new InsureBankBean.bankInfoRequest();
         bankInfoRequest.id = request.bankId;
         String interName = "获取银行卡详情";
-        String result = commonAction.httpRequest(toBankInfo, JsonKit.bean2Json(bankInfoRequest), interName);
+        String result = commonAction.httpRequest(toBankInfo, JsonKit.bean2Json(bankInfoRequest), interName,actionBean.token);
         InsureBankBean.bankInfoResponse bankInfoResponse = JsonKit.json2Bean(result, InsureBankBean.bankInfoResponse.class);
         response.data = bankInfoResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
@@ -207,7 +207,7 @@ public class InsureBankAction extends BaseAction {
             }
         }
         String interName = "更新银行卡状态";
-        String result = commonAction.httpRequest(toUpdateBank, JsonKit.bean2Json(updateBankStatusRequest), interName);
+        String result = commonAction.httpRequest(toUpdateBank, JsonKit.bean2Json(updateBankStatusRequest), interName,actionBean.token);
         BaseResponseBean bankStatusResponse = JsonKit.json2Bean(result, BaseResponseBean.class);
         //根据接口返回状态,修改本地库的银行卡授权状态
         if (request.bankUseStatus == 2) {
@@ -262,7 +262,7 @@ public class InsureBankAction extends BaseAction {
             }
         }
         String interName = "获取银行卡绑定验证码";
-        String result = commonAction.httpRequest(toBankSms, JsonKit.bean2Json(bankSmsRequest), interName);
+        String result = commonAction.httpRequest(toBankSms, JsonKit.bean2Json(bankSmsRequest), interName,actionBean.token);
         InsureBankBean.bankSmsResponse bankSmsResponse = JsonKit.json2Bean(result, InsureBankBean.bankSmsResponse.class);
         //数据库添加记录
         bankVerify.verify_id = bankSmsResponse.data.requestId;
@@ -335,7 +335,7 @@ public class InsureBankAction extends BaseAction {
                 return verifyResponse;
             }
         }
-        String result = commonAction.httpRequest(toVerifyBankSms, JsonKit.bean2Json(verifyBankSmsRequest), interName);
+        String result = commonAction.httpRequest(toVerifyBankSms, JsonKit.bean2Json(verifyBankSmsRequest), interName,request.token);
         InsureBankBean.verifyBankSmsResponse verifyBankSmsResponse = JsonKit.json2Bean(result, InsureBankBean.verifyBankSmsResponse.class);
         long date = new Date().getTime();
         bankVerify.verify_status = "2";

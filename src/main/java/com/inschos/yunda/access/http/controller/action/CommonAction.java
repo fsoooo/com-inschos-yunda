@@ -32,7 +32,7 @@ public class CommonAction extends BaseAction {
      * @param interName 接口名称
      * @return String
      */
-    public String httpRequest(String url, String json, String interName) {
+    public String httpRequest(String url, String json, String interName, String token) {
         BaseResponseBean response = new BaseResponseBean();
         if (interName == null) {
             interName = "";
@@ -63,7 +63,7 @@ public class CommonAction extends BaseAction {
      */
     public CommonBean.findAuthorizeResponse findWechatContractStatus(CommonBean.findAuthorizeRequset request) {
         String interName = "获取授权/签约状态";
-        String result = httpRequest(toAuthorizeQuery, JsonKit.bean2Json(request), interName);
+        String result = httpRequest(toAuthorizeQuery, "", interName,request.token);
         CommonBean.findAuthorizeResponse authorizeResponse = JsonKit.json2Bean(result, CommonBean.findAuthorizeResponse.class);
         return authorizeResponse;
     }
@@ -76,7 +76,7 @@ public class CommonAction extends BaseAction {
      */
     public CommonBean.doWecahtContractResponse doWechatContract(CommonBean.doWecahtContractRequset request) {
         String interName = "执行微信签约操作";
-        String result = httpRequest(toWechatContract, JsonKit.bean2Json(request), interName);
+        String result = httpRequest(toWechatContract, JsonKit.bean2Json(request), interName,request.token);
         CommonBean.doWecahtContractResponse response = JsonKit.json2Bean(result, CommonBean.doWecahtContractResponse.class);
         return response;
     }
@@ -89,7 +89,7 @@ public class CommonAction extends BaseAction {
      */
     public CommonBean.doBankAuthorizeResponse doBankAuthorize(CommonBean.doBankAuthorizeRequset request) {
         String interName = "执行银行卡授权";
-        String result = httpRequest(toBankAuthorize, JsonKit.bean2Json(request), interName);
+        String result = httpRequest(toBankAuthorize, JsonKit.bean2Json(request), interName,request.token);
         CommonBean.doBankAuthorizeResponse response = JsonKit.json2Bean(result, CommonBean.doBankAuthorizeResponse.class);
         return response;
     }

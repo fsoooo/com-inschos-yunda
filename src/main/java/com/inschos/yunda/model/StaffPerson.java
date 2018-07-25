@@ -1,6 +1,7 @@
 package com.inschos.yunda.model;
 
 public class StaffPerson {
+    public String token;
     public long id;
     public long cust_id;
     public long account_uuid;

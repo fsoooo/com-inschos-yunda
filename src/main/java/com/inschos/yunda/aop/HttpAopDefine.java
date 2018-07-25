@@ -57,6 +57,7 @@ public class HttpAopDefine {
 //			B.log.info("accessToken:{}", accessToken);
 
             ActionBean bean = new ActionBean();
+            bean.token = accessToken;
 
             AccountBean accountBean = accountClient.getAccount(accessToken);
 

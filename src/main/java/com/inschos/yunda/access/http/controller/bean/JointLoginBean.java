@@ -5,6 +5,7 @@ import java.util.List;
 public class JointLoginBean {
 
     public static class Requset {
+        public String token;
         public String channel_code;
         public String insured_name;
         public String insured_code;

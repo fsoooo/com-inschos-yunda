@@ -2,6 +2,7 @@ package com.inschos.yunda.access.http.controller.bean;
 
 public class InsurePrepareBean {
     public static class Requset {
+        public String token;
         public String account_id;
         public String biz_content;
         public String sign;
