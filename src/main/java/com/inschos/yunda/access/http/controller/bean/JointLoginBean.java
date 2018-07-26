@@ -61,6 +61,8 @@ public class JointLoginBean {
 
     public static class AccountResponseData {
         public String token;
+        public String custId;
+        public String accountUuid;
     }
 
     public static class BankResponse extends BaseResponseBean {

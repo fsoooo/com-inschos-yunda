@@ -57,6 +57,7 @@ public class IntersAction extends BaseAction {
     public String jointLogin(HttpServletRequest httpServletRequest) {
         JointLoginBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), JointLoginBean.Requset.class);
         HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+
         BaseResponseBean response = new BaseResponseBean();
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "请检查报文格式是否正确", response);
@@ -71,7 +72,7 @@ public class IntersAction extends BaseAction {
             //return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败", response);
         }
         //TODO 成功获取联合登录信息
-        String loginToken = accountResponse.data.loginToken;
+        String loginToken = accountResponse.data.token;
         String custId = accountResponse.data.custId;
         String accountUuid = accountResponse.data.accountUuid;
         request.token = loginToken;
@@ -297,7 +298,7 @@ public class IntersAction extends BaseAction {
         if (staffPersonInfo != null) {
             accountResponse.data.custId = staffPersonInfo.cust_id + "";
             accountResponse.data.accountUuid = staffPersonInfo.account_uuid + "";
-            accountResponse.data.loginToken = staffPersonInfo.login_token;
+            accountResponse.data.token = staffPersonInfo.login_token;
             return accountResponse;
         }
         JointLoginBean.Requset jointLoginRequest = new JointLoginBean.Requset();
@@ -316,7 +317,7 @@ public class IntersAction extends BaseAction {
         jointLoginRequest.bank_address = request.bank_address;
         jointLoginRequest.channel_order_code = request.channel_order_code;
         String interName = "账号服务";
-        String result = commonAction.httpRequest(toJointLogin, JsonKit.bean2Json(jointLoginRequest), interName,"");
+        String result = commonAction.httpRequest(toJointLogin, JsonKit.bean2Json(jointLoginRequest), interName,request.token);
         accountResponse = JsonKit.json2Bean(result, JointLoginBean.AccountResponse.class);
         if(accountResponse.code!=200){
             return accountResponse;
@@ -325,7 +326,7 @@ public class IntersAction extends BaseAction {
         long date = new Date().getTime();
         staffPerson.cust_id = Long.valueOf(accountResponse.data.custId);
         staffPerson.account_uuid = Long.valueOf(accountResponse.data.accountUuid);
-        staffPerson.login_token = accountResponse.data.loginToken;
+        staffPerson.login_token = accountResponse.data.token;
         staffPerson.name = request.insured_name;
         staffPerson.papers_code = request.insured_code;
         staffPerson.phone = request.insured_phone;
@@ -606,7 +607,7 @@ public class IntersAction extends BaseAction {
             }
             staffPerson.cust_id = Long.valueOf(accountResponse.data.custId);
             staffPerson.account_uuid = Long.valueOf(accountResponse.data.accountUuid);
-            staffPerson.login_token = accountResponse.data.loginToken;
+            staffPerson.login_token = accountResponse.data.token;
             staffPerson.created_at = date;
             staffPerson.updated_at = date;
             long addRes = staffPersonDao.addStaffPerson(staffPerson);
