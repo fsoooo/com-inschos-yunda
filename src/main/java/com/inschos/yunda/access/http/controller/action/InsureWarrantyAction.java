@@ -37,8 +37,6 @@ public class InsureWarrantyAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
         InsureWarrantyBean.warrantyListRequest warrantyListRequest = new InsureWarrantyBean.warrantyListRequest();
-        warrantyListRequest.custId = Long.valueOf(actionBean.userId);
-        warrantyListRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
         if (request.warrantyStatus == null) {
             request.warrantyStatus = "4";//保障中
         }
@@ -112,8 +110,6 @@ public class InsureWarrantyAction extends BaseAction {
         WarrantyRecord insureResult = warrantyRecordDao.findInsureResult(warrantyRecord);
         if (insureResult == null) {
             InsureWarrantyBean.insureResultRequest insureResultRequest = new InsureWarrantyBean.insureResultRequest();
-            insureResultRequest.custId = Long.valueOf(actionBean.userId);
-            insureResultRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
             String interName = "获取投保结果";
             String result = commonAction.httpRequest(toInsureResult, JsonKit.bean2Json(insureResultRequest), interName,actionBean.token);
             InsureWarrantyBean.insureResultResponse insureResultResponse = JsonKit.json2Bean(result, InsureWarrantyBean.insureResultResponse.class);

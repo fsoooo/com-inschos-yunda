@@ -241,8 +241,6 @@ public class InsureBankAction extends BaseAction {
         }
         InsureBankBean.bankSmsRequest bankSmsRequest = new InsureBankBean.bankSmsRequest();
         InsureUserBean.userInfoRequest userInfoRequest = new InsureUserBean.userInfoRequest();
-        userInfoRequest.custId = Long.valueOf(actionBean.userId);
-        userInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
         InsureUserBean.userInfoResponse userInfoResponse = insureUserAction.findUserInfoById(userInfoRequest);
         bankSmsRequest.bankPhone = request.phone;
         bankSmsRequest.bankCode = request.bankCode;

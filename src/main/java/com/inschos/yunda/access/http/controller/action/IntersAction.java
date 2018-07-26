@@ -57,8 +57,6 @@ public class IntersAction extends BaseAction {
     public String jointLogin(HttpServletRequest httpServletRequest) {
         JointLoginBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), JointLoginBean.Requset.class);
         HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String token = httpRequest.getParameter("token");
-        request.token = token;
         BaseResponseBean response = new BaseResponseBean();
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "请检查报文格式是否正确", response);
@@ -76,6 +74,7 @@ public class IntersAction extends BaseAction {
         String loginToken = accountResponse.data.loginToken;
         String custId = accountResponse.data.custId;
         String accountUuid = accountResponse.data.accountUuid;
+        request.token = loginToken;
         //TODO 查询授权/签约详情(此接口还需判断用户是否有可用银行卡)
         CommonBean.findAuthorizeResponse authorizeResponse = doAuthorizeRes(request);
         if (authorizeResponse.code != 200) {
@@ -317,7 +316,7 @@ public class IntersAction extends BaseAction {
         jointLoginRequest.bank_address = request.bank_address;
         jointLoginRequest.channel_order_code = request.channel_order_code;
         String interName = "账号服务";
-        String result = commonAction.httpRequest(toJointLogin, JsonKit.bean2Json(jointLoginRequest), interName,request.token);
+        String result = commonAction.httpRequest(toJointLogin, JsonKit.bean2Json(jointLoginRequest), interName,"");
         accountResponse = JsonKit.json2Bean(result, JointLoginBean.AccountResponse.class);
         if(accountResponse.code!=200){
             return accountResponse;

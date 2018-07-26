@@ -42,14 +42,25 @@ public class JointLoginBean {
         public String url;//授权页面地址
     }
 
+    public static class AccountRequset{
+        public String platform;//平台
+        public String name;//姓名
+        public String phone;//电话
+        public String certType;//证件类型//证件类型1：身份证，2：护照，3：军官证，4：其他
+        public String certCode;//证件号
+        public String email;//邮件
+        public String province;//省
+        public String city;//市
+        public String district;//区/县
+        public String address;//详细地址
+    }
+
     public static class AccountResponse extends BaseResponseBean {
         public AccountResponseData data;
     }
 
     public static class AccountResponseData {
-        public String custId;
-        public String accountUuid;
-        public String loginToken;
+        public String token;
     }
 
     public static class BankResponse extends BaseResponseBean {

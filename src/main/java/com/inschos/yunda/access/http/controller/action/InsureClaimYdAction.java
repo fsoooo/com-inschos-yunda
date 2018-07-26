@@ -121,8 +121,6 @@ public class InsureClaimYdAction extends BaseAction {
             claimType = "3";
         }
         InsureWarrantyBean.warrantyInfoRequest warrantyInfoRequest = new InsureWarrantyBean.warrantyInfoRequest();
-        warrantyInfoRequest.custId = Long.valueOf(actionBean.userId);
-        warrantyInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
         warrantyInfoRequest.warrantyUuid = warrantyUuid;
         String warrantyRecordRes = insureWarrantyAction.findInsureWarrantyInfoById(warrantyInfoRequest);
         if (warrantyRecordRes == null) {
@@ -226,8 +224,6 @@ public class InsureClaimYdAction extends BaseAction {
         claimVerifyResponse.claimDescription = claimVerifyRes.claim_desc;
         //获取保单信息
         InsureWarrantyBean.warrantyInfoRequest warrantyInfoRequest = new InsureWarrantyBean.warrantyInfoRequest();
-        warrantyInfoRequest.custId = Long.valueOf(actionBean.userId);
-        warrantyInfoRequest.accountUuid = Long.valueOf(actionBean.accountUuid);
         warrantyInfoRequest.warrantyUuid = claimVerifyRes.warranty_uuid;
         String warrantyRecordRes = insureWarrantyAction.findInsureWarrantyInfoById(warrantyInfoRequest);
         if (warrantyRecordRes == null) {
