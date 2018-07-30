@@ -66,7 +66,7 @@ public class IntersAction extends BaseAction {
         JointLoginBean.Response returnResponse = new JointLoginBean.Response();
         //TODO 联合登录触发账号服务
         JointLoginBean.AccountResponse accountResponse = doAccount(request);
-        if (accountResponse.code != 200) {
+        if (accountResponse==null||accountResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败", response);
         }
         //TODO 成功获取联合登录信息
@@ -76,7 +76,7 @@ public class IntersAction extends BaseAction {
         request.token = loginToken;
         //TODO 查询授权/签约详情(此接口还需判断用户是否有可用银行卡)
         CommonBean.findAuthorizeResponse authorizeResponse = doAuthorizeRes(request);
-        if (authorizeResponse.code != 200) {
+        if (authorizeResponse==null||authorizeResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, "查询授权/签约接口请求失败,查询授权/签约详情失败", response);
         }
         //TODO 判断授权情况,返回相应参数(URL+token)
