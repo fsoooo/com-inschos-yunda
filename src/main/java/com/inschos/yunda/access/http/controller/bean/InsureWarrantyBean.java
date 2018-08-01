@@ -290,4 +290,21 @@ public class InsureWarrantyBean {
     public static class insureResultResponseData {
 
     }
+
+    public static class warrantyStatusRequest{
+        public String warrantyUuid;
+    }
+
+    public static class warrantyStatusResponse extends BaseResponseBean{
+        public warrantyStatusResponseData data;
+    }
+
+    public static class warrantyStatusResponseData{
+        public String warrantyUuid;
+        public String policyNo;
+        public String proposalNo;
+        public String status;
+        public String statusTxt;
+        public String remark;
+    }
 }

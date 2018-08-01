@@ -71,7 +71,7 @@ public class IntersAction extends BaseAction {
         }
         //TODO 成功获取联合登录信息
         String loginToken = accountResponse.data.token;
-        String custId = accountResponse.data.custId;
+        String custId = accountResponse.data.userId;
         String accountUuid = accountResponse.data.accountUuid;
         request.token = loginToken;
         //TODO 查询授权/签约详情(此接口还需判断用户是否有可用银行卡)
@@ -267,7 +267,6 @@ public class IntersAction extends BaseAction {
     private CommonBean.findAuthorizeResponse doAuthorizeRes(JointLoginBean.Requset request) {
         BaseResponseBean response = new BaseResponseBean();
         //TODO 先判断本地库里有没有用户信息
-
         JointLoginBean.Requset jointLoginRequest = new JointLoginBean.Requset();
         jointLoginRequest.insured_name = request.insured_name;
         jointLoginRequest.insured_code = request.insured_code;
@@ -294,26 +293,21 @@ public class IntersAction extends BaseAction {
         staffPerson.phone = request.insured_phone;
         StaffPerson staffPersonInfo = staffPersonDao.findStaffPersonInfoByCode(staffPerson);
         if (staffPersonInfo != null) {
-            accountResponse.data.custId = staffPersonInfo.cust_id + "";
+            accountResponse.data.userId = staffPersonInfo.cust_id + "";
             accountResponse.data.accountUuid = staffPersonInfo.account_uuid + "";
             accountResponse.data.token = staffPersonInfo.login_token;
             return accountResponse;
         }
-        JointLoginBean.Requset jointLoginRequest = new JointLoginBean.Requset();
-        jointLoginRequest.channel_code = request.channel_code;
-        jointLoginRequest.insured_name = request.insured_name;
-        jointLoginRequest.insured_code = request.insured_code;
-        jointLoginRequest.insured_phone = request.insured_phone;
-        jointLoginRequest.insured_email = request.insured_email;
-        jointLoginRequest.insured_province = request.insured_province;
-        jointLoginRequest.insured_city = request.insured_city;
-        jointLoginRequest.insured_county = request.insured_county;
-        jointLoginRequest.insured_address = request.insured_address;
-        jointLoginRequest.bank_name = request.bank_name;
-        jointLoginRequest.bank_code = request.bank_code;
-        jointLoginRequest.bank_phone = request.bank_phone;
-        jointLoginRequest.bank_address = request.bank_address;
-        jointLoginRequest.channel_order_code = request.channel_order_code;
+        JointLoginBean.AccountRequset jointLoginRequest = new JointLoginBean.AccountRequset();
+        jointLoginRequest.platform = "YunDa";
+        jointLoginRequest.name = request.insured_name;
+        jointLoginRequest.certType = "1";
+        jointLoginRequest.certCode = request.insured_code;
+        jointLoginRequest.email = request.insured_email;
+        jointLoginRequest.province = request.insured_province;
+        jointLoginRequest.city = request.insured_city;
+        jointLoginRequest.district = request.insured_county;
+        jointLoginRequest.address = request.insured_address;
         String interName = "账号服务";
         String result = commonAction.httpRequest(toJointLogin, JsonKit.bean2Json(jointLoginRequest), interName,request.token);
         accountResponse = JsonKit.json2Bean(result, JointLoginBean.AccountResponse.class);
@@ -322,7 +316,7 @@ public class IntersAction extends BaseAction {
         }
         //TODO 获取数据成功,数据入库
         long date = new Date().getTime();
-        staffPerson.cust_id = Long.valueOf(accountResponse.data.custId);
+        staffPerson.cust_id = Long.valueOf(accountResponse.data.userId);
         staffPerson.account_uuid = Long.valueOf(accountResponse.data.accountUuid);
         staffPerson.login_token = accountResponse.data.token;
         staffPerson.name = request.insured_name;
@@ -603,14 +597,14 @@ public class IntersAction extends BaseAction {
             if (accountResponse.code != 200) {
                 return 0;
             }
-            staffPerson.cust_id = Long.valueOf(accountResponse.data.custId);
+            staffPerson.cust_id = Long.valueOf(accountResponse.data.userId);
             staffPerson.account_uuid = Long.valueOf(accountResponse.data.accountUuid);
             staffPerson.login_token = accountResponse.data.token;
             staffPerson.created_at = date;
             staffPerson.updated_at = date;
             long addRes = staffPersonDao.addStaffPerson(staffPerson);
             if (addRes != 0) {
-                cust_id = Long.valueOf(accountResponse.data.custId);
+                cust_id = Long.valueOf(accountResponse.data.userId);
             } else {
                 return 0;
             }
