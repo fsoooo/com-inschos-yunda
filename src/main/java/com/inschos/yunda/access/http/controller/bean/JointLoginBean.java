@@ -44,6 +44,7 @@ public class JointLoginBean {
 
     public static class AccountRequset{
         public String platform;//平台
+        public String origin;//平台来源
         public String name;//姓名
         public String phone;//电话
         public String certType;//证件类型//证件类型1：身份证，2：护照，3：军官证，4：其他

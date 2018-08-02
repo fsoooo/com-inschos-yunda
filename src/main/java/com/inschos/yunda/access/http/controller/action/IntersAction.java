@@ -299,7 +299,8 @@ public class IntersAction extends BaseAction {
             return accountResponse;
         }
         JointLoginBean.AccountRequset jointLoginRequest = new JointLoginBean.AccountRequset();
-        jointLoginRequest.platform = "YunDa";
+        jointLoginRequest.platform = "YUNDA";
+        jointLoginRequest.origin = "1000";
         jointLoginRequest.name = request.insured_name;
         jointLoginRequest.certType = "1";
         jointLoginRequest.certCode = request.insured_code;

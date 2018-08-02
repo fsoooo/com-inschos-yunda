@@ -43,7 +43,7 @@ public class IntersCommonUrlBean {
 
     //3.交易服务-授权签约接口
     //授权查询(银行卡+微信)
-    public static final String toAuthorizeQuery = IntersCommonUrlBean.getServerHostInsure() + "/";
+    public static final String toAuthorizeQuery = IntersCommonUrlBean.getServerHostInsure() + "/bank/getUsedPayInfo";
     //获取支付银行卡信息
     public static final String toPayBank = IntersCommonUrlBean.getServerHostInsure() + "/";
     //执行银行卡授权
