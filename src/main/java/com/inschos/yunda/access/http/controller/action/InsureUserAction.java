@@ -48,7 +48,7 @@ public class InsureUserAction extends BaseAction {
      */
     public InsureUserBean.userInfoResponse findUserInfoById(InsureUserBean.userInfoRequest request) {
         StaffPerson staffPerson = new StaffPerson();
-        staffPerson.token = request.token;
+        staffPerson.login_token = request.token;
         InsureUserBean.userInfoResponse userInfoResponse = findUserInfoCommon(staffPerson);
         return userInfoResponse;
     }
@@ -83,16 +83,16 @@ public class InsureUserAction extends BaseAction {
             //没有查到用户信息,从接口里拿,然后插入数据同时返回
             InsureSetupBean.accountInfoRequest accountInfoRequest = new InsureSetupBean.accountInfoRequest();
             InsureSetupBean.accountInfoResponse accountInfoResponse = new InsureSetupBean.accountInfoResponse();
-            if (staffPerson.cust_id != 0 && staffPerson.account_uuid != 0) {
+            if (staffPerson.cust_id != 0 && staffPerson.account_uuid != null) {
                 accountInfoRequest.custId = staffPerson.cust_id;
                 accountInfoRequest.accountUuid = staffPerson.account_uuid;
-                String result = commonAction.httpRequest(toAccountInfo, JsonKit.bean2Json(accountInfoRequest), interName,staffPerson.token);
+                String result = commonAction.httpRequest(toAccountInfo, JsonKit.bean2Json(accountInfoRequest), interName,staffPerson.login_token);
                 accountInfoResponse = JsonKit.json2Bean(result, InsureSetupBean.accountInfoResponse.class);
             } else if (staffPerson.name != null && staffPerson.papers_code != null && staffPerson.phone != null) {
                 accountInfoRequest.name = staffPerson.name;
                 accountInfoRequest.idCard = staffPerson.papers_code;
                 accountInfoRequest.phone = staffPerson.phone;
-                String result = commonAction.httpRequest(toAccountInfo, JsonKit.bean2Json(accountInfoRequest), interName,staffPerson.token);
+                String result = commonAction.httpRequest(toAccountInfo, JsonKit.bean2Json(accountInfoRequest), interName,staffPerson.login_token);
                 accountInfoResponse = JsonKit.json2Bean(result, InsureSetupBean.accountInfoResponse.class);
             }
             //获取数据成功,数据入库

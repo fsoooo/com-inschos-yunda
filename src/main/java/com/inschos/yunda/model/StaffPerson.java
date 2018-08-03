@@ -1,10 +1,10 @@
 package com.inschos.yunda.model;
 
 public class StaffPerson {
-    public String token;
     public long id;
     public long cust_id;
-    public long account_uuid;
+    public String account_uuid;
+    public String manager_uuid;
     public String login_token;
     public String name;
     public long papers_type = 1;

@@ -1,5 +1,7 @@
 package com.inschos.yunda.access.http.controller.bean;
 
+import com.inschos.yunda.annotation.CheckParamsKit;
+
 import java.util.List;
 
 public class JointLoginBean {

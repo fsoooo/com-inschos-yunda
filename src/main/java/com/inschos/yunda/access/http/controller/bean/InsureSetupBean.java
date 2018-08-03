@@ -32,7 +32,7 @@ public class InsureSetupBean {
         public String idCard;
         public String phone;
         public long custId;//用户id
-        public long accountUuid;//用户account_uuid
+        public String accountUuid;//用户account_uuid
     }
 
     public static class accountInfoResponse extends BaseResponseBean {
@@ -41,7 +41,7 @@ public class InsureSetupBean {
 
     public static class accountInfoResponseData {
         public long custId;//用户id
-        public long accountUuid;//用户account_uuid
+        public String accountUuid;//用户account_uuid
         public String name;
         public String idCard;
         public String phone;

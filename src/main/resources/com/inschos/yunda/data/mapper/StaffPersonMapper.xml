@@ -4,7 +4,8 @@
 <mapper namespace="com.inschos.yunda.data.mapper.StaffPersonMapper">
 
     <insert id="addStaffPerson" parameterType="StaffPerson" useGeneratedKeys="true" keyProperty="id">
-        insert into staff_person(`cust_id`,`account_uuid`,`name`,`papers_type`,`papers_code`,`phone`,`created_at`,`updated_at`) values(#{cust_id},#{account_uuid},#{name},#{papers_type},#{papers_code},#{phone},#{created_at},#{updated_at})
+        insert into staff_person(`cust_id`,`account_uuid`,`manager_uuid`,`name`,`papers_type`,`papers_code`,`phone`,`login_token`,`created_at`,`updated_at`)
+        values(#{cust_id},#{account_uuid},#{manager_uuid},#{name},#{papers_type},#{papers_code},#{phone},#{login_token},#{created_at},#{updated_at})
     </insert>
 
     <!--基础类型 不支持空,如需要查询,可以用封装类来接值.然后再做封装类和基础类型的转换-->
@@ -18,7 +19,8 @@
     </select>
 
     <select id="findStaffPersonInfoById" parameterType="StaffPerson" resultType="StaffPerson">
-        select `cust_id`,`account_uuid`,`name`,`papers_type`,`papers_code`,`phone`,`created_at`,`updated_at`
+        select
+        `cust_id`,`account_uuid`,`manager_uuid`,`name`,`papers_type`,`papers_code`,`phone`,`login_token`,`created_at`,`updated_at`
         from staff_person
         <where>
             cust_id =#{cust_id} AND account_uuid =#{account_uuid}
@@ -26,7 +28,8 @@
     </select>
 
     <select id="findStaffPersonInfoByCode" parameterType="StaffPerson" resultType="StaffPerson">
-        select `cust_id`,`account_uuid`,`name`,`papers_type`,`papers_code`,`phone`,`created_at`,`updated_at`
+        select
+        `cust_id`,`account_uuid`,`manager_uuid`,`name`,`papers_type`,`papers_code`,`phone`,`login_token`,`created_at`,`updated_at`
         from staff_person
         <where>
             name =#{name} AND papers_type =#{papers_type} AND papers_code =#{papers_code} AND phone =#{phone}

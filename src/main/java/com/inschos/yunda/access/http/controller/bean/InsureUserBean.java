@@ -17,7 +17,7 @@ public class InsureUserBean {
     public static class userInfoResponseData {
         public long id;
         public long custId;
-        public long accountUuid;
+        public String accountUuid;
         public String loginToken;
         public String name;
         public long papersType = 1;

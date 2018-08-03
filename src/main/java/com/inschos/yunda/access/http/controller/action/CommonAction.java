@@ -25,11 +25,11 @@ public class CommonAction extends BaseAction {
 
     /**
      * http请求公共函数
-     * TODO 接口返回的code,服务请求方自行判断
      *
      * @param url       请求地址
      * @param json      请求报文,格式是json
      * @param interName 接口名称
+     * @param token     接口token
      * @return String
      */
     public String httpRequest(String url, String json, String interName, String token) {
@@ -38,19 +38,21 @@ public class CommonAction extends BaseAction {
             interName = "";
         }
         try {
-            String result = HttpClientKit.post(url, JsonKit.bean2Json(json));
+            logger.info(interName + "接口请求地址：" + url);
+            logger.info(interName + "接口请求参数：" + json);
+            String result = HttpClientKit.post(url + "?token=" + token,json);
             if (result == null) {
                 return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
             }
+            logger.info(interName + "接口返回数据：" + result);
             if (!isJSONValid(result)) {
                 return json(BaseResponseBean.CODE_FAILURE, interName + "接口返回报文解析失败", response);
             }
-            response = JsonKit.json2Bean(result, BaseResponseBean.class);
-//            if (response.code != 200 || response.code == 500) {
-//                return json(BaseResponseBean.CODE_FAILURE, interName + "接口服务请求失败", response);
-//            }
-            return json(BaseResponseBean.CODE_SUCCESS, interName + "接口请求成功", response);
+            return result;
+//            response = JsonKit.json2Bean(result, BaseResponseBean.class);
+//            return json(BaseResponseBean.CODE_SUCCESS, interName + "接口请求成功", response);
         } catch (IOException e) {
+            e.printStackTrace();
             return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
         }
     }
@@ -63,7 +65,7 @@ public class CommonAction extends BaseAction {
      */
     public CommonBean.findAuthorizeResponse findWechatContractStatus(CommonBean.findAuthorizeRequset request) {
         String interName = "获取授权/签约状态";
-        String result = httpRequest(toAuthorizeQuery, "", interName,request.token);
+        String result = httpRequest(toAuthorizeQuery, "", interName, request.token);
         CommonBean.findAuthorizeResponse authorizeResponse = JsonKit.json2Bean(result, CommonBean.findAuthorizeResponse.class);
         return authorizeResponse;
     }
@@ -76,7 +78,7 @@ public class CommonAction extends BaseAction {
      */
     public CommonBean.doWecahtContractResponse doWechatContract(CommonBean.doWecahtContractRequset request) {
         String interName = "执行微信签约操作";
-        String result = httpRequest(toWechatContract, JsonKit.bean2Json(request), interName,request.token);
+        String result = httpRequest(toWechatContract, JsonKit.bean2Json(request), interName, request.token);
         CommonBean.doWecahtContractResponse response = JsonKit.json2Bean(result, CommonBean.doWecahtContractResponse.class);
         return response;
     }
@@ -89,7 +91,7 @@ public class CommonAction extends BaseAction {
      */
     public CommonBean.doBankAuthorizeResponse doBankAuthorize(CommonBean.doBankAuthorizeRequset request) {
         String interName = "执行银行卡授权";
-        String result = httpRequest(toBankAuthorize, JsonKit.bean2Json(request), interName,request.token);
+        String result = httpRequest(toBankAuthorize, JsonKit.bean2Json(request), interName, request.token);
         CommonBean.doBankAuthorizeResponse response = JsonKit.json2Bean(result, CommonBean.doBankAuthorizeResponse.class);
         return response;
     }

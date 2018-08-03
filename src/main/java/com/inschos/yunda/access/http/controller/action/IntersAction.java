@@ -2,6 +2,7 @@ package com.inschos.yunda.access.http.controller.action;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.inschos.yunda.access.http.controller.bean.*;
+import com.inschos.yunda.annotation.CheckParamsKit;
 import com.inschos.yunda.assist.kit.Base64Kit;
 import com.inschos.yunda.assist.kit.HttpKit;
 import com.inschos.yunda.assist.kit.JsonKit;
@@ -63,11 +64,17 @@ public class IntersAction extends BaseAction {
         if (request.insured_name == null || request.insured_code == null || request.insured_phone == null) {
             return json(BaseResponseBean.CODE_FAILURE, "姓名,证件号,手机号不能为空", response);
         }
-        JointLoginBean.Response returnResponse = new JointLoginBean.Response();
+
         //TODO 联合登录触发账号服务
         JointLoginBean.AccountResponse accountResponse = doAccount(request);
-        if (accountResponse==null||accountResponse.code != 200) {
-            return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败", response);
+        if (accountResponse==null||accountResponse.code != 200||accountResponse.data==null) {
+            String reason = "";
+            if(accountResponse.message!=null){
+                for (CheckParamsKit.Entry<String, String> stringStringEntry : accountResponse.message) {
+                    reason = reason+stringStringEntry.details;
+                }
+            }
+            return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败"+" "+reason, response);
         }
         //TODO 成功获取联合登录信息
         String loginToken = accountResponse.data.token;
@@ -79,40 +86,41 @@ public class IntersAction extends BaseAction {
         if (authorizeResponse==null||authorizeResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, "查询授权/签约接口请求失败,查询授权/签约详情失败", response);
         }
-        //TODO 判断授权情况,返回相应参数(URL+token)
-        if (authorizeResponse.data.toString() == "未授权") {
-            returnResponse.data.status = "";
-            returnResponse.data.content = "";
-            returnResponse.data.target_url = "";
-            returnResponse.data.local_url = "";
+        JointLoginBean.Response returnResponse = new JointLoginBean.Response();
+        //TODO 判断授权情况,返回相应参数(URL+token) 01未授权/02已授权
+        if (authorizeResponse.data==null||authorizeResponse.data.bank==null) {
+            returnResponse.data.status = "01";//未授权
+            returnResponse.data.content = "未授权";
+            returnResponse.data.target_url = "https://api-yunda.inschos.com/webapi/do_insured?token="+loginToken;
+            returnResponse.data.local_url = "https://api-yunda.inschos.com/webapi/ins_center?token="+loginToken;
             return JsonKit.bean2Json(returnResponse);
         }
-        //TODO 联合登录表插入数据,先判断今天有没有插入,再插入登录记录.每天只有一个最早的记录(上工时间)
-        long date = new Date().getTime();
-        JointLogin jointLogin = new JointLogin();
-        jointLogin.login_start = date;
-        jointLogin.phone = request.insured_phone;
-        jointLogin.created_at = date;
-        jointLogin.updated_at = date;
-        jointLogin.day_start = TimeKit.getDayStartTime();//获取当天开始时间戳(毫秒值)
-        jointLogin.day_end = TimeKit.getDayEndTime();//获取当天结束时间戳(毫秒值)
-        long repeatRes = jointLoginDao.findLoginRecord(jointLogin);
-        if (repeatRes == 0) {
-            long login_id = jointLoginDao.addLoginRecord(jointLogin);
-        }
-        //TODO 联合登录触发投保服务(先走英大,再走泰康流程)
-        InsureParamsBean.Response insureResponse = new InsureParamsBean.Response();
-        String insureResYd = doInsuredPayYd(request);
-        insureResponse = JsonKit.json2Bean(insureResYd, InsureParamsBean.Response.class);
-        if (insureResponse == null || insureResponse.code != 200) {
-            //TODO 泰康流程
-            String insureResTk = doInsuredPayTk(request);
-            insureResponse = JsonKit.json2Bean(insureResTk, InsureParamsBean.Response.class);
-            if (insureResponse == null || insureResponse.code != 200) {
-                return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
-            }
-        }
-        response.data = insureResponse.data;
+//        //TODO 联合登录表插入数据,先判断今天有没有插入,再插入登录记录.每天只有一个最早的记录(上工时间)
+//        long date = new Date().getTime();
+//        JointLogin jointLogin = new JointLogin();
+//        jointLogin.login_start = date;
+//        jointLogin.phone = request.insured_phone;
+//        jointLogin.created_at = date;
+//        jointLogin.updated_at = date;
+//        jointLogin.day_start = TimeKit.getDayStartTime();//获取当天开始时间戳(毫秒值)
+//        jointLogin.day_end = TimeKit.getDayEndTime();//获取当天结束时间戳(毫秒值)
+//        long repeatRes = jointLoginDao.findLoginRecord(jointLogin);
+//        if (repeatRes == 0) {
+//            long login_id = jointLoginDao.addLoginRecord(jointLogin);
+//        }
+//        //TODO 联合登录触发投保服务(先走英大,再走泰康流程)
+//        InsureParamsBean.Response insureResponse = new InsureParamsBean.Response();
+//        String insureResYd = doInsuredPayYd(request);
+//        insureResponse = JsonKit.json2Bean(insureResYd, InsureParamsBean.Response.class);
+//        if (insureResponse == null || insureResponse.code != 200) {
+//            //TODO 泰康流程
+//            String insureResTk = doInsuredPayTk(request);
+//            insureResponse = JsonKit.json2Bean(insureResTk, InsureParamsBean.Response.class);
+//            if (insureResponse == null || insureResponse.code != 200) {
+//                return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
+//            }
+//        }
+//        response.data = insureResponse.data;
         return json(BaseResponseBean.CODE_SUCCESS, "投保成功", response);
     }
 
@@ -141,7 +149,7 @@ public class IntersAction extends BaseAction {
         }
         //TODO 联合登录触发账号服务
         JointLoginBean.AccountResponse accountResponse = doAccount(request);
-        if (accountResponse.code != 200) {
+        if (accountResponse.code != 200||accountResponse.data==null) {
             return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败", response);
         }
         //TODO 查询授权/签约详情
@@ -292,18 +300,22 @@ public class IntersAction extends BaseAction {
         staffPerson.papers_code = request.insured_code;
         staffPerson.phone = request.insured_phone;
         StaffPerson staffPersonInfo = staffPersonDao.findStaffPersonInfoByCode(staffPerson);
-        if (staffPersonInfo != null) {
-            accountResponse.data.userId = staffPersonInfo.cust_id + "";
-            accountResponse.data.accountUuid = staffPersonInfo.account_uuid + "";
-            accountResponse.data.token = staffPersonInfo.login_token;
-            return accountResponse;
-        }
+        logger.info("账号服务查库："+JsonKit.bean2Json(staffPersonInfo));
+//        if (staffPersonInfo != null) {
+//            accountResponse.code = 200;
+//            accountResponse.data.userId = staffPersonInfo.cust_id + "";
+//            accountResponse.data.accountUuid = staffPersonInfo.account_uuid + "";
+//            accountResponse.data.managerUuid = staffPersonInfo.manager_uuid + "";
+//            accountResponse.data.token = staffPersonInfo.login_token + "";
+//            return accountResponse;
+//        }
         JointLoginBean.AccountRequset jointLoginRequest = new JointLoginBean.AccountRequset();
         jointLoginRequest.platform = "YUNDA";
         jointLoginRequest.origin = "1000";
         jointLoginRequest.name = request.insured_name;
         jointLoginRequest.certType = "1";
         jointLoginRequest.certCode = request.insured_code;
+        jointLoginRequest.phone = request.insured_phone;
         jointLoginRequest.email = request.insured_email;
         jointLoginRequest.province = request.insured_province;
         jointLoginRequest.city = request.insured_city;
@@ -311,22 +323,25 @@ public class IntersAction extends BaseAction {
         jointLoginRequest.address = request.insured_address;
         String interName = "账号服务";
         String result = commonAction.httpRequest(toJointLogin, JsonKit.bean2Json(jointLoginRequest), interName,request.token);
+        logger.info(interName+"返回数据："+result);
         accountResponse = JsonKit.json2Bean(result, JointLoginBean.AccountResponse.class);
-        if(accountResponse.code!=200){
+        if(accountResponse.code==200&&accountResponse.data!=null){
+            //TODO 获取数据成功,数据入库
+            long date = new Date().getTime();
+            staffPerson.cust_id = Long.valueOf(accountResponse.data.userId);
+            staffPerson.account_uuid = accountResponse.data.accountUuid;
+            staffPerson.manager_uuid = accountResponse.data.managerUuid;
+            staffPerson.login_token = accountResponse.data.token;
+            staffPerson.name = request.insured_name;
+            staffPerson.papers_code = request.insured_code;
+            staffPerson.phone = request.insured_phone;
+            staffPerson.created_at = date;
+            staffPerson.updated_at = date;
+            long addRes = staffPersonDao.addStaffPerson(staffPerson);
+            return accountResponse;
+        }else{
             return accountResponse;
         }
-        //TODO 获取数据成功,数据入库
-        long date = new Date().getTime();
-        staffPerson.cust_id = Long.valueOf(accountResponse.data.userId);
-        staffPerson.account_uuid = Long.valueOf(accountResponse.data.accountUuid);
-        staffPerson.login_token = accountResponse.data.token;
-        staffPerson.name = request.insured_name;
-        staffPerson.papers_code = request.insured_code;
-        staffPerson.phone = request.insured_phone;
-        staffPerson.created_at = date;
-        staffPerson.updated_at = date;
-        long addRes = staffPersonDao.addStaffPerson(staffPerson);
-        return accountResponse;
     }
 
     /**
@@ -599,7 +614,8 @@ public class IntersAction extends BaseAction {
                 return 0;
             }
             staffPerson.cust_id = Long.valueOf(accountResponse.data.userId);
-            staffPerson.account_uuid = Long.valueOf(accountResponse.data.accountUuid);
+            staffPerson.account_uuid = accountResponse.data.accountUuid;
+            staffPerson.manager_uuid = accountResponse.data.managerUuid;
             staffPerson.login_token = accountResponse.data.token;
             staffPerson.created_at = date;
             staffPerson.updated_at = date;
