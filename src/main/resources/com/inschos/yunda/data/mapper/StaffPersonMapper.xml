@@ -34,6 +34,7 @@
         <where>
             name =#{name} AND papers_type =#{papers_type} AND papers_code =#{papers_code} AND phone =#{phone}
         </where>
+        limit 1;
     </select>
 
 </mapper>

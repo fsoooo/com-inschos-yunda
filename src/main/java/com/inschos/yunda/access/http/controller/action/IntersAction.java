@@ -46,7 +46,7 @@ public class IntersAction extends BaseAction {
     /**
      * 联合登录
      * TODO 韵达触发联合登录:
-     * TODO 1.账号服务(登录/注册)，获取account_id,,user_id,login_token
+     * TODO 1.账号服务(登录/注册)，获取account_id,manager_uuid,user_id,user_type,login_token
      * TODO 2.授权查询,已授权往下执行,未授权返回结果,结束
      * TODO 3.购保结果,查询当天有没有购保,为购保往下执行,已购保返回购保结果(保单状态),结束
      * TODO 4.购保操作,投保操作,投保成功,执行支付操作
@@ -64,7 +64,6 @@ public class IntersAction extends BaseAction {
         if (request.insured_name == null || request.insured_code == null || request.insured_phone == null) {
             return json(BaseResponseBean.CODE_FAILURE, "姓名,证件号,手机号不能为空", response);
         }
-
         //TODO 联合登录触发账号服务
         JointLoginBean.AccountResponse accountResponse = doAccount(request);
         if (accountResponse==null||accountResponse.code != 200||accountResponse.data==null) {
@@ -86,42 +85,53 @@ public class IntersAction extends BaseAction {
         if (authorizeResponse==null||authorizeResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, "查询授权/签约接口请求失败,查询授权/签约详情失败", response);
         }
-        JointLoginBean.Response returnResponse = new JointLoginBean.Response();
+        JointLoginBean.ResponseData returnResponseData = new JointLoginBean.ResponseData();
         //TODO 判断授权情况,返回相应参数(URL+token) 01未授权/02已授权
         if (authorizeResponse.data==null||authorizeResponse.data.bank==null) {
-            returnResponse.data.status = "01";//未授权
-            returnResponse.data.content = "未授权";
-            returnResponse.data.target_url = "https://api-yunda.inschos.com/webapi/do_insured?token="+loginToken;
-            returnResponse.data.local_url = "https://api-yunda.inschos.com/webapi/ins_center?token="+loginToken;
-            return JsonKit.bean2Json(returnResponse);
+            returnResponseData.status = "01";
+            returnResponseData.content = "开启快递保免密支付,每日出行有保障>>";
+            returnResponseData.target_url = "https://api-yunda.inschos.com/webapi/do_insured?token="+loginToken;
+            returnResponseData.local_url = "https://api-yunda.inschos.com/webapi/ins_center?token="+loginToken;
+            response.data = returnResponseData;
+            //return json(BaseResponseBean.CODE_SUCCESS, "绑定银行卡,开启快递保免密支付,每日出行有保障>>", response);
         }
-//        //TODO 联合登录表插入数据,先判断今天有没有插入,再插入登录记录.每天只有一个最早的记录(上工时间)
-//        long date = new Date().getTime();
-//        JointLogin jointLogin = new JointLogin();
-//        jointLogin.login_start = date;
-//        jointLogin.phone = request.insured_phone;
-//        jointLogin.created_at = date;
-//        jointLogin.updated_at = date;
-//        jointLogin.day_start = TimeKit.getDayStartTime();//获取当天开始时间戳(毫秒值)
-//        jointLogin.day_end = TimeKit.getDayEndTime();//获取当天结束时间戳(毫秒值)
-//        long repeatRes = jointLoginDao.findLoginRecord(jointLogin);
-//        if (repeatRes == 0) {
-//            long login_id = jointLoginDao.addLoginRecord(jointLogin);
-//        }
-//        //TODO 联合登录触发投保服务(先走英大,再走泰康流程)
-//        InsureParamsBean.Response insureResponse = new InsureParamsBean.Response();
-//        String insureResYd = doInsuredPayYd(request);
-//        insureResponse = JsonKit.json2Bean(insureResYd, InsureParamsBean.Response.class);
-//        if (insureResponse == null || insureResponse.code != 200) {
-//            //TODO 泰康流程
-//            String insureResTk = doInsuredPayTk(request);
-//            insureResponse = JsonKit.json2Bean(insureResTk, InsureParamsBean.Response.class);
-//            if (insureResponse == null || insureResponse.code != 200) {
-//                return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
-//            }
-//        }
-//        response.data = insureResponse.data;
-        return json(BaseResponseBean.CODE_SUCCESS, "投保成功", response);
+        //TODO 联合登录表插入数据,先判断今天有没有插入,再插入登录记录.每天只有一个最早的记录(上工时间)
+        long date = new Date().getTime();
+        JointLogin jointLogin = new JointLogin();
+        jointLogin.login_start = date;
+        jointLogin.phone = request.insured_phone;
+        jointLogin.created_at = date;
+        jointLogin.updated_at = date;
+        jointLogin.day_start = TimeKit.getDayStartTime();//获取当天开始时间戳(毫秒值)
+        jointLogin.day_end = TimeKit.getDayEndTime();//获取当天结束时间戳(毫秒值)
+        long repeatRes = jointLoginDao.findLoginRecord(jointLogin);
+        if (repeatRes == 0) {
+            long login_id = jointLoginDao.addLoginRecord(jointLogin);
+        }
+        //TODO 联合登录触发投保服务(先走英大,再走泰康流程)
+        InsureParamsBean.Response insureResponse = new InsureParamsBean.Response();
+        String insureResYd = doInsuredPayYd(request);
+        logger.info("英大投保结果"+insureResYd);
+        insureResponse = JsonKit.json2Bean(insureResYd, InsureParamsBean.Response.class);
+        if (insureResponse == null || insureResponse.code != 200) {
+            //TODO 泰康流程
+            String insureResTk = doInsuredPayTk(request);
+            insureResponse = JsonKit.json2Bean(insureResTk, InsureParamsBean.Response.class);
+            if (insureResponse == null || insureResponse.code != 200) {
+                returnResponseData.status = "01";
+                returnResponseData.content = "今日快递保未生效,点击查看原因>>";
+                returnResponseData.target_url = "https://api-yunda.inschos.com/webapi/do_insured?token="+loginToken;
+                returnResponseData.local_url = "https://api-yunda.inschos.com/webapi/ins_center?token="+loginToken;
+                response.data = returnResponseData;
+                return json(BaseResponseBean.CODE_FAILURE, "今日快递保未生效,点击查看原因>>", response);
+            }
+        }
+        returnResponseData.status = "01";
+        returnResponseData.content = "今日快递保生效中>>";
+        returnResponseData.target_url = "https://api-yunda.inschos.com/webapi/ins_center?token="+loginToken;
+        returnResponseData.local_url = "https://api-yunda.inschos.com/webapi/ins_center?token="+loginToken;
+        response.data = returnResponseData;
+        return json(BaseResponseBean.CODE_SUCCESS, "今日快递保生效中>>", response);
     }
 
     /**
@@ -149,21 +159,33 @@ public class IntersAction extends BaseAction {
         }
         //TODO 联合登录触发账号服务
         JointLoginBean.AccountResponse accountResponse = doAccount(request);
-        if (accountResponse.code != 200||accountResponse.data==null) {
-            return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败", response);
+        if (accountResponse==null||accountResponse.code != 200||accountResponse.data==null) {
+            String reason = "";
+            if(accountResponse.message!=null){
+                for (CheckParamsKit.Entry<String, String> stringStringEntry : accountResponse.message) {
+                    reason = reason+stringStringEntry.details;
+                }
+            }
+            return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败"+" "+reason, response);
         }
-        //TODO 查询授权/签约详情
+        //TODO 成功获取联合登录信息
+        String loginToken = accountResponse.data.token;
+        String custId = accountResponse.data.userId;
+        String accountUuid = accountResponse.data.accountUuid;
+        request.token = loginToken;
+        //TODO 查询授权/签约详情(此接口还需判断用户是否有可用银行卡)
         CommonBean.findAuthorizeResponse authorizeResponse = doAuthorizeRes(request);
-        if (authorizeResponse.code != 200) {
+        if (authorizeResponse==null||authorizeResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, "查询授权/签约接口请求失败,查询授权/签约详情失败", response);
         }
-        //TODO 判断授权/签约状态
-        if (authorizeResponse.data.toString() == "未授权") {
+        //TODO 判断授权情况,返回相应参数(URL+token) 01未授权/02已授权
+        if (authorizeResponse.data==null||authorizeResponse.data.bank== ) {
             //TODO 返回参数
-            authorizeQueryResponseData.status = "";
-            authorizeQueryResponseData.url = "";
+            authorizeQueryResponseData.status = "01";
+            authorizeQueryResponseData.url =  "https://api-yunda.inschos.com/webapi/bank_authorize?token="+loginToken;
             response.data = authorizeQueryResponseData;
             String responseText = "未授权";
+            response.data = authorizeQueryResponseData;
             return json(BaseResponseBean.CODE_FAILURE, responseText, response);
         }
         String responseText = "已授权";
@@ -232,7 +254,7 @@ public class IntersAction extends BaseAction {
 
     /**
      * 保险推送接口
-     * TODO 核心服务投保成功后触发此接口,将购保结果推送至韵达
+     * TODO 核心服务投保成功后触发此接口,将购保结果推送至韵达(可以做异步处理)
      *
      * @param httpServletRequest
      * @return
@@ -337,7 +359,11 @@ public class IntersAction extends BaseAction {
             staffPerson.phone = request.insured_phone;
             staffPerson.created_at = date;
             staffPerson.updated_at = date;
-            long addRes = staffPersonDao.addStaffPerson(staffPerson);
+            //插入之前要先判断
+            StaffPerson staffPersonRepeat = staffPersonDao.findStaffPersonInfoByCode(staffPerson);
+            if(staffPersonRepeat==null){
+                long addRes = staffPersonDao.addStaffPerson(staffPerson);
+            }
             return accountResponse;
         }else{
             return accountResponse;
@@ -380,6 +406,7 @@ public class IntersAction extends BaseAction {
     private String doInsuredPay(JointLoginBean.Requset request, String p_code) {
         BaseResponseBean response = new BaseResponseBean();
         BaseResponseBean insuredCount = insuredCount(request);
+        logger.info("保单数量："+JsonKit.bean2Json(insuredCount));
         if (insuredCount.code != 600) {
             //TODO 有投保记录
             return json(insuredCount);
@@ -387,6 +414,9 @@ public class IntersAction extends BaseAction {
         WarrantyRecord warrantyRecord = new WarrantyRecord();
         //TODO 调用投保接口
         InsureParamsBean.Response insureResponse = doInsured(request);
+        if(insureResponse.code==500){
+            return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
+        }
         InsureParamsBean.ResponseData responseData = new InsureParamsBean.ResponseData();
         InusrePayBean.Requset inusrePayRequest = new InusrePayBean.Requset();
         //TODO 保单记录表添加/更新
@@ -471,6 +501,8 @@ public class IntersAction extends BaseAction {
      * @return
      */
     private InsureParamsBean.Response doInsured(JointLoginBean.Requset request) {
+        String endTime = TimeKit.getDayEndTime()+"";
+        String startTime = TimeKit.curTimeMillis2Str();
         //投保人基础信息
         InsureParamsBean.PolicyHolder policyHolder = new InsureParamsBean.PolicyHolder();
         policyHolder.name = request.insured_name;
@@ -479,12 +511,13 @@ public class IntersAction extends BaseAction {
         policyHolder.phone = request.insured_phone;
         policyHolder.relationName = "本人";
         //以下数据 按业务选填
-        policyHolder.occupation = "";//职业
+        policyHolder.occupation = "快递员";//职业
         policyHolder.birthday = "";//生日 时间戳
         policyHolder.sex = "";//性别 1 男 2 女
         policyHolder.age = "";//年龄
-        policyHolder.email = "";//邮箱
-        policyHolder.nationality = "";//国籍
+
+        policyHolder.email = request.insured_email;//邮箱
+        policyHolder.nationality = "CHN";//国籍
         policyHolder.annualIncome = "";//年收入
         policyHolder.height = "";//身高
         policyHolder.weight = "";//体重
@@ -492,25 +525,25 @@ public class IntersAction extends BaseAction {
         policyHolder.address = "";//详细地址
         policyHolder.courier_state = "";//站点地址
         policyHolder.courier_start_time = "";//分拣开始时间
-        policyHolder.province = "";//省
-        policyHolder.city = "";//市
-        policyHolder.county = "";//县
-        policyHolder.bank_code = "";//银行卡号
-        policyHolder.bank_name = "";//银行卡名字
-        policyHolder.bank_phone = "";//银行卡绑定手机
-        policyHolder.insure_days = "";//购保天数
-        policyHolder.price = "";//价格
+        policyHolder.province = request.insured_province;//省
+        policyHolder.city = request.insured_city;//市
+        policyHolder.county = request.insured_county;//县
+        policyHolder.bank_code = request.bank_code;//银行卡号
+        policyHolder.bank_name = request.bank_name;//银行卡名字
+        policyHolder.bank_phone = request.bank_phone;//银行卡绑定手机
+        //TODO 要查数据库，默认是一天两元的
+        policyHolder.insure_days = "1";//购保天数
+        policyHolder.price = "2";//价格
         //TODO 投保人被保人和受益人是本人
         List<InsureParamsBean.PolicyHolder> recognizees = new ArrayList<>();
         recognizees.add(policyHolder);
         InsureParamsBean.Requset insuredRequest = new InsureParamsBean.Requset();
         insuredRequest.productId = 90;//产品id:英大90,泰康91
-        insuredRequest.startTime = "";
-        insuredRequest.endTime = "";
-        insuredRequest.count = "";
-        insuredRequest.businessNo = "";
-        insuredRequest.payCategoryId = "";
-        insuredRequest.businessNo = "";
+        insuredRequest.startTime = startTime;
+        insuredRequest.endTime = endTime;
+        insuredRequest.count = "1";
+        insuredRequest.businessNo = endTime;
+        insuredRequest.payCategoryId = "0";
         insuredRequest.policyholder = policyHolder;
         insuredRequest.recognizees = recognizees;
         insuredRequest.beneficiary = policyHolder;
