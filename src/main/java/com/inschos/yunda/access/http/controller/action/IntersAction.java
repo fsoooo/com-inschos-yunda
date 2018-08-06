@@ -90,8 +90,8 @@ public class IntersAction extends BaseAction {
         if (authorizeResponse.data==null||authorizeResponse.data.bank==null) {
             returnResponseData.status = "01";
             returnResponseData.content = "开启快递保免密支付,每日出行有保障>>";
-            returnResponseData.target_url = "https://api-yunda.inschos.com/webapi/do_insured?token="+loginToken;
-            returnResponseData.local_url = "https://api-yunda.inschos.com/webapi/ins_center?token="+loginToken;
+            returnResponseData.target_url = toDOBankAuthorize+"?token="+loginToken;
+            returnResponseData.local_url = toInsureCenter+"?token="+loginToken;
             response.data = returnResponseData;
             //return json(BaseResponseBean.CODE_SUCCESS, "绑定银行卡,开启快递保免密支付,每日出行有保障>>", response);
         }
@@ -120,16 +120,16 @@ public class IntersAction extends BaseAction {
             if (insureResponse == null || insureResponse.code != 200) {
                 returnResponseData.status = "01";
                 returnResponseData.content = "今日快递保未生效,点击查看原因>>";
-                returnResponseData.target_url = "https://api-yunda.inschos.com/webapi/do_insured?token="+loginToken;
-                returnResponseData.local_url = "https://api-yunda.inschos.com/webapi/ins_center?token="+loginToken;
+                returnResponseData.target_url = toDoInsured+"?token="+loginToken;
+                returnResponseData.local_url = toInsureCenter+"?token="+loginToken;
                 response.data = returnResponseData;
                 return json(BaseResponseBean.CODE_FAILURE, "今日快递保未生效,点击查看原因>>", response);
             }
         }
         returnResponseData.status = "01";
         returnResponseData.content = "今日快递保生效中>>";
-        returnResponseData.target_url = "https://api-yunda.inschos.com/webapi/ins_center?token="+loginToken;
-        returnResponseData.local_url = "https://api-yunda.inschos.com/webapi/ins_center?token="+loginToken;
+        returnResponseData.target_url = toInsureCenter+"?token="+loginToken;
+        returnResponseData.local_url = toInsureCenter+"?token="+loginToken;
         response.data = returnResponseData;
         return json(BaseResponseBean.CODE_SUCCESS, "今日快递保生效中>>", response);
     }
@@ -182,7 +182,7 @@ public class IntersAction extends BaseAction {
         if (authorizeResponse.data==null||authorizeResponse.data.bank==null) {
             //TODO 返回参数
             authorizeQueryResponseData.status = "01";
-            authorizeQueryResponseData.url =  "https://api-yunda.inschos.com/webapi/bank_authorize?token="+loginToken;
+            authorizeQueryResponseData.url =  toDOBankAuthorize+"?token="+loginToken;
             response.data = authorizeQueryResponseData;
             String responseText = "未授权";
             response.data = authorizeQueryResponseData;

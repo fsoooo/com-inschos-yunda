@@ -79,4 +79,13 @@ public class IntersCommonUrlBean {
 
     //6.投保推送韵达
     public static final String toCallBackYunda = "https://apptest.yundasys.com/ywy-insurance/interface/ywy/insurance/pushinsuranceinfo.do";
+
+    //7.联合登录入口URL
+    public static final String toInsureInfo = "https://api-yunda.inschos.com/webapi/ins_info";
+
+    public static final String toInsureCenter = "https://api-yunda.inschos.com/webapi/ins_center";
+
+    public static final String toDoInsured = "https://api-yunda.inschos.com/webapi/do_insured";
+
+    public static final String toDOBankAuthorize = "https://api-yunda.inschos.com/webapi/bank_authorize";
 }

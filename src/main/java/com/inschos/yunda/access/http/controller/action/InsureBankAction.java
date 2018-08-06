@@ -68,7 +68,7 @@ public class InsureBankAction extends BaseAction {
         verifyBankSmsRequest.verifyId = verifyId;
         verifyBankSmsRequest.verifyCode = request.verifyCode;
         InsureBankBean.verifyBankSmsResponse verifyBankSmsResponse = verifyBankSms(verifyBankSmsRequest);
-        if (!verifyBankSmsResponse.data.verifyStatus) {
+        if (verifyBankSmsResponse==null||!verifyBankSmsResponse.data.verifyStatus) {
             return json(BaseResponseBean.CODE_FAILURE, "短信验证码校验失败", response);
         }
         String interName = "添加银行卡";
