@@ -5,6 +5,10 @@ package com.inschos.yunda.access.http.controller.bean;
  */
 public class IntersCommonUrlBean {
 
+    public static final String platform =  "YUNDA";
+
+    public static final String origin = "1000";
+
     private static final String SERVER_HOST_ACCOUNT = "http://122.14.202.146:9200/api/account/web";
 
     private static final String SERVER_HOST_CUSTOMER = "http://122.14.202.146:9200/api/customer/web";

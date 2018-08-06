@@ -83,18 +83,11 @@ public class InsureUserAction extends BaseAction {
             //没有查到用户信息,从接口里拿,然后插入数据同时返回
             InsureSetupBean.accountInfoRequest accountInfoRequest = new InsureSetupBean.accountInfoRequest();
             InsureSetupBean.accountInfoResponse accountInfoResponse = new InsureSetupBean.accountInfoResponse();
-            if (staffPerson.cust_id != 0 && staffPerson.account_uuid != null) {
-                accountInfoRequest.custId = staffPerson.cust_id;
-                accountInfoRequest.accountUuid = staffPerson.account_uuid;
-                String result = commonAction.httpRequest(toAccountInfo, JsonKit.bean2Json(accountInfoRequest), interName,staffPerson.login_token);
-                accountInfoResponse = JsonKit.json2Bean(result, InsureSetupBean.accountInfoResponse.class);
-            } else if (staffPerson.name != null && staffPerson.papers_code != null && staffPerson.phone != null) {
-                accountInfoRequest.name = staffPerson.name;
-                accountInfoRequest.idCard = staffPerson.papers_code;
-                accountInfoRequest.phone = staffPerson.phone;
-                String result = commonAction.httpRequest(toAccountInfo, JsonKit.bean2Json(accountInfoRequest), interName,staffPerson.login_token);
-                accountInfoResponse = JsonKit.json2Bean(result, InsureSetupBean.accountInfoResponse.class);
+            if (staffPerson.login_token == null) {
+                return userInfoResponse;
             }
+            String result = commonAction.httpRequest(toAccountInfo, "", interName,staffPerson.login_token);
+            accountInfoResponse = JsonKit.json2Bean(result, InsureSetupBean.accountInfoResponse.class);
             //获取数据成功,数据入库
             long date = new Date().getTime();
             staffPerson.cust_id = accountInfoResponse.data.custId;

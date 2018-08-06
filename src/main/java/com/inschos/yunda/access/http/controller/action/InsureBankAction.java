@@ -68,7 +68,8 @@ public class InsureBankAction extends BaseAction {
         verifyBankSmsRequest.verifyId = verifyId;
         verifyBankSmsRequest.verifyCode = request.verifyCode;
         InsureBankBean.verifyBankSmsResponse verifyBankSmsResponse = verifyBankSms(verifyBankSmsRequest);
-        if (verifyBankSmsResponse==null||!verifyBankSmsResponse.data.verifyStatus) {
+        logger.info("校验验证码"+JsonKit.bean2Json(verifyBankSmsResponse));
+        if (verifyBankSmsResponse.code!=200||verifyBankSmsResponse.data.verifyStatus==false) {
             return json(BaseResponseBean.CODE_FAILURE, "短信验证码校验失败", response);
         }
         String interName = "添加银行卡";
@@ -241,11 +242,17 @@ public class InsureBankAction extends BaseAction {
         }
         InsureBankBean.bankSmsRequest bankSmsRequest = new InsureBankBean.bankSmsRequest();
         InsureUserBean.userInfoRequest userInfoRequest = new InsureUserBean.userInfoRequest();
+        userInfoRequest.token = request.token;
         InsureUserBean.userInfoResponse userInfoResponse = insureUserAction.findUserInfoById(userInfoRequest);
+        logger.info("获取个人信息"+JsonKit.bean2Json(userInfoResponse));
+        if(userInfoResponse.code!=200){
+            return json(BaseResponseBean.CODE_FAILURE, "获取验证码失败,个人信息无法获取", response);
+        }
         bankSmsRequest.bankPhone = request.phone;
         bankSmsRequest.bankCode = request.bankCode;
         bankSmsRequest.Name = userInfoResponse.data.name;
         bankSmsRequest.idCard = userInfoResponse.data.papersCode;
+        bankSmsRequest.origin = origin;
         //判断是否已经发过验证码，避免重复发送
         BankVerify bankVerify = new BankVerify();
         long date = new Date().getTime();
