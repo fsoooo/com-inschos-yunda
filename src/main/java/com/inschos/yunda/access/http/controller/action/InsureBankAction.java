@@ -141,7 +141,10 @@ public class InsureBankAction extends BaseAction {
             Object bankList = bankListResponse.data;
             List<InsureBankBean.bankInfoResponseData> bankLists = JsonKit.json2Bean(JsonKit.bean2Json(bankList),new TypeReference<List<InsureBankBean.bankInfoResponseData>>() {
             });
-            long bankCount = bankLists.size();
+            long bankCount = 0;
+            if(bankList != null){
+                bankCount = bankLists.size();
+            }
             return bankCount;
         } catch (IOException e) {
             return -1;
