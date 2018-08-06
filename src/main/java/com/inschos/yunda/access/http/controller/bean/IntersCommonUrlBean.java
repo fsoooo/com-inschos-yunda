@@ -59,9 +59,9 @@ public class IntersCommonUrlBean {
     //获取投保结果
     public static final String toInsureResult = IntersCommonUrlBean.getServerHostInsure() + "/";
     //获取保单列表
-    public static final String toWarrantyList = IntersCommonUrlBean.getServerHostInsure() + "/trade/car_insurance/get_insurance_policy_list_for_online_store";
+    public static final String toWarrantyList = IntersCommonUrlBean.getServerHostInsure() + "/trade/get_insurance_policy_list_for_online_store";
     //获取保单详情
-    public static final String toWarrantyInfo = IntersCommonUrlBean.getServerHostInsure() + "/trade/car_insurance/get_insurance_policy_detail_for_online_store";
+    public static final String toWarrantyInfo = IntersCommonUrlBean.getServerHostInsure() + "/trade/get_insurance_policy_detail_for_online_store";
 
     //4.交易服务-银行卡接口
     //添加银行卡
