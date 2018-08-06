@@ -179,7 +179,7 @@ public class IntersAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, "查询授权/签约接口请求失败,查询授权/签约详情失败", response);
         }
         //TODO 判断授权情况,返回相应参数(URL+token) 01未授权/02已授权
-        if (authorizeResponse.data==null||authorizeResponse.data.bank== ) {
+        if (authorizeResponse.data==null||authorizeResponse.data.bank==null) {
             //TODO 返回参数
             authorizeQueryResponseData.status = "01";
             authorizeQueryResponseData.url =  "https://api-yunda.inschos.com/webapi/bank_authorize?token="+loginToken;
