@@ -49,6 +49,7 @@ public class InsureUserAction extends BaseAction {
     public InsureUserBean.userInfoResponse findUserInfoById(InsureUserBean.userInfoRequest request) {
         StaffPerson staffPerson = new StaffPerson();
         staffPerson.login_token = request.token;
+        logger.info("获取用户信息token："+request.token);
         InsureUserBean.userInfoResponse userInfoResponse = findUserInfoCommon(staffPerson);
         return userInfoResponse;
     }
@@ -76,10 +77,24 @@ public class InsureUserAction extends BaseAction {
      * @return
      */
     private InsureUserBean.userInfoResponse findUserInfoCommon(StaffPerson staffPerson) {
+        logger.info("获取用户信息公共参数："+JsonKit.bean2Json(staffPerson));
         StaffPerson staffPersonInfo = staffPersonDao.findStaffPersonInfoByCode(staffPerson);
         InsureUserBean.userInfoResponse userInfoResponse = new InsureUserBean.userInfoResponse();
         String interName = "获取用户信息";
-        if (staffPersonInfo == null) {
+        InsureUserBean.userInfoResponseData userInfoResponseData = new InsureUserBean.userInfoResponseData();
+        logger.info("获取用户信息公共参数-查库："+JsonKit.bean2Json(staffPersonInfo));
+        if(staffPersonInfo != null&&staffPersonInfo.name!=null&&staffPersonInfo.papers_code!=null&&staffPersonInfo.phone!=null){
+            userInfoResponseData.id = staffPersonInfo.id;
+            userInfoResponseData.custId = staffPersonInfo.cust_id;
+            userInfoResponseData.accountUuid = staffPersonInfo.account_uuid;
+            userInfoResponseData.loginToken = staffPersonInfo.login_token;
+            userInfoResponseData.name = staffPersonInfo.name;
+            userInfoResponseData.papersType = staffPersonInfo.papers_type;
+            userInfoResponseData.papersCode = staffPersonInfo.papers_code;
+            userInfoResponseData.phone = staffPersonInfo.phone;
+            userInfoResponseData.createdAt = staffPersonInfo.created_at;
+            userInfoResponseData.updatedAt = staffPersonInfo.updated_at;
+        }else{
             //没有查到用户信息,从接口里拿,然后插入数据同时返回
             InsureSetupBean.accountInfoRequest accountInfoRequest = new InsureSetupBean.accountInfoRequest();
             InsureSetupBean.accountInfoResponse accountInfoResponse = new InsureSetupBean.accountInfoResponse();
@@ -88,7 +103,7 @@ public class InsureUserAction extends BaseAction {
             }
             String result = commonAction.httpRequest(toAccountInfo, "", interName,staffPerson.login_token);
             accountInfoResponse = JsonKit.json2Bean(result, InsureSetupBean.accountInfoResponse.class);
-            //获取数据成功,数据入库
+            //获取数据成功,数据入库 TODO 需要判断,数据库里没有的插入，数据库里已经有的执行更新操作
             long date = new Date().getTime();
             staffPerson.cust_id = accountInfoResponse.data.custId;
             staffPerson.account_uuid = accountInfoResponse.data.accountUuid;
@@ -98,31 +113,27 @@ public class InsureUserAction extends BaseAction {
             staffPerson.phone = accountInfoResponse.data.phone;
             staffPerson.created_at = date;
             staffPerson.updated_at = date;
-            long addRes = staffPersonDao.addStaffPerson(staffPerson);
-            if (addRes != 0) {
-                userInfoResponse.data.id = addRes;
+            if(staffPersonInfo==null){
+                long addRes = staffPersonDao.addStaffPerson(staffPerson);
+                if (addRes != 0) {
+                    userInfoResponseData.id = addRes;
+                }
+            }else{
+                staffPerson.id = staffPerson.id;
+                long updateRes = staffPersonDao.updateStaffPerson(staffPerson);
+                userInfoResponseData.id = staffPersonInfo.id;
             }
-            userInfoResponse.data.custId = staffPerson.cust_id;
-            userInfoResponse.data.accountUuid = staffPerson.account_uuid;
-            userInfoResponse.data.loginToken = staffPerson.login_token;
-            userInfoResponse.data.name = staffPerson.name;
-            userInfoResponse.data.papersType = staffPerson.papers_type;
-            userInfoResponse.data.papersCode = staffPerson.papers_code;
-            userInfoResponse.data.phone = staffPerson.phone;
-            userInfoResponse.data.createdAt = staffPerson.created_at;
-            userInfoResponse.data.updatedAt = staffPerson.updated_at;
-        } else {
-            userInfoResponse.data.id = staffPersonInfo.id;
-            userInfoResponse.data.custId = staffPersonInfo.cust_id;
-            userInfoResponse.data.accountUuid = staffPersonInfo.account_uuid;
-            userInfoResponse.data.loginToken = staffPersonInfo.login_token;
-            userInfoResponse.data.name = staffPersonInfo.name;
-            userInfoResponse.data.papersType = staffPersonInfo.papers_type;
-            userInfoResponse.data.papersCode = staffPersonInfo.papers_code;
-            userInfoResponse.data.phone = staffPersonInfo.phone;
-            userInfoResponse.data.createdAt = staffPersonInfo.created_at;
-            userInfoResponse.data.updatedAt = staffPersonInfo.updated_at;
+            userInfoResponseData.custId = staffPerson.cust_id;
+            userInfoResponseData.accountUuid = staffPerson.account_uuid;
+            userInfoResponseData.loginToken = staffPerson.login_token;
+            userInfoResponseData.name = staffPerson.name;
+            userInfoResponseData.papersType = staffPerson.papers_type;
+            userInfoResponseData.papersCode = staffPerson.papers_code;
+            userInfoResponseData.phone = staffPerson.phone;
+            userInfoResponseData.createdAt = staffPerson.created_at;
+            userInfoResponseData.updatedAt = staffPerson.updated_at;
         }
+        userInfoResponse.data = userInfoResponseData;
         return userInfoResponse;
     }
 }

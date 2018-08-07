@@ -8,6 +8,12 @@
         values(#{cust_id},#{account_uuid},#{manager_uuid},#{name},#{papers_type},#{papers_code},#{phone},#{login_token},#{created_at},#{updated_at})
     </insert>
 
+    <update id="updateStaffPerson" parameterType="StaffPerson">
+        update staff_person set
+        `cust_id` =#{cust_id} AND `account_uuid` =#{account_uuid} AND `manager_uuid` =#{manager_uuid} AND `name` =#{name} AND `papers_type` =#{papers_type} AND `papers_code` =#{papers_code} AND `phone` =#{phone} AND `login_token` =#{login_token} AND `updated_at` =#{updated_at}
+        where id =#{id}
+    </update>
+
     <!--基础类型 不支持空,如需要查询,可以用封装类来接值.然后再做封装类和基础类型的转换-->
     <!--封装类:java.lang.Long java.lang.Integer -->
     <select id="findStaffPersonId" parameterType="StaffPerson" resultType="java.lang.Long">

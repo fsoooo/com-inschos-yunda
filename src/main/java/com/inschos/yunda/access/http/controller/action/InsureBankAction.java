@@ -245,17 +245,18 @@ public class InsureBankAction extends BaseAction {
         }
         InsureBankBean.bankSmsRequest bankSmsRequest = new InsureBankBean.bankSmsRequest();
         InsureUserBean.userInfoRequest userInfoRequest = new InsureUserBean.userInfoRequest();
-        userInfoRequest.token = request.token;
+        userInfoRequest.token = actionBean.token;
         InsureUserBean.userInfoResponse userInfoResponse = insureUserAction.findUserInfoById(userInfoRequest);
-        logger.info("获取个人信息"+JsonKit.bean2Json(userInfoResponse));
-        if(userInfoResponse.code!=200){
+        logger.info("获取个人信息(银)"+JsonKit.bean2Json(userInfoResponse));
+        if(userInfoResponse.code!=200&&userInfoResponse.data==null){
             return json(BaseResponseBean.CODE_FAILURE, "获取验证码失败,个人信息无法获取", response);
         }
         bankSmsRequest.bankPhone = request.phone;
         bankSmsRequest.bankCode = request.bankCode;
-        bankSmsRequest.Name = userInfoResponse.data.name;
+        bankSmsRequest.name = userInfoResponse.data.name;
         bankSmsRequest.idCard = userInfoResponse.data.papersCode;
         bankSmsRequest.origin = origin;
+        logger.info("获取验证码信息："+JsonKit.bean2Json(bankSmsRequest));
         //判断是否已经发过验证码，避免重复发送
         BankVerify bankVerify = new BankVerify();
         long date = new Date().getTime();

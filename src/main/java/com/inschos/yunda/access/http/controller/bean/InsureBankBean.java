@@ -60,7 +60,7 @@ public class InsureBankBean {
 
     public static class bankSmsRequest {
         public String origin = "YUNDA";//标识
-        public String Name;//用户姓名
+        public String name;//用户姓名
         public String bankCode;//用户银行卡号
         public String bankPhone;//银行卡绑定手机
         public String idCard;//用户身份证号
