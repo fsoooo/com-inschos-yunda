@@ -206,9 +206,6 @@ public class IntersAction extends BaseAction {
     public String prepareInusre(HttpServletRequest httpServletRequest) {
         InsurePrepareBean.Requset request = JsonKit.json2Bean(HttpKit.readRequestBody(httpServletRequest), InsurePrepareBean.Requset.class);
         BaseResponseBean response = new BaseResponseBean();
-        HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String token = httpRequest.getParameter("token");
-        request.token = token;
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
@@ -217,12 +214,15 @@ public class IntersAction extends BaseAction {
         }
         Base64Kit base64Kit = new Base64Kit();
         String biz_content = base64Kit.getFromBase64(request.biz_content);
+        logger.info("预投保参数："+biz_content);
         if (biz_content == null) {
             return json(BaseResponseBean.CODE_FAILURE, "预投保参数解析失败", response);
         }
         List<InsurePrepareBean.InsureRequest> insureRequests = JsonKit.json2Bean(biz_content, new TypeReference<List<InsurePrepareBean.InsureRequest>>() {
         });
+        logger.info("预投保参数："+JsonKit.bean2Json(insureRequests));
         for (InsurePrepareBean.InsureRequest insureRequest : insureRequests) {
+            logger.info("预投保参数："+JsonKit.bean2Json(insureRequest));
             JointLoginBean.Requset jointLoginRequest = new JointLoginBean.Requset();
             jointLoginRequest.channel_code = insureRequest.channel_code;
             jointLoginRequest.insured_name = insureRequest.channel_user_name;
@@ -238,7 +238,23 @@ public class IntersAction extends BaseAction {
             jointLoginRequest.bank_phone = insureRequest.channel_bank_phone;
             jointLoginRequest.bank_address = insureRequest.channel_bank_address;
             jointLoginRequest.channel_order_code = "";
-            //TODO  http 请求 投保服务
+            //TODO 请求 账号服务
+            JointLoginBean.AccountResponse accountResponse = doAccount(jointLoginRequest);
+            if (accountResponse==null||accountResponse.code != 200||accountResponse.data==null) {
+                String reason = "";
+                if(accountResponse.message!=null){
+                    for (CheckParamsKit.Entry<String, String> stringStringEntry : accountResponse.message) {
+                        reason = reason+stringStringEntry.details;
+                    }
+                }
+                return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败"+" "+reason, response);
+            }
+            //TODO 成功获取联合登录信息
+            String loginToken = accountResponse.data.token;
+            String custId = accountResponse.data.userId;
+            String accountUuid = accountResponse.data.accountUuid;
+            jointLoginRequest.token = loginToken;
+            //TODO 请求 投保服务
             String insureRes = doInsuredPayTk(jointLoginRequest);
             InsureParamsBean.Response insureResponse = JsonKit.json2Bean(insureRes, InsureParamsBean.Response.class);
             if (insureResponse == null) {
@@ -323,6 +339,7 @@ public class IntersAction extends BaseAction {
         staffPerson.phone = request.insured_phone;
         StaffPerson staffPersonInfo = staffPersonDao.findStaffPersonInfoByCode(staffPerson);
         logger.info("账号服务查库："+JsonKit.bean2Json(staffPersonInfo));
+        logger.info("账号服务请求参数："+JsonKit.bean2Json(request));
 //        if (staffPersonInfo != null) {
 //            accountResponse.code = 200;
 //            accountResponse.data.userId = staffPersonInfo.cust_id + "";
