@@ -281,7 +281,7 @@ public class InsureBankAction extends BaseAction {
                     reason = reason+","+stringStringEntry.details;
                 }
             }
-            return json(BaseResponseBean.CODE_SUCCESS, interName+"接口请求成功 "+reason, response);
+            return json(BaseResponseBean.CODE_FAILURE, interName+"接口请求成功 "+reason, response);
         }
         //数据库添加记录
         bankVerify.verify_id = bankSmsResponse.data.requestId;
