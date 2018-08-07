@@ -12,4 +12,6 @@ public interface StaffPersonMapper {
     StaffPerson findStaffPersonInfoById(StaffPerson staffPerson);
 
     StaffPerson findStaffPersonInfoByCode(StaffPerson staffPerson);
+
+    StaffPerson findStaffPersonInfoByPhone(StaffPerson staffPerson);
 }

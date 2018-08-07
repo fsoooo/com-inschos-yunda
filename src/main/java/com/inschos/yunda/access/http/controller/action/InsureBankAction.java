@@ -5,6 +5,7 @@ import com.inschos.yunda.access.http.controller.bean.ActionBean;
 import com.inschos.yunda.access.http.controller.bean.BaseResponseBean;
 import com.inschos.yunda.access.http.controller.bean.InsureBankBean;
 import com.inschos.yunda.access.http.controller.bean.InsureUserBean;
+import com.inschos.yunda.annotation.CheckParamsKit;
 import com.inschos.yunda.assist.kit.HttpClientKit;
 import com.inschos.yunda.assist.kit.JsonKit;
 import com.inschos.yunda.data.dao.BankVerifyDao;
@@ -273,6 +274,15 @@ public class InsureBankAction extends BaseAction {
         String interName = "获取银行卡绑定验证码";
         String result = commonAction.httpRequest(toBankSms, JsonKit.bean2Json(bankSmsRequest), interName,actionBean.token);
         InsureBankBean.bankSmsResponse bankSmsResponse = JsonKit.json2Bean(result, InsureBankBean.bankSmsResponse.class);
+        if(bankSmsResponse.code!=200){
+            String reason = "";
+            if(bankSmsResponse.message!=null){
+                for (CheckParamsKit.Entry<String, String> stringStringEntry : bankSmsResponse.message) {
+                    reason = reason+","+stringStringEntry.details;
+                }
+            }
+            return json(BaseResponseBean.CODE_SUCCESS, interName+"接口请求成功 "+reason, response);
+        }
         //数据库添加记录
         bankVerify.verify_id = bankSmsResponse.data.requestId;
         bankVerify.verify_code = "";
@@ -282,7 +292,7 @@ public class InsureBankAction extends BaseAction {
         bankVerify.updated_at = date;
         long addBankVerifyRes = bankVerifyDao.addBankVerify(bankVerify);
         response.data = bankSmsResponse.data;
-        return json(BaseResponseBean.CODE_SUCCESS, "接口请求成功", response);
+        return json(BaseResponseBean.CODE_SUCCESS, interName+"接口请求成功", response);
     }
 
     /**

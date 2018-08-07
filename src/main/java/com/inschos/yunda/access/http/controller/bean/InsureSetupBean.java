@@ -67,4 +67,20 @@ public class InsureSetupBean {
     public static class doWechatContractResponse extends BaseResponseBean {
         public Object data;
     }
+
+    public static class accountInfoTokenResponse{
+        public accountInfoTokenResponseData data;
+    }
+
+    public static class accountInfoTokenResponseData{
+        public String name;
+        public String papersType;
+        public String papersCode;
+        public String papersStart;
+        public String papersEnd;
+        public int sex;
+        public String addressDetail;
+        public String phone;
+        public String email;
+    }
 }

@@ -49,7 +49,7 @@ public class InsureUserAction extends BaseAction {
     public InsureUserBean.userInfoResponse findUserInfoById(InsureUserBean.userInfoRequest request) {
         StaffPerson staffPerson = new StaffPerson();
         staffPerson.login_token = request.token;
-        logger.info("获取用户信息token："+request.token);
+        logger.info("获取用户信息token：" + request.token);
         InsureUserBean.userInfoResponse userInfoResponse = findUserInfoCommon(staffPerson);
         return userInfoResponse;
     }
@@ -77,62 +77,58 @@ public class InsureUserAction extends BaseAction {
      * @return
      */
     private InsureUserBean.userInfoResponse findUserInfoCommon(StaffPerson staffPerson) {
-        logger.info("获取用户信息公共参数："+JsonKit.bean2Json(staffPerson));
-        StaffPerson staffPersonInfo = staffPersonDao.findStaffPersonInfoByCode(staffPerson);
+        logger.info("获取用户信息公共参数：" + JsonKit.bean2Json(staffPerson));
+        StaffPerson staffPersonInfo = null;
+        if (staffPerson.phone != null) {
+            staffPersonInfo = staffPersonDao.findStaffPersonInfoByPhone(staffPerson);
+        } else if (staffPerson.papers_code != null) {
+            staffPersonInfo = staffPersonDao.findStaffPersonInfoByCode(staffPerson);
+        }
         InsureUserBean.userInfoResponse userInfoResponse = new InsureUserBean.userInfoResponse();
         String interName = "获取用户信息";
         InsureUserBean.userInfoResponseData userInfoResponseData = new InsureUserBean.userInfoResponseData();
-        logger.info("获取用户信息公共参数-查库："+JsonKit.bean2Json(staffPersonInfo));
-        if(staffPersonInfo != null&&staffPersonInfo.name!=null&&staffPersonInfo.papers_code!=null&&staffPersonInfo.phone!=null){
-            userInfoResponseData.id = staffPersonInfo.id;
-            userInfoResponseData.custId = staffPersonInfo.cust_id;
-            userInfoResponseData.accountUuid = staffPersonInfo.account_uuid;
-            userInfoResponseData.loginToken = staffPersonInfo.login_token;
+        logger.info("获取用户信息公共参数-查库：" + JsonKit.bean2Json(staffPersonInfo));
+        if (staffPersonInfo != null && staffPersonInfo.name != null && staffPersonInfo.papers_code != null && staffPersonInfo.phone != null) {
             userInfoResponseData.name = staffPersonInfo.name;
-            userInfoResponseData.papersType = staffPersonInfo.papers_type;
             userInfoResponseData.papersCode = staffPersonInfo.papers_code;
             userInfoResponseData.phone = staffPersonInfo.phone;
             userInfoResponseData.createdAt = staffPersonInfo.created_at;
             userInfoResponseData.updatedAt = staffPersonInfo.updated_at;
-        }else{
+            logger.info("返回个人信息(查库)："+JsonKit.bean2Json(userInfoResponseData));
+        } else {
             //没有查到用户信息,从接口里拿,然后插入数据同时返回
             InsureSetupBean.accountInfoRequest accountInfoRequest = new InsureSetupBean.accountInfoRequest();
-            InsureSetupBean.accountInfoResponse accountInfoResponse = new InsureSetupBean.accountInfoResponse();
             if (staffPerson.login_token == null) {
                 return userInfoResponse;
             }
-            String result = commonAction.httpRequest(toAccountInfo, "", interName,staffPerson.login_token);
-            accountInfoResponse = JsonKit.json2Bean(result, InsureSetupBean.accountInfoResponse.class);
+            String result = commonAction.httpRequest(toAccountInfo, "", interName, staffPerson.login_token);
+            InsureSetupBean.accountInfoTokenResponse accountInfoData = JsonKit.json2Bean(result, InsureSetupBean.accountInfoTokenResponse.class);
             //获取数据成功,数据入库 TODO 需要判断,数据库里没有的插入，数据库里已经有的执行更新操作
             long date = new Date().getTime();
-            staffPerson.cust_id = accountInfoResponse.data.custId;
-            staffPerson.account_uuid = accountInfoResponse.data.accountUuid;
-            staffPerson.login_token = accountInfoResponse.data.loginToken;
-            staffPerson.name = accountInfoResponse.data.name;
-            staffPerson.papers_code = accountInfoResponse.data.idCard;
-            staffPerson.phone = accountInfoResponse.data.phone;
+            staffPerson.name = accountInfoData.data.name;
+            staffPerson.papers_code = accountInfoData.data.papersCode;
+            staffPerson.phone = accountInfoData.data.phone;
             staffPerson.created_at = date;
             staffPerson.updated_at = date;
-            if(staffPersonInfo==null){
+            if (staffPersonInfo == null) {
                 long addRes = staffPersonDao.addStaffPerson(staffPerson);
                 if (addRes != 0) {
                     userInfoResponseData.id = addRes;
                 }
-            }else{
+            } else {
                 staffPerson.id = staffPerson.id;
                 long updateRes = staffPersonDao.updateStaffPerson(staffPerson);
                 userInfoResponseData.id = staffPersonInfo.id;
             }
-            userInfoResponseData.custId = staffPerson.cust_id;
-            userInfoResponseData.accountUuid = staffPerson.account_uuid;
-            userInfoResponseData.loginToken = staffPerson.login_token;
-            userInfoResponseData.name = staffPerson.name;
-            userInfoResponseData.papersType = staffPerson.papers_type;
-            userInfoResponseData.papersCode = staffPerson.papers_code;
-            userInfoResponseData.phone = staffPerson.phone;
-            userInfoResponseData.createdAt = staffPerson.created_at;
-            userInfoResponseData.updatedAt = staffPerson.updated_at;
+            logger.info("返回个人信息(接口)："+JsonKit.bean2Json(accountInfoData));
+            userInfoResponseData.name =  accountInfoData.data.name;
+            userInfoResponseData.papersCode =  accountInfoData.data.papersCode;
+            userInfoResponseData.phone =  accountInfoData.data.phone;
+            userInfoResponseData.createdAt = date;
+            userInfoResponseData.updatedAt = date;
+            logger.info("返回个人信息(接口)："+JsonKit.bean2Json(userInfoResponseData));
         }
+        logger.info("返回个人信息："+JsonKit.bean2Json(userInfoResponseData));
         userInfoResponse.data = userInfoResponseData;
         return userInfoResponse;
     }

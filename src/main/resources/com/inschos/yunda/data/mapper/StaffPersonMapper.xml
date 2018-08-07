@@ -38,7 +38,17 @@
         `cust_id`,`account_uuid`,`manager_uuid`,`name`,`papers_type`,`papers_code`,`phone`,`login_token`,`created_at`,`updated_at`
         from staff_person
         <where>
-            name =#{name} AND papers_type =#{papers_type} AND papers_code =#{papers_code} AND phone =#{phone}
+           papers_code =#{papers_code}
+        </where>
+        limit 1;
+    </select>
+
+    <select id="findStaffPersonInfoByPhone" parameterType="StaffPerson" resultType="StaffPerson">
+        select
+        `cust_id`,`account_uuid`,`manager_uuid`,`name`,`papers_type`,`papers_code`,`phone`,`login_token`,`created_at`,`updated_at`
+        from staff_person
+        <where>
+           phone =#{phone}
         </where>
         limit 1;
     </select>

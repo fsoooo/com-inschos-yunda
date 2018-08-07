@@ -33,4 +33,8 @@ public class StaffPersonDao {
     public StaffPerson findStaffPersonInfoByCode(StaffPerson staffPerson) {
         return staffPersonMapper.findStaffPersonInfoByCode(staffPerson);
     }
+
+    public StaffPerson findStaffPersonInfoByPhone(StaffPerson staffPerson) {
+        return staffPersonMapper.findStaffPersonInfoByPhone(staffPerson);
+    }
 }
