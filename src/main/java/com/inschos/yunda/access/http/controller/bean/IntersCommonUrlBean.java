@@ -57,7 +57,7 @@ public class IntersCommonUrlBean {
 
     //4.交易服务-保单接口
     //获取投保结果
-    public static final String toInsureResult = IntersCommonUrlBean.getServerHostInsure() + "/";
+    public static final String toWarrantyResult = IntersCommonUrlBean.getServerHostInsure() + "/query";
     //获取保单列表
     public static final String toWarrantyList = IntersCommonUrlBean.getServerHostInsure() + "/trade/get_insurance_policy_list_for_online_store";
     //获取保单详情

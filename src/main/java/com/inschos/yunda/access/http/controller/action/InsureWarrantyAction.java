@@ -103,18 +103,15 @@ public class InsureWarrantyAction extends BaseAction {
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
+        String loginToken = actionBean.token;
         WarrantyRecord warrantyRecord = new WarrantyRecord();
         warrantyRecord.cust_id = Long.valueOf(actionBean.userId);
         warrantyRecord.day_start = TimeKit.currentTimeMillis();//获取当前时间戳(毫秒值)
         warrantyRecord.day_end = TimeKit.getDayEndTime();//获取当天结束时间戳(毫秒值)
+        //TODO 获取当天的投保单(最新一条保单记录)
         WarrantyRecord insureResult = warrantyRecordDao.findInsureResult(warrantyRecord);
         if (insureResult == null) {
-            InsureWarrantyBean.insureResultRequest insureResultRequest = new InsureWarrantyBean.insureResultRequest();
-            String interName = "获取投保结果";
-            String result = commonAction.httpRequest(toInsureResult, JsonKit.bean2Json(insureResultRequest), interName,actionBean.token);
-            InsureWarrantyBean.insureResultResponse insureResultResponse = JsonKit.json2Bean(result, InsureWarrantyBean.insureResultResponse.class);
-            response.data = insureResultResponse.data;
-            return json(BaseResponseBean.CODE_SUCCESS, interName + "成功", response);
+            return json(BaseResponseBean.CODE_SUCCESS,  "没有投保记录", response);
         } else {
             InsureResultBean insureResultBean = new InsureResultBean();
             insureResultBean.id = insureResult.id;
