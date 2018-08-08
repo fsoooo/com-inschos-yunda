@@ -86,6 +86,6 @@ public class BankController {
     @RequestMapping("/doBankAuthorize/**")
     @ResponseBody
     public String doBankAuthorize(ActionBean actionBean) {
-        return bankAction.doBankAuthorize(actionBean);
+        return bankAction.findBankAuthorize(actionBean);
     }
 }

@@ -601,7 +601,7 @@ public class IntersAction extends BaseAction {
      */
     private InusrePayBean.payBankResponse doPayBank(JointLoginBean.Requset request) {
         String interName = "交易服务-银行卡服务";
-        String result = commonAction.httpRequest(toPayBank, JsonKit.bean2Json(request), interName,request.token);
+        String result = commonAction.httpRequest(toAuthorizeQuery, JsonKit.bean2Json(request), interName,request.token);
         InusrePayBean.payBankResponse bankResponse = JsonKit.json2Bean(result, InusrePayBean.payBankResponse.class);
         return bankResponse;
     }
