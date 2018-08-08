@@ -1,7 +1,9 @@
 package com.inschos.yunda.access.http.controller.request;
 
+import com.inschos.yunda.access.http.controller.action.TestAction;
 import com.inschos.yunda.annotation.*;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -19,7 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 public class TestController {
 
     private static final Logger logger = Logger.getLogger(TestController.class);
-
+    @Autowired
+    private TestAction testAction;
 
     @TestAnnotationBefore
     @RequestMapping("/aop/before/**")
@@ -55,6 +58,12 @@ public class TestController {
     @ResponseBody
     public String afterReturning(HttpServletRequest request) {
         return "add...........";
+    }
+
+    @RequestMapping("/call_back_yunda/**")
+    @ResponseBody
+    public String CallBackYunda(HttpServletRequest request){
+        return testAction.CallBackYunda(request);
     }
 
 }
