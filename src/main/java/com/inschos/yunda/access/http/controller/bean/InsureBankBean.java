@@ -54,10 +54,6 @@ public class InsureBankBean {
         public String bankCity;//银行卡开户城市
     }
 
-    public static class deleteBankStatusRequest {
-        public long id;//银行卡id
-    }
-
     public static class bankSmsRequest {
         public String origin = "YUNDA";//标识
         public String name;//用户姓名

@@ -217,6 +217,8 @@ public class InsureBankAction extends BaseAction {
      * 2.当只剩下一张银行卡时,不能取消授权
      * 3.当所有银行卡都取消授权,本地库要更改银行卡授权状态
      * 4.当改变默认使用银行卡时,要做银行卡短信验证,然后变更本地库
+     * 5.取消授权，需要请求删除接口
+     * 6.本地库记录默认使用银行卡，当默认使用银行卡改变是修改本地库
      *
      * @return
      * @params actionBean
@@ -275,7 +277,11 @@ public class InsureBankAction extends BaseAction {
             }
         }
         String interName = "更新银行卡状态";
-        String result = commonAction.httpRequest(toUpdateBank, JsonKit.bean2Json(updateBankStatusRequest), interName, actionBean.token);
+        String result = "";
+        if(request.bankAuthorizeStatus == 2){
+            result = commonAction.httpRequest(toDeleteBank, JsonKit.bean2Json(updateBankStatusRequest), interName, actionBean.token);
+
+        }
         BaseResponseBean bankStatusResponse = JsonKit.json2Bean(result, BaseResponseBean.class);
         //根据接口返回状态,修改本地库的银行卡授权状态
         if (request.bankUseStatus == 2) {
