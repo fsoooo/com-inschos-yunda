@@ -74,4 +74,18 @@ public class BankController {
     public String updateBankStatus(ActionBean actionBean) {
         return bankAction.updateBankStatus(actionBean);
     }
+
+
+    /**
+     * 银行卡授权操作
+     *
+     * @return
+     * @params actionBean
+     */
+    @GetActionBeanAnnotation
+    @RequestMapping("/doBankAuthorize/**")
+    @ResponseBody
+    public String doBankAuthorize(ActionBean actionBean) {
+        return bankAction.doBankAuthorize(actionBean);
+    }
 }

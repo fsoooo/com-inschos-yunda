@@ -78,44 +78,4 @@ public class InsureSetupController {
     public String findWhetContractUrl(ActionBean actionBean) {
         return insureSetupAction.findWhetContractUrl(actionBean);
     }
-
-    /**
-     * 获取微信免密授权书详情
-     *
-     * @return json
-     * @params actionBean
-     * @access public
-     */
-    @GetActionBeanAnnotation
-    @RequestMapping("/findWhetContractInfo/**")
-    @ResponseBody
-    public String findWhetContractInfo(ActionBean actionBean) {
-        return insureSetupAction.findWhetContractInfo(actionBean);
-    }
-
-    /**
-     * 获取银行卡转账授权书详情
-     *
-     * @return
-     * @params actionBean
-     */
-    @GetActionBeanAnnotation
-    @RequestMapping("/findBankAuthorizeInfo/**")
-    @ResponseBody
-    public String findBankAuthorizeInfo(ActionBean actionBean) {
-        return insureSetupAction.findBankAuthorizeInfo(actionBean);
-    }
-
-    /**
-     * 银行卡授权操作
-     *
-     * @return
-     * @params actionBean
-     */
-    @GetActionBeanAnnotation
-    @RequestMapping("/doBankAuthorize/**")
-    @ResponseBody
-    public String doBankAuthorize(ActionBean actionBean) {
-        return insureSetupAction.doBankAuthorize(actionBean);
-    }
 }

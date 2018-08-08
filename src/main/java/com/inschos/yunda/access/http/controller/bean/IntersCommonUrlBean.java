@@ -48,12 +48,6 @@ public class IntersCommonUrlBean {
     //3.交易服务-授权签约接口
     //授权查询(银行卡+微信)
     public static final String toAuthorizeQuery = IntersCommonUrlBean.getServerHostInsure() + "/bank/getUsedPayInfo";
-    //获取支付银行卡信息
-    public static final String toPayBank = IntersCommonUrlBean.getServerHostInsure() + "/";
-    //执行银行卡授权
-    public static final String toBankAuthorize = IntersCommonUrlBean.getServerHostInsure() + "/";
-    //微信签约
-    public static final String toWechatContract = IntersCommonUrlBean.getServerHostInsure() + "/";
 
     //4.交易服务-保单接口
     //获取投保结果
@@ -76,8 +70,8 @@ public class IntersCommonUrlBean {
     public static final String toDeleteBank = IntersCommonUrlBean.getServerHostInsure() + "/bank/remove";
     //获取银行卡短信验证码
     public static final String toBankSms = IntersCommonUrlBean.getServerHostInsure() + "/bank/applyAuth";
-    //校验银行卡短信验证码
-    public static final String toVerifyBankSms = IntersCommonUrlBean.getServerHostInsure() + "/bank/confirmAuth";
+    //银行卡授权操作
+    public static final String toBankAuthorize = IntersCommonUrlBean.getServerHostInsure() + "/bank/confirmAuth";
 
     //5.交易服务-理赔服务接口(英大/泰康)
 

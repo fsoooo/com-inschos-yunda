@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+import static com.inschos.yunda.access.http.controller.bean.IntersCommonUrlBean.toAuthorizeQuery;
+
 @Component
 public class InsureSetupAction extends BaseAction {
 
@@ -115,8 +117,9 @@ public class InsureSetupAction extends BaseAction {
         BaseResponseBean response = new BaseResponseBean();
         CommonBean.findAuthorizeRequset authorizeRequset = new CommonBean.findAuthorizeRequset();
         authorizeRequset.token = actionBean.token;
-        CommonBean.findAuthorizeResponse authorizeResponse = commonAction.findWechatContractStatus(authorizeRequset);
-        response.data = authorizeResponse.data;
+        String interName = "获取授权/签约状态";
+        String result = commonAction.httpRequest(toAuthorizeQuery, "", interName, authorizeRequset.token);
+        response.data = result;
         return json(BaseResponseBean.CODE_SUCCESS, "获取授权/签约状态成功", response);
     }
 
@@ -132,6 +135,7 @@ public class InsureSetupAction extends BaseAction {
         if (request == null) {
             return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
         }
+        String token = actionBean.token;
         WarrantyRecord warrantyRecord = new WarrantyRecord();
         warrantyRecord.cust_id = Long.valueOf(actionBean.userId);
         //前一天的保单信息
@@ -153,77 +157,9 @@ public class InsureSetupAction extends BaseAction {
         doWecahtContractRequset.insuredName = userInfoResponse.data.name;
         doWecahtContractRequset.insuredCode = userInfoResponse.data.papersCode;
         doWecahtContractRequset.insuredPhone = userInfoResponse.data.phone;
-        CommonBean.doWecahtContractResponse doWecahtContractResponse = commonAction.doWechatContract(doWecahtContractRequset);
-        response.data = doWecahtContractResponse.data;
+        String interName = "获取签约链接";
+        String result = commonAction.httpRequest(toAuthorizeQuery, JsonKit.bean2Json(doWecahtContractRequset), interName, token);
+        response.data = result;
         return json(BaseResponseBean.CODE_SUCCESS, "获取签约信息成功", response);
-    }
-
-    /**
-     * 获取微信免密授权书详情(获取用户信息)
-     *
-     * @param actionBean
-     * @return
-     */
-    public String findWhetContractInfo(ActionBean actionBean) {
-        BaseResponseBean response = new BaseResponseBean();
-        InsureUserBean.userInfoRequest userInfoRequest = new InsureUserBean.userInfoRequest();
-        userInfoRequest.token = actionBean.token;
-        InsureUserBean.userInfoResponse userInfoResponse = insureUserAction.findUserInfoById(userInfoRequest);
-        response.data = userInfoResponse.data;
-        return json(BaseResponseBean.CODE_SUCCESS, "获取微信免密授权书详情成功", response);
-    }
-
-    /**
-     * 获取银行卡转账授权书详情(获取用户信息)
-     *
-     * @return
-     * @params actionBean
-     */
-    public String findBankAuthorizeInfo(ActionBean actionBean) {
-        BaseResponseBean response = new BaseResponseBean();
-        InsureUserBean.userInfoRequest userInfoRequest = new InsureUserBean.userInfoRequest();
-        userInfoRequest.token = actionBean.token;
-        InsureUserBean.userInfoResponse userInfoResponse = insureUserAction.findUserInfoById(userInfoRequest);
-        response.data = userInfoResponse.data;
-        return json(BaseResponseBean.CODE_SUCCESS, "获取银行卡转账授权书详情成功", response);
-    }
-
-    /**
-     * 银行卡授权操作
-     *
-     * @return
-     * @params actionBean
-     */
-    public String doBankAuthorize(ActionBean actionBean) {
-        InsureSetupBean.doBankAuthorizeRequest request = JsonKit.json2Bean(actionBean.body, InsureSetupBean.doBankAuthorizeRequest.class);
-        BaseResponseBean response = new BaseResponseBean();
-        if (request == null) {
-            return json(BaseResponseBean.CODE_FAILURE, "参数解析失败", response);
-        }
-        CommonBean.doBankAuthorizeRequset doBankAuthorizeRequset = new CommonBean.doBankAuthorizeRequset();
-        doBankAuthorizeRequset.token = actionBean.token;
-        doBankAuthorizeRequset.name = request.name;
-        doBankAuthorizeRequset.bankCode = request.bankCode;
-        doBankAuthorizeRequset.phone = request.phone;
-        if (request.verifyId == null) {
-            InsureBankBean.bankVerifyIdRequest bankVerifyIdRequest = new InsureBankBean.bankVerifyIdRequest();
-            bankVerifyIdRequest.cust_id = Long.valueOf(actionBean.userId);
-            bankVerifyIdRequest.bank_code = request.bankCode;
-            bankVerifyIdRequest.bank_phone = request.phone;
-            request.verifyId = insureBankAction.findBankVerifyId(bankVerifyIdRequest);
-        }
-        doBankAuthorizeRequset.requestId = request.verifyId;
-        doBankAuthorizeRequset.vdCode = request.verifyCode;
-        //检验短信验证码
-        InsureBankBean.bankRequest verifyBankSmsRequest = new InsureBankBean.bankRequest();
-        verifyBankSmsRequest.verifyId = request.verifyId;
-        verifyBankSmsRequest.verifyCode = request.verifyCode;
-        InsureBankBean.verifyBankSmsResponse verifyBankSmsResponse = insureBankAction.verifyBankSms(verifyBankSmsRequest);
-        if (!verifyBankSmsResponse.data.verifyStatus) {
-            return json(BaseResponseBean.CODE_FAILURE, "短信验证码校验失败", response);
-        }
-        CommonBean.doBankAuthorizeResponse doBankAuthorizeResponse = commonAction.doBankAuthorize(doBankAuthorizeRequset);
-        response.data = doBankAuthorizeResponse.data;
-        return json(BaseResponseBean.CODE_SUCCESS, "银行卡授权成功", response);
     }
 }

@@ -56,43 +56,4 @@ public class CommonAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, interName + "接口请求失败", response);
         }
     }
-
-    /**
-     * 获取授权/签约状态
-     *
-     * @param request
-     * @return
-     */
-    public CommonBean.findAuthorizeResponse findWechatContractStatus(CommonBean.findAuthorizeRequset request) {
-        String interName = "获取授权/签约状态";
-        String result = httpRequest(toAuthorizeQuery, "", interName, request.token);
-        CommonBean.findAuthorizeResponse authorizeResponse = JsonKit.json2Bean(result, CommonBean.findAuthorizeResponse.class);
-        return authorizeResponse;
-    }
-
-    /**
-     * 执行微信签约操作(获取微信签约URL)
-     *
-     * @param request
-     * @return
-     */
-    public CommonBean.doWecahtContractResponse doWechatContract(CommonBean.doWecahtContractRequset request) {
-        String interName = "执行微信签约操作";
-        String result = httpRequest(toWechatContract, JsonKit.bean2Json(request), interName, request.token);
-        CommonBean.doWecahtContractResponse response = JsonKit.json2Bean(result, CommonBean.doWecahtContractResponse.class);
-        return response;
-    }
-
-    /**
-     * 执行银行卡授权
-     *
-     * @param request
-     * @return
-     */
-    public CommonBean.doBankAuthorizeResponse doBankAuthorize(CommonBean.doBankAuthorizeRequset request) {
-        String interName = "执行银行卡授权";
-        String result = httpRequest(toBankAuthorize, JsonKit.bean2Json(request), interName, request.token);
-        CommonBean.doBankAuthorizeResponse response = JsonKit.json2Bean(result, CommonBean.doBankAuthorizeResponse.class);
-        return response;
-    }
 }

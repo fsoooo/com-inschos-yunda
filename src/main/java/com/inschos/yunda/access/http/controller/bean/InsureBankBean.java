@@ -80,7 +80,7 @@ public class InsureBankBean {
         public String bank_phone;
     }
 
-    public static class verifyBankSmsRequest {
+    public static class doBankAuthorizeRequest {
         public String origin = "YUNDA";//标识
         public String Name;//用户姓名
         public String bankCode;//用户银行卡号
@@ -88,13 +88,14 @@ public class InsureBankBean {
         public String idCard;//用户身份证号
         public String requestId;//验证id
         public String vdCode;//验证码
+        public String token;
     }
 
-    public static class verifyBankSmsResponse extends BaseResponseBean {
-        public verifyBankSmsResponseData data;
+    public static class doBankAuthorizeResponse extends BaseResponseBean {
+        public doBankAuthorizeResponseData data;
     }
 
-    public static class verifyBankSmsResponseData {
+    public static class doBankAuthorizeResponseData {
         public boolean verifyStatus;
     }
 
