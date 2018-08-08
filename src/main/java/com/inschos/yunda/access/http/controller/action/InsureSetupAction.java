@@ -119,8 +119,13 @@ public class InsureSetupAction extends BaseAction {
         authorizeRequset.token = actionBean.token;
         String interName = "获取授权/签约状态";
         String result = commonAction.httpRequest(toAuthorizeQuery, "", interName, authorizeRequset.token);
-        response.data = result;
-        return json(BaseResponseBean.CODE_SUCCESS, "获取授权/签约状态成功", response);
+        CommonBean.findAuthorizeResponse authorizeResponse = JsonKit.json2Bean(result,CommonBean.findAuthorizeResponse.class);
+        if(authorizeResponse.code==200&&authorizeResponse.data!=null&&authorizeResponse.data.bank!=null&&authorizeResponse.data.weixin!=null){
+            response.data = result;
+            return json(BaseResponseBean.CODE_SUCCESS, interName+"成功", response);
+        }else{
+            return json(BaseResponseBean.CODE_FAILURE, interName+"失败", response);
+        }
     }
 
     /**
@@ -159,7 +164,12 @@ public class InsureSetupAction extends BaseAction {
         doWecahtContractRequset.insuredPhone = userInfoResponse.data.phone;
         String interName = "获取签约链接";
         String result = commonAction.httpRequest(toAuthorizeQuery, JsonKit.bean2Json(doWecahtContractRequset), interName, token);
-        response.data = result;
-        return json(BaseResponseBean.CODE_SUCCESS, "获取签约信息成功", response);
+        CommonBean.findAuthorizeResponse authorizeResponse = JsonKit.json2Bean(result,CommonBean.findAuthorizeResponse.class);
+        if(authorizeResponse.code==200&&authorizeResponse.data!=null&&authorizeResponse.data.bank!=null&&authorizeResponse.data.weixin!=null){
+            response.data = result;
+            return json(BaseResponseBean.CODE_SUCCESS, interName+"成功", response);
+        }else{
+            return json(BaseResponseBean.CODE_FAILURE, interName+"失败", response);
+        }
     }
 }
