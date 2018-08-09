@@ -127,15 +127,18 @@ public class InsureClaimYdAction extends BaseAction {
             return json(BaseResponseBean.CODE_FAILURE, "获取理赔申请页信息-保单信息失败", response);
         }
         InsureWarrantyBean.warrantyInfoResponse warrantyInfoResponse = JsonKit.json2Bean(warrantyRecordRes, InsureWarrantyBean.warrantyInfoResponse.class);
+        if(warrantyInfoResponse.code!=200||warrantyInfoResponse.data==null){
+            return json(BaseResponseBean.CODE_FAILURE, "获取理赔申请页信息-保单信息失败", response);
+        }
         InsureClaimBean.claimMaterialInfoResponse claimMaterialInfoResponse = new InsureClaimBean.claimMaterialInfoResponse();
         //TODO 保单数据还没做处理
         claimMaterialInfoResponse.claimType = claimType;
         claimMaterialInfoResponse.claimId = request.claimId;
         claimMaterialInfoResponse.insureName = claimRecordRes.name;
-        claimMaterialInfoResponse.insureDays = warrantyInfoResponse.data.toString();
-        claimMaterialInfoResponse.insurePrice = warrantyInfoResponse.data.toString();
-        claimMaterialInfoResponse.productName = warrantyInfoResponse.data.toString();
-        claimMaterialInfoResponse.warrantyCode = warrantyInfoResponse.data.toString();
+        claimMaterialInfoResponse.insureDays = warrantyInfoResponse.data.type;
+        claimMaterialInfoResponse.insurePrice = warrantyInfoResponse.data.premium;
+        claimMaterialInfoResponse.productName = "人身意外险";
+        claimMaterialInfoResponse.warrantyCode = warrantyInfoResponse.data.warrantyCode;
         response.data = claimMaterialInfoResponse;
         return json(BaseResponseBean.CODE_SUCCESS, "获取理赔申请页信息成功", response);
     }
@@ -231,10 +234,13 @@ public class InsureClaimYdAction extends BaseAction {
         }
         InsureWarrantyBean.warrantyInfoResponse warrantyInfoResponse = JsonKit.json2Bean(warrantyRecordRes, InsureWarrantyBean.warrantyInfoResponse.class);
         claimVerifyResponse.productName = "英大快递保";
-        claimVerifyResponse.insureStart = warrantyInfoResponse.data.toString();
-        claimVerifyResponse.insureEnd = warrantyInfoResponse.data.toString();
-        claimVerifyResponse.warrantyCode = warrantyInfoResponse.data.toString();
-        claimVerifyResponse.insurePrice = warrantyInfoResponse.data.toString();
+        if(warrantyInfoResponse.code!=200||warrantyInfoResponse.data==null){
+            return json(BaseResponseBean.CODE_FAILURE, "获取理赔申请页信息-保单信息失败", response);
+        }
+        claimVerifyResponse.insureStart = warrantyInfoResponse.data.startTimeText;
+        claimVerifyResponse.insureEnd = warrantyInfoResponse.data.endTimeText;
+        claimVerifyResponse.warrantyCode = warrantyInfoResponse.data.warrantyCode;
+        claimVerifyResponse.insurePrice = warrantyInfoResponse.data.premium;
         //获取理赔资料
         claimVerifyResponse.claimApplication = claimVerifyRes.claimInfo.claim_application;
         claimVerifyResponse.medicalInformation = claimVerifyRes.claimInfo.medical_information;
