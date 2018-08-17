@@ -3,10 +3,7 @@ package com.inschos.yunda.access.http.controller.action;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.inschos.yunda.access.http.controller.bean.*;
 import com.inschos.yunda.annotation.CheckParamsKit;
-import com.inschos.yunda.assist.kit.Base64Kit;
-import com.inschos.yunda.assist.kit.HttpKit;
-import com.inschos.yunda.assist.kit.JsonKit;
-import com.inschos.yunda.assist.kit.TimeKit;
+import com.inschos.yunda.assist.kit.*;
 import com.inschos.yunda.data.dao.JointLoginDao;
 import com.inschos.yunda.data.dao.StaffPersonDao;
 import com.inschos.yunda.data.dao.WarrantyRecordDao;
@@ -18,11 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import sun.security.provider.MD5;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.lang.reflect.Field;
+import java.util.*;
 
 import static com.inschos.yunda.access.http.controller.bean.IntersCommonUrlBean.*;
 
@@ -295,6 +292,7 @@ public class IntersAction extends BaseAction {
         callbackYundaRequest.status = request.status;
         callbackYundaRequest.ordersName = request.ordersName;
         callbackYundaRequest.companyName = request.companyName;
+        callbackYundaRequest.sign = getSign(callbackYundaRequest);
         String interName = "投保信息推送韵达";
         String result = commonAction.httpRequest(toCallBackYunda, JsonKit.bean2Json(callbackYundaRequest), interName,token);
         CallbackYundaBean.ResponseData responseData = JsonKit.json2Bean(result,CallbackYundaBean.ResponseData.class);
@@ -677,5 +675,40 @@ public class IntersAction extends BaseAction {
             }
         }
         return cust_id;
+    }
+
+    /**
+     * 获取sign(韵达推送数据)
+     * @return
+     */
+    private String getSign(CallbackYundaBean.Requset requset){
+        Field[] fields = requset.getClass().getFields();
+        List<String> list = new ArrayList<>();
+        Map<String,Object> map = new HashMap<>();
+        for (Field field : fields) {
+            if(field.isAccessible()){
+                String name = field.getName();
+                list.add(name);
+                try {
+                    Object  value = field.get(requset);
+                    map.put(name,value);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        String appSecret = "yundabm";
+        // 参数名排序
+        Collections.sort(list);
+        // 连接参数value
+        StringBuffer stb = new StringBuffer();
+        for (String str : list) {
+            stb.append(map.get(str));
+        }
+        // 加签名key
+        stb.append(appSecret);
+        String sign = "";
+        sign = MD5Kit.MD5Digest(stb.toString());
+        return sign;
     }
 }

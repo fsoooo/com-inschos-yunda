@@ -11,6 +11,7 @@ public class CallbackYundaBean {
         public String status;//保单状态 10
         public String ordersName;//保单名称 32
         public String companyName;//保险公司名称 32
+        public String sign;//签名 64
     }
 
     public static class Response extends BaseResponseBean {
