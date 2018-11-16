@@ -3,7 +3,10 @@ package com.inschos.yunda.access.http.controller.action;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.inschos.yunda.access.http.controller.bean.*;
 import com.inschos.yunda.annotation.CheckParamsKit;
-import com.inschos.yunda.assist.kit.*;
+import com.inschos.yunda.assist.kit.Base64Kit;
+import com.inschos.yunda.assist.kit.HttpKit;
+import com.inschos.yunda.assist.kit.JsonKit;
+import com.inschos.yunda.assist.kit.TimeKit;
 import com.inschos.yunda.data.dao.JointLoginDao;
 import com.inschos.yunda.data.dao.StaffPersonDao;
 import com.inschos.yunda.data.dao.WarrantyRecordDao;
@@ -15,10 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import sun.security.provider.MD5;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Field;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 import static com.inschos.yunda.access.http.controller.bean.IntersCommonUrlBean.*;
@@ -63,14 +67,14 @@ public class IntersAction extends BaseAction {
         }
         //TODO 联合登录触发账号服务
         JointLoginBean.AccountResponse accountResponse = doAccount(request);
-        if (accountResponse==null||accountResponse.code != 200||accountResponse.data==null) {
+        if (accountResponse == null || accountResponse.code != 200 || accountResponse.data == null) {
             String reason = "";
-            if(accountResponse.message!=null){
+            if (accountResponse.message != null) {
                 for (CheckParamsKit.Entry<String, String> stringStringEntry : accountResponse.message) {
-                    reason = reason+stringStringEntry.details;
+                    reason = reason + stringStringEntry.details;
                 }
             }
-            return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败"+" "+reason, response);
+            return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败" + " " + reason, response);
         }
         //TODO 成功获取联合登录信息
         String loginToken = accountResponse.data.token;
@@ -79,16 +83,16 @@ public class IntersAction extends BaseAction {
         request.token = loginToken;
         //TODO 查询授权/签约详情(此接口还需判断用户是否有可用银行卡)
         CommonBean.findAuthorizeResponse authorizeResponse = doAuthorizeRes(request);
-        if (authorizeResponse==null||authorizeResponse.code != 200) {
+        if (authorizeResponse == null || authorizeResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, "查询授权/签约接口请求失败,查询授权/签约详情失败", response);
         }
         JointLoginBean.ResponseData returnResponseData = new JointLoginBean.ResponseData();
         //TODO 判断授权情况,返回相应参数(URL+token) 01未授权/02已授权
-        if (authorizeResponse.data==null||authorizeResponse.data.bank==null) {
+        if (authorizeResponse.data == null || authorizeResponse.data.bank == null) {
             returnResponseData.status = "01";
             returnResponseData.content = "开启快递保免密支付,每日出行有保障>>";
-            returnResponseData.target_url = toDOBankAuthorize+"?token="+loginToken;
-            returnResponseData.local_url = toInsureCenter+"?token="+loginToken;
+            returnResponseData.target_url = toDOBankAuthorize + "?token=" + loginToken;
+            returnResponseData.local_url = toInsureCenter + "?token=" + loginToken;
             response.data = returnResponseData;
             //return json(BaseResponseBean.CODE_SUCCESS, "绑定银行卡,开启快递保免密支付,每日出行有保障>>", response);
         }
@@ -108,7 +112,7 @@ public class IntersAction extends BaseAction {
         //TODO 联合登录触发投保服务(先走英大,再走泰康流程)
         InsureParamsBean.Response insureResponse = new InsureParamsBean.Response();
         String insureResYd = doInsuredPayYd(request);
-        logger.info("英大投保结果"+insureResYd);
+        logger.info("英大投保结果" + insureResYd);
         insureResponse = JsonKit.json2Bean(insureResYd, InsureParamsBean.Response.class);
         if (insureResponse == null || insureResponse.code != 200) {
             //TODO 泰康流程
@@ -117,16 +121,16 @@ public class IntersAction extends BaseAction {
             if (insureResponse == null || insureResponse.code != 200) {
                 returnResponseData.status = "01";
                 returnResponseData.content = "今日快递保未生效,点击查看原因>>";
-                returnResponseData.target_url = toDoInsured+"?token="+loginToken;
-                returnResponseData.local_url = toInsureCenter+"?token="+loginToken;
+                returnResponseData.target_url = toDoInsured + "?token=" + loginToken;
+                returnResponseData.local_url = toInsureCenter + "?token=" + loginToken;
                 response.data = returnResponseData;
                 return json(BaseResponseBean.CODE_FAILURE, "今日快递保未生效,点击查看原因>>", response);
             }
         }
         returnResponseData.status = "01";
         returnResponseData.content = "今日快递保生效中>>";
-        returnResponseData.target_url = toInsureCenter+"?token="+loginToken;
-        returnResponseData.local_url = toInsureCenter+"?token="+loginToken;
+        returnResponseData.target_url = toInsureCenter + "?token=" + loginToken;
+        returnResponseData.local_url = toInsureCenter + "?token=" + loginToken;
         response.data = returnResponseData;
         return json(BaseResponseBean.CODE_SUCCESS, "今日快递保生效中>>", response);
     }
@@ -156,14 +160,14 @@ public class IntersAction extends BaseAction {
         }
         //TODO 联合登录触发账号服务
         JointLoginBean.AccountResponse accountResponse = doAccount(request);
-        if (accountResponse==null||accountResponse.code != 200||accountResponse.data==null) {
+        if (accountResponse == null || accountResponse.code != 200 || accountResponse.data == null) {
             String reason = "";
-            if(accountResponse.message!=null){
+            if (accountResponse.message != null) {
                 for (CheckParamsKit.Entry<String, String> stringStringEntry : accountResponse.message) {
-                    reason = reason+stringStringEntry.details;
+                    reason = reason + stringStringEntry.details;
                 }
             }
-            return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败"+" "+reason, response);
+            return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败" + " " + reason, response);
         }
         //TODO 成功获取联合登录信息
         String loginToken = accountResponse.data.token;
@@ -172,14 +176,14 @@ public class IntersAction extends BaseAction {
         request.token = loginToken;
         //TODO 查询授权/签约详情(此接口还需判断用户是否有可用银行卡)
         CommonBean.findAuthorizeResponse authorizeResponse = doAuthorizeRes(request);
-        if (authorizeResponse==null||authorizeResponse.code != 200) {
+        if (authorizeResponse == null || authorizeResponse.code != 200) {
             return json(BaseResponseBean.CODE_FAILURE, "查询授权/签约接口请求失败,查询授权/签约详情失败", response);
         }
         //TODO 判断授权情况,返回相应参数(URL+token) 01未授权/02已授权
-        if (authorizeResponse.data==null||authorizeResponse.data.bank==null) {
+        if (authorizeResponse.data == null || authorizeResponse.data.bank == null) {
             //TODO 返回参数
             authorizeQueryResponseData.status = "01";
-            authorizeQueryResponseData.url =  toDOBankAuthorize+"?token="+loginToken;
+            authorizeQueryResponseData.url = toDOBankAuthorize + "?token=" + loginToken;
             response.data = authorizeQueryResponseData;
             String responseText = "未授权";
             response.data = authorizeQueryResponseData;
@@ -211,15 +215,15 @@ public class IntersAction extends BaseAction {
         }
         Base64Kit base64Kit = new Base64Kit();
         String biz_content = base64Kit.getFromBase64(request.biz_content);
-        logger.info("预投保参数："+biz_content);
+        logger.info("预投保参数：" + biz_content);
         if (biz_content == null) {
             return json(BaseResponseBean.CODE_FAILURE, "预投保参数解析失败", response);
         }
         List<InsurePrepareBean.InsureRequest> insureRequests = JsonKit.json2Bean(biz_content, new TypeReference<List<InsurePrepareBean.InsureRequest>>() {
         });
-        logger.info("预投保参数："+JsonKit.bean2Json(insureRequests));
+        logger.info("预投保参数：" + JsonKit.bean2Json(insureRequests));
         for (InsurePrepareBean.InsureRequest insureRequest : insureRequests) {
-            logger.info("预投保参数："+JsonKit.bean2Json(insureRequest));
+            logger.info("预投保参数：" + JsonKit.bean2Json(insureRequest));
             JointLoginBean.Requset jointLoginRequest = new JointLoginBean.Requset();
             jointLoginRequest.channel_code = insureRequest.channel_code;
             jointLoginRequest.insured_name = insureRequest.channel_user_name;
@@ -237,14 +241,14 @@ public class IntersAction extends BaseAction {
             jointLoginRequest.channel_order_code = "";
             //TODO 请求 账号服务
             JointLoginBean.AccountResponse accountResponse = doAccount(jointLoginRequest);
-            if (accountResponse==null||accountResponse.code != 200||accountResponse.data==null) {
+            if (accountResponse == null || accountResponse.code != 200 || accountResponse.data == null) {
                 String reason = "";
-                if(accountResponse.message!=null){
+                if (accountResponse.message != null) {
                     for (CheckParamsKit.Entry<String, String> stringStringEntry : accountResponse.message) {
-                        reason = reason+stringStringEntry.details;
+                        reason = reason + stringStringEntry.details;
                     }
                 }
-                return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败"+" "+reason, response);
+                return json(BaseResponseBean.CODE_FAILURE, "账号服务接口请求失败,获取登录token失败" + " " + reason, response);
             }
             //TODO 成功获取联合登录信息
             String loginToken = accountResponse.data.token;
@@ -292,13 +296,21 @@ public class IntersAction extends BaseAction {
         callbackYundaRequest.status = request.status;
         callbackYundaRequest.ordersName = request.ordersName;
         callbackYundaRequest.companyName = request.companyName;
-        callbackYundaRequest.sign = getSign(callbackYundaRequest);
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("ordersId", request.ordersId);
+        params.put("payTime", request.payTime);
+        params.put("effectiveTime", request.effectiveTime);
+        params.put("type", request.type);
+        params.put("status", request.status);
+        params.put("ordersName", request.ordersName);
+        params.put("companyName", request.companyName);
+        callbackYundaRequest.sign = getSign(params);
         String interName = "投保信息推送韵达";
-        String result = commonAction.httpRequest(toCallBackYunda, JsonKit.bean2Json(callbackYundaRequest), interName,token);
-        CallbackYundaBean.ResponseData responseData = JsonKit.json2Bean(result,CallbackYundaBean.ResponseData.class);
-        if(responseData.result==true){
+        String result = commonAction.httpRequest(toCallBackYunda, JsonKit.bean2Json(callbackYundaRequest), interName, token);
+        CallbackYundaBean.ResponseData responseData = JsonKit.json2Bean(result, CallbackYundaBean.ResponseData.class);
+        if (responseData.result == true) {
             return json(BaseResponseBean.CODE_SUCCESS, "保险数据推送韵达成功", response);
-        }else{
+        } else {
             return json(BaseResponseBean.CODE_FAILURE, "保险数据推送韵达失败", response);
         }
     }
@@ -316,7 +328,7 @@ public class IntersAction extends BaseAction {
         jointLoginRequest.insured_code = request.insured_code;
         jointLoginRequest.insured_phone = request.insured_phone;
         String interName = "授权/签约查询";
-        String result = commonAction.httpRequest(toAuthorizeQuery, JsonKit.bean2Json(jointLoginRequest), interName,request.token);
+        String result = commonAction.httpRequest(toAuthorizeQuery, JsonKit.bean2Json(jointLoginRequest), interName, request.token);
         CommonBean.findAuthorizeResponse authorizeResponse = JsonKit.json2Bean(result, CommonBean.findAuthorizeResponse.class);
         return authorizeResponse;
     }
@@ -336,8 +348,8 @@ public class IntersAction extends BaseAction {
         staffPerson.papers_code = request.insured_code;
         staffPerson.phone = request.insured_phone;
         StaffPerson staffPersonInfo = staffPersonDao.findStaffPersonInfoByCode(staffPerson);
-        logger.info("账号服务查库："+JsonKit.bean2Json(staffPersonInfo));
-        logger.info("账号服务请求参数："+JsonKit.bean2Json(request));
+        logger.info("账号服务查库：" + JsonKit.bean2Json(staffPersonInfo));
+        logger.info("账号服务请求参数：" + JsonKit.bean2Json(request));
 //        if (staffPersonInfo != null) {
 //            accountResponse.code = 200;
 //            accountResponse.data.userId = staffPersonInfo.cust_id + "";
@@ -359,10 +371,10 @@ public class IntersAction extends BaseAction {
         jointLoginRequest.district = request.insured_county;
         jointLoginRequest.address = request.insured_address;
         String interName = "账号服务";
-        String result = commonAction.httpRequest(toJointLogin, JsonKit.bean2Json(jointLoginRequest), interName,request.token);
-        logger.info(interName+"返回数据："+result);
+        String result = commonAction.httpRequest(toJointLogin, JsonKit.bean2Json(jointLoginRequest), interName, request.token);
+        logger.info(interName + "返回数据：" + result);
         accountResponse = JsonKit.json2Bean(result, JointLoginBean.AccountResponse.class);
-        if(accountResponse.code==200&&accountResponse.data!=null){
+        if (accountResponse.code == 200 && accountResponse.data != null) {
             //TODO 获取数据成功,数据入库
             long date = new Date().getTime();
             staffPerson.cust_id = Long.valueOf(accountResponse.data.userId);
@@ -376,11 +388,11 @@ public class IntersAction extends BaseAction {
             staffPerson.updated_at = date;
             //插入之前要先判断
             StaffPerson staffPersonRepeat = staffPersonDao.findStaffPersonInfoByCode(staffPerson);
-            if(staffPersonRepeat==null){
+            if (staffPersonRepeat == null) {
                 long addRes = staffPersonDao.addStaffPerson(staffPerson);
             }
             return accountResponse;
-        }else{
+        } else {
             return accountResponse;
         }
     }
@@ -421,7 +433,7 @@ public class IntersAction extends BaseAction {
     private String doInsuredPay(JointLoginBean.Requset request, String p_code) {
         BaseResponseBean response = new BaseResponseBean();
         BaseResponseBean insuredCount = insuredCount(request);
-        logger.info("保单数量："+JsonKit.bean2Json(insuredCount));
+        logger.info("保单数量：" + JsonKit.bean2Json(insuredCount));
         if (insuredCount.code != 600) {
             //TODO 有投保记录
             return json(insuredCount);
@@ -429,7 +441,7 @@ public class IntersAction extends BaseAction {
         WarrantyRecord warrantyRecord = new WarrantyRecord();
         //TODO 调用投保接口
         InsureParamsBean.Response insureResponse = doInsured(request);
-        if(insureResponse.code==500){
+        if (insureResponse.code == 500) {
             return json(BaseResponseBean.CODE_FAILURE, "投保失败", response);
         }
         InsureParamsBean.ResponseData responseData = new InsureParamsBean.ResponseData();
@@ -516,7 +528,7 @@ public class IntersAction extends BaseAction {
      * @return
      */
     private InsureParamsBean.Response doInsured(JointLoginBean.Requset request) {
-        String endTime = TimeKit.getDayEndTime()+"";
+        String endTime = TimeKit.getDayEndTime() + "";
         String startTime = TimeKit.curTimeMillis2Str();
         //投保人基础信息
         InsureParamsBean.PolicyHolder policyHolder = new InsureParamsBean.PolicyHolder();
@@ -563,7 +575,7 @@ public class IntersAction extends BaseAction {
         insuredRequest.recognizees = recognizees;
         insuredRequest.beneficiary = policyHolder;
         String interName = "交易服务-投保接口";
-        String result = commonAction.httpRequest(toInsured, JsonKit.bean2Json(insuredRequest), interName,request.token);
+        String result = commonAction.httpRequest(toInsured, JsonKit.bean2Json(insuredRequest), interName, request.token);
         InsureParamsBean.Response insureResponse = JsonKit.json2Bean(result, InsureParamsBean.Response.class);
         return insureResponse;
     }
@@ -586,7 +598,7 @@ public class IntersAction extends BaseAction {
             insurePayRequest.bankData = bankResponse.data;
         }
         String interName = "交易服务-支付接口";
-        String result = commonAction.httpRequest(toPay, JsonKit.bean2Json(insurePayRequest), interName,jointLoginRequest.token);
+        String result = commonAction.httpRequest(toPay, JsonKit.bean2Json(insurePayRequest), interName, jointLoginRequest.token);
         InusrePayBean.Response insureResponse = JsonKit.json2Bean(result, InusrePayBean.Response.class);
         return insureResponse;
     }
@@ -599,7 +611,7 @@ public class IntersAction extends BaseAction {
      */
     private InusrePayBean.payBankResponse doPayBank(JointLoginBean.Requset request) {
         String interName = "交易服务-银行卡服务";
-        String result = commonAction.httpRequest(toAuthorizeQuery, JsonKit.bean2Json(request), interName,request.token);
+        String result = commonAction.httpRequest(toAuthorizeQuery, JsonKit.bean2Json(request), interName, request.token);
         InusrePayBean.payBankResponse bankResponse = JsonKit.json2Bean(result, InusrePayBean.payBankResponse.class);
         return bankResponse;
     }
@@ -679,36 +691,101 @@ public class IntersAction extends BaseAction {
 
     /**
      * 获取sign(韵达推送数据)
+     *
      * @return
      */
-    private String getSign(CallbackYundaBean.Requset requset){
-        Field[] fields = requset.getClass().getFields();
+    private String getSign(HashMap<String, String> params) {
         List<String> list = new ArrayList<>();
-        Map<String,Object> map = new HashMap<>();
-        for (Field field : fields) {
-            if(field.isAccessible()){
-                String name = field.getName();
-                list.add(name);
-                try {
-                    Object  value = field.get(requset);
-                    map.put(name,value);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
+        for (String key : params.keySet()) {
+            if (!key.equals("sign")) {
+                list.add(key);
             }
         }
-        String appSecret = "yundabm";
         // 参数名排序
         Collections.sort(list);
         // 连接参数value
         StringBuffer stb = new StringBuffer();
         for (String str : list) {
-            stb.append(map.get(str));
+            stb.append(params.get(str));
         }
+        String appSecret = "yundabm";
         // 加签名key
         stb.append(appSecret);
+        logger.info(stb.toString());
         String sign = "";
-        sign = MD5Kit.MD5Digest(stb.toString());
+        sign = stringToMD5(stb.toString());
+//        sign = MD5(stb.toString()).toLowerCase();
         return sign;
     }
+
+    /**
+     * MD5加密
+     *
+     * @param key
+     * @return
+     */
+    private String MD5(String key) {
+
+        char hexDigits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(key.getBytes());
+            byte[] tmp = md.digest();
+            char[] str = new char[16 * 2];
+
+            int k = 0;
+            for (int i = 0; i < 16; i++) {
+                byte byte0 = tmp[i];
+                str[k++] = hexDigits[byte0 >>> 4 & 0xf];
+                str[k++] = hexDigits[byte0 & 0xf];
+            }
+            return new String(str);
+        } catch (Exception e) {
+            return null;
+        }
+
+
+//        char hexDigits[] = {
+//                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+//        };
+//        try {
+//            byte[] btInput = key.getBytes();
+//            // 获得MD5摘要算法的 MessageDigest 对象
+//            MessageDigest mdInst = MessageDigest.getInstance("MD5");
+//            // 使用指定的字节更新摘要
+//            mdInst.update(btInput);
+//            // 获得密文
+//            byte[] md = mdInst.digest();
+//            // 把密文转换成十六进制的字符串形式
+//            int j = md.length;
+//            char str[] = new char[j * 2];
+//            int k = 0;
+//            for (int i = 0; i < j; i++) {
+//                byte byte0 = md[i];
+//                str[k++] = hexDigits[byte0 >>> 4 & 0xf];
+//                str[k++] = hexDigits[byte0 & 0xf];
+//            }
+//            return new String(str);
+//        } catch (Exception e) {
+//            return null;
+//        }
+    }
+
+
+    private String stringToMD5(String plainText) {
+        byte[] secretBytes = null;
+        try {
+            secretBytes = MessageDigest.getInstance("md5").digest(
+                    plainText.getBytes());
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("没有这个md5算法！");
+        }
+        String md5code = new BigInteger(1, secretBytes).toString(16);
+        for (int i = 0; i < 32 - md5code.length(); i++) {
+            md5code = "0" + md5code;
+        }
+        return md5code;
+    }
+
+
 }
